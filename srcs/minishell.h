@@ -84,6 +84,33 @@ typedef struct minis
 	int		exit_status;
 }	t_minis;
 
+
+// en cours
+void	add_token(char *line, t_type_token type_token, int len, t_token **token);
+void	parse_builtin(char *line);
+
+// quote est le premier caractere 
+int		check_quote_debut_ok(char *line); // verifier s'il y a 2 quotes pareils dans la chaine de caracteres
+int		check_2_quotes_debut_puis_fin(char *line); // fonction qui verifie (' ', '\0', reir, pipe) apres la 2e quote
+
+// quote au milieu
+int		check_quote_milieu_ok(char *line);
+char	caractere_quote_debut(char *line); // recuprer le caractere de la premiere quote
+int		index_quote_debut(char *line, char c); // recuperer l'index de la premiere quote 
+int		index_quote_fin(char *line, char c); // recuperer l'index de la deuxieme quote 
+int 	check_2_quotes_milieu_puis_fin(char *line); // fonction qui verifie (' ','\0', reir, pipe) apres la 2e quote
+
+// pour compter len type mot
+int		len_mot_total(char *line); // compter len du type mot (avec quote + sans quote)
+int		len_mot_avant_quote(char *line); // recuperer len avant la quote qui est au milieu de la chaine
+int		len_mot_2_quotes_entier(char *line); // compter le nombre de caracteres entre 2 quotes, y compris les 2 quotes
+int		len_mot_apres_quote(char *line); // recuperer len apres la 2e quote
+
+// pas de quote dans la chaine
+int		len_mot_sans_quote(char *line); // compter le nombre de caracteres s'il y a pas de 2 quotes qui fonctionnent
+
+
+
 // void	ft_echo(char *str, int option_n);
 // void	ft_env(char **env);
 // int		ft_export_all(char **tab, char ***env);

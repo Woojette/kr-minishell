@@ -1,26 +1,53 @@
 #include "minishell.h"
 
+// // On ajoute le token dans la structure t_token;
+// void add_token(char *line, t_type_token type_token, int len, t_token **token)
+// {
+// 	t_token *new;
+
+// 	new = malloc(sizeof(t_token));
+// 	if (!new)
+// 		return ; // Il faudra return une erreur
+// 	new->str = ft_strndup(line, len);	
+// 	new->type_token = type_token;
+// 	new->type_quote = GENERAL; // on va gerer plus tard ***
+// 	line += len; // demander a ma princesse (pour )
+
+// 	if (!token)
+// 	{
+// 		*token = new;
+// 		return;
+// 	}
+// 	while (token->next)
+// 		token = token->next; // On avance a la fin de la liste chainee
+// 	token->next = new;
+// }
+
 // On ajoute le token dans la structure t_token;
 void add_token(char *line, t_type_token type_token, int len, t_token **token)
 {
-	t_token *new;
+    t_token *new_node;
+    t_token *tmp;
 
-	new = malloc(sizeof(t_token));
-	if (!new)
-		return ; // Il faudra return une erreur
-	new->str = ft_strndup(line, len);	
-	new->type_token = type_token;
-	new->type_quote = GENERAL; // on va gerer plus tard ***
-	line += len; // demander a ma princesse (pour )
+    new_node = malloc(sizeof(t_token));
+    if (!new_node)
+        return ;
 
-	if (!token)
-	{
-		*token = new;
-		return;
-	}
-	while (token->next)
-		token = token->next; // On avance a la fin de la liste chainee
-	token->next = new;
+    new_node->str = ft_strndup(line, len);    
+    new_node->type_token = type_token;
+    new_node->type_quote = GENERAL;
+    new_node->type_bi = 0; // par defaut
+    new_node->next = NULL;
+
+    if (*token == NULL) // Si la liste est vide on met au debut
+        *token = new_node;
+    else
+    {
+        tmp = *token;
+        while (tmp->next)
+            tmp = tmp->next;
+        tmp->next = new_node;
+    }
 }
 
 // On parse pour les mots pour trouver les builtins, on ajoute dans la structure si on en trouve
@@ -42,7 +69,8 @@ void parse_builtin(char *line)
 		add_token(line, T_EXIT, 4);
 }
 
-int	ft_strlen_mot_sans_quote(char *line)
+// compter le nombre de caracteres s'il y a pas de 2 quotes qui fonctionnent
+int	len_mot_sans_quote(char *line)
 {
 	int	i;
 
@@ -55,41 +83,41 @@ int	ft_strlen_mot_sans_quote(char *line)
 	}
 	return (i);
 }
-int	ft_strlen_mot_avec_quote(char *line)
-{
-	int		i;
-	int		check_quote;
-	char	*temp;
+// int	len_mot_avec_quote(char *line)
+// {
+// 	int		i;
+// 	int		check_quote;
+// 	char	*temp;
 
-	line++;
-	temp = line;
-	i = 1;
-	check_quote = 1;
-	while (*line)
-	{
-		if ((*line) == '"' || (*line) == '\'')
-		{
-			i++;
-			check_quote++;
-			break ;
-		}
-		line++;
-		i++;
-	}
-	if (check_quote == 2)
-		return (i);
-	else if (check_quote == 1)
-	{
-		i = 1;
-		while ((*temp) != '>' && (*temp) != '<' && (*temp) != '|'
-			&& (*temp) != '"' && (*temp) != '\'')
-		{
-			temp++;
-			i++;
-		}
-		return (i);
-	}
-}
+// 	line++;
+// 	temp = line;
+// 	i = 1;
+// 	check_quote = 1;
+// 	while (*line)
+// 	{
+// 		if ((*line) == '"' || (*line) == '\'')
+// 		{
+// 			i++;
+// 			check_quote++;
+// 			break ;
+// 		}
+// 		line++;
+// 		i++;
+// 	}
+// 	if (check_quote == 2)
+// 		return (i);
+// 	else if (check_quote == 1)
+// 	{
+// 		i = 1;
+// 		while ((*temp) != '>' && (*temp) != '<' && (*temp) != '|'
+// 			&& (*temp) != '"' && (*temp) != '\'')
+// 		{
+// 			temp++;
+// 			i++;
+// 		}
+// 		return (i);
+// 	}
+// }
 
 // verifier s'il y a 2 quotes pareils dans la chaine de caracteres
 // on recupere le type du premier quote 
@@ -158,18 +186,21 @@ int check_2_quotes_debut_puis_fin(char *line)
 int	len_mot_2_quotes_entier(char *line)
 {
 	char	debut_quote; // recuperer la quote de premier caractere de la chaine
+	int		i;
 	int		len;
 
-	debut_quote = line[0];
+	debut_quote = caractere_quote_debut(line);
+	i = index_quote_debut(line, debut_quote) + 1;
 	len = 1;
-	while (line[len])
+	while (line[i])
 	{
-		if (line[len] == debut_quote)
+		if (line[i] == debut_quote)
 		{
 			len++;
 			break ;
 		}
 		len++;
+		i++;
 	}
 	return (len);
 }
@@ -260,6 +291,23 @@ int	index_quote_debut(char *line, char c)
 	return (i);
 }
 
+// recuperer l'index de la deuxieme quote 
+int	index_quote_fin(char *line, char c)
+{
+	int	i;
+	int	debut_quote;
+
+	debut_quote = index_quote_debut(line, c);
+	i = debut_quote + 1;
+	while (line[i])
+	{
+		if (line[i] == c)
+			break ;
+		i++;
+	}
+	return (i);
+}
+
 // fonction qui verifie l'espace (ou '\0', reir, pipe) apres la 2e quote
 // au cas ou le premier caractere ne commence pas par une quote
 int check_2_quotes_milieu_puis_fin(char *line)
@@ -293,6 +341,7 @@ int check_2_quotes_milieu_puis_fin(char *line)
 	return (0); // quotes puis caractere -> 0  ex) echo you"p"i
 }
 
+// recuperer len avant la quote qui est au milieu de la chaine
 int	len_mot_avant_quote(char *line)
 {
 	int		i;
@@ -303,10 +352,33 @@ int	len_mot_avant_quote(char *line)
 	debut_quote = caractere_quote_debut(line);
 	quote = index_quote_debut(line, debut_quote);
 	while (i < quote)
+		i++;
+	return (i); // ex) you"pi" (-> 3)
 }
 
-// compter len du type mot (avec quotes + sans quotes)
-int	len_mot(char *line)
+// recuperer len apres la 2e quote
+int	len_mot_apres_quote(char *line)
+{
+	int		i;
+	int		len_apres_quote;
+	char	quote;
+
+	quote = caractere_quote_debut(line);
+	i = index_quote_fin(line, quote) + 1;
+	len_apres_quote = 0;
+	while (line[i])
+	{
+		if (line[i] == ' ' || line[i] == '\0'
+			|| line[i] == '>' || line[i] == '<' || line[i] == '|')
+			break;
+		len_apres_quote++;
+		i++;
+	}
+	return (len_apres_quote);
+}
+
+// compter len du type mot (avec quote + sans quote)
+int	len_mot_total(char *line)
 {
 	int	len;
 
@@ -319,15 +391,23 @@ int	len_mot(char *line)
 			len = len_mot_2_quotes_entier(line); // calcule a partir de la 1e quote a la 2e quote  ex) "..."
 		// 1-2.  1) le premier caractere = quote   2) 2 quotes bien fermees   3) un caractere apres la 2e quote
 		else if (check_quote_debut_ok(line) == 1 && check_2_quotes_debut_puis_fin(line) == 0)
-			len = len_mot_2_quotes_entier(line) + len_mot_sans_quote(line); // ex) 'you'pi ->  strlen("'you'") + strlen("pi")
+			len = len_mot_2_quotes_entier(line) + len_mot_apres_quote(line); // ex) 'you'pi ->  strlen("'you'") + strlen("pi")
 		// 1-3.  1) le premier caractere = quote   2) 2 quotes pas fermees
 		else if (check_quote_debut_ok(line) == 0) // ex) ', ", "', '", "'', '"", "'''', '''", echo "hi, echo 'hi |
 			len = len_mot_sans_quote(line);
 	}
 	// 2. le cas ou le premier caractere ne commence pas par une quote (mais pas redir, ni pipe non plus)
 	else if (line[0] != '"' || line[0] != '\'')
-	{
-
+	{	// 2-1.  1) quote au milieu   2) 2 quotes bien fermees   3) fin (' ' ou '\0' ou redir ou pipe) apres la 2e quote
+		if (check_quote_milieu_ok(line) == 1 && check_2_quotes_milieu_puis_fin(line) == 1)
+			len = len_mot_avant_quote(line) + len_mot_2_quotes_entier(line);
+		// 2-2.  1) quote au milieu   2) 2 quotes bien fermees   3) un caractere apres la 2e quote
+		else if (check_quote_milieu_ok(line) == 1 && check_2_quotes_milieu_puis_fin(line) == 0)
+			len = len_mot_avant_quote(line) + len_mot_2_quotes_entier(line) + len_mot_apres_quote(line);
+		// 2-3.  1) quote au milieu   2) 2 quotes pas fermees
+		// 2-4.  1) pas de quote dans la chaine
+		else if (check_quote_milieu_ok(line) == 0)
+			len = len_mot_sans_quote(line); // s'il y a qu'une seule quote, on s'en fout, on considere la chaine comme s'il y a pas de quote
 	}
 }
 
@@ -365,13 +445,13 @@ void parse_input(char *line, t_token **token)
 		}
 		else if ((*line) != ' ' && (*line) != '\t' && (*line) != '"' && (*line) != '\'') // mot qui commence pas par quote
 		{
-			add_token(line, T_MOT, ft_strlen_mot_sans_quote(line));
-			line += ft_strlen_mot_sans_quote(line);
+			add_token(line, T_MOT, len_mot_sans_quote(line));
+			line += len_mot_sans_quote(line);
 		}
 		else if ((*line) == '"' || (*line) == '\'') // mot qui commence par quote
 		{
-			add_token(line, T_MOT, ft_strlen_mot_avec_quote(line));
-			line += ft_strlen_mot_avec_quote(line);
+			add_token(line, T_MOT, len_mot_avec_quote(line));
+			line += len_mot_avec_quote(line);
 		}
 		// else if (ft_isalpha(*line) == 1 || line == '"' || line == '\'') // builtin est toujours miniscule ***
 		// {
