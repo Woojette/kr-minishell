@@ -113,7 +113,7 @@ int	ft_check_quotes(char *line)
 	i = 0;
 	while (line[i])
 	{
-		if (line[i] == '"')
+		if (line[i] == '"' || line[i] == '\'')
 		{
 			quote = line[i];
 			i++;
@@ -126,6 +126,7 @@ int	ft_check_quotes(char *line)
 	}
 	return (1);
 }
+
 
 // verifier s'il y a 2 quotes pareils dans la chaine de caracteres
 // on recupere le type du premier quote 
@@ -431,7 +432,7 @@ int	len_mot_total(char *line)
 
 	len = 0;
 	// 1. le cas ou le premier caractere est une quote  ex) "hihi", "hihi, 'hihi', 'hihi, 'hi"hi, etc
-	if (line[0] == '"')
+	if (line[0] == '"' || line[0] == '\'')
 	{
 		// 1-1.  1) le premier caractere = quote   2) 2 quotes bien fermees   3) fin (' ' ou '\\0' ou redir ou pipe) apres la 2e quote
 		if (check_quote_debut_ok(line) == 1 && check_2_quotes_debut_puis_fin(line) == 1) // ex) echo "hihi" coucou,  echo "hihi", echo "hihi"| ~~~
@@ -444,8 +445,9 @@ int	len_mot_total(char *line)
 			len = len_mot_sans_quote(line);
 	}
 	// 2. le cas ou le premier caractere ne commence pas par une quote (mais pas redir, ni pipe non plus)
-	else if (line[0] != '"')
+	else if (line[0] != '"' || line[0] != '\'')
 	{
+
 		if (check_quote_milieu_ok(line) == 1 && check_avant_quote_espace(line) == 0 && check_2_quotes_milieu_puis_fin(line) == 1)
 		{
 			// printf("test  2-1a\\n");
@@ -454,13 +456,13 @@ int	len_mot_total(char *line)
 
 		else if (check_quote_milieu_ok(line) == 1 && check_avant_quote_espace(line) == 0 &&  check_2_quotes_milieu_puis_fin(line) == 0)
 		{
-			printf("test  2-2\\n");
+			// printf("test  2-2\\n");
 			len = len_mot_avant_quote(line) + len_mot_2_quotes_entier(line) + len_mot_apres_quote(line);
 		}
 
 		else if (check_avant_quote_espace(line) == 0 && check_quote_milieu_ok(line) == 0)
 		{
-			printf("test 2-3\\n");
+			// printf("test 2-3\\n");
 			len = len_mot_sans_quote(line);
 		}
 		else
