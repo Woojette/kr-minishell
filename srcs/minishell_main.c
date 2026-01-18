@@ -102,7 +102,7 @@ int	len_mot_sans_quote(char *line)
 	return (i);
 }
 
-// Verifie les quotes, dès qu’on croise un quote, on cherche sa paire
+// Verifie les quotes, dès qu’on croise une quote, on cherche sa paire
 // si on arrive a la fin avant = unclose quote
 // a verifier avant de commencer le parsing
 int	ft_check_quotes(char *line)
@@ -113,18 +113,18 @@ int	ft_check_quotes(char *line)
 	i = 0;
 	while (line[i])
 	{
-		if (line[i] == '"' || line[i] == '\'')
+		if (line[i] == '"' || line[i] == '\'') // si on croise une quote, on entre dans la boucle pour trouver une autre
 		{
-			quote = line[i];
-			i++;
-			while (line[i] && line[i] != quote)
+			quote = line[i]; // sauvegrader la premiere quote
+			i++; // puis, commencer a chercher la deuxieme
+			while (line[i] && line[i] != quote) // ce qui n'est pas une quote pareille que la premiere, on passe
 				i++;
-			if (!line[i]) // on est a la fin sans trouver la quote fermante
+			if (!line[i]) // on est a la fin sans trouver la quote fermante -> 0
 				return (0);
 		}
 		i++;
 	}
-	return (1);
+	return (1); // s'il y a 2 quotes bien fermees -> 1
 }
 
 
@@ -248,36 +248,7 @@ int	check_quote_milieu_ok(char *line)
 	return (0); // ex) echo you"pi''
 }
 
-// // verifier s'il y a un espace (ou '\0', redir, pipe) avant la quote au cas ou la quote est au milieu de la chaine
-// // ex) echo you"pi"
-// int	check_avant_quote_espace(char *line)
-// {
-// 	int		i;
-// 	int		pos_quote;
-// 	char	debut_quote;
-
-// 	if (!line || line[0] == '\0')
-// 		return (0);
-// 	i = 0;
-// 	if (caractere_quote_debut(line) == 0)
-// 		return (0); // s'il y a pas de quote, on retourne 0
-// 	debut_quote = caractere_quote_debut(line); // recuperer le type de la premiere quote
-// 	if (index_quote_debut(line, debut_quote) == 0)
-// 		return (0); // si la quote est au debut, on retourne 0
-// 	pos_quote = index_quote_debut(line, debut_quote); // recuperer l'index de la premiere quote
-// 	if (check_quote_milieu_ok(line) == 1)
-// 	{
-// 		while (i < pos_quote)
-// 		{
-// 			if (line[i] == ' '
-// 			|| line[i] == '>' || line[i] == '<' || line[i] == '|')
-// 				return (1); // ex) echo "pi" (<- 2 noeuds)
-// 			i++;
-// 		}
-// 	}
-// 	return (0);
-// }
-
+// verifier s'il y a un espace (redir, pipe) avant la premiere quote
 int check_avant_quote_espace(char *line)
 {
     int i;
@@ -285,23 +256,23 @@ int check_avant_quote_espace(char *line)
 
     if (!line || !*line)
         return 0;
-    // 첫 번째 quote 문자 찾기
+    // cherecher la premiere quote
     i = 0;
     while (line[i] && line[i] != '"' && line[i] != '\'')
         i++;
     if (!line[i])
-        return 0; // quote 없음
-    pos_quote = i;
-    if (pos_quote == 0)
-        return 1; // quote가 맨 앞
-    i = pos_quote - 1;
-    while (i >= 0)
+        return (0);
+    pos_quote = i;  // l'index de la premiere quote
+    if (pos_quote == 0) // s'il y a pas de quote dans la chaine, pas besoin de chercher
+        return (1);
+    i = pos_quote - 1; // avant la quote
+    while (i >= 0) // on cherche un espace (redir, pipe) jusqu'a tout au debut de la chaine
     {
         if (line[i] == ' ' || line[i] == '>' || line[i] == '<' || line[i] == '|')
             return 1;
         i--;
     }
-    return 0;
+    return (0);
 }
 
 // recuprer le caractere de la premiere quote
@@ -447,31 +418,31 @@ int	len_mot_total(char *line)
 	// 2. le cas ou le premier caractere ne commence pas par une quote (mais pas redir, ni pipe non plus)
 	else if (line[0] != '"' || line[0] != '\'')
 	{
-
+		// 2-1.  1) quote au milieu   2) 2 quotes bien fermees   3) apres quote ' ' ou redir ou pipe
 		if (check_quote_milieu_ok(line) == 1 && check_avant_quote_espace(line) == 0 && check_2_quotes_milieu_puis_fin(line) == 1)
 		{
 			// printf("test  2-1a\\n");
 			len = len_mot_avant_quote(line) + len_mot_2_quotes_entier(line);
 		}
-
+		// 2-2.  1) quote au milieu   2) 2 quotes bien fermees   3) caractere apres la 2e quote
 		else if (check_quote_milieu_ok(line) == 1 && check_avant_quote_espace(line) == 0 &&  check_2_quotes_milieu_puis_fin(line) == 0)
 		{
 			// printf("test  2-2\\n");
 			len = len_mot_avant_quote(line) + len_mot_2_quotes_entier(line) + len_mot_apres_quote(line);
 		}
-
-		else if (check_avant_quote_espace(line) == 0 && check_quote_milieu_ok(line) == 0)
+		// 2-3.  1) pas de quote
+		else if (check_quote_milieu_ok(line) == 0 && check_avant_quote_espace(line) == 0)
 		{
 			// printf("test 2-3\\n");
 			len = len_mot_sans_quote(line);
 		}
+		// 2-4. proteger au cas ou on sait jamais
 		else
 		{
-			printf("test 2-4\\n");
+			// printf("test 2-4\\n");
 			len = len_mot_sans_quote(line);
 		}
 	}
-
 	return (len);
 }
 
