@@ -56,10 +56,10 @@ typedef enum s_type_bi
 typedef struct s_token
 {
 
-	char			*str; // token = <<
+	char					*str; // token = <<
 	t_type_token	type_token; //= T_RD_HEREDOC
-	t_type_bi		type_bi; // type builtin
-	t_state			type_quote; // = GENERAL
+	t_type_bi			type_bi; // type builtin
+	t_state				type_quote; // = GENERAL
 	struct s_token	*next;
 }	t_token;
 
@@ -94,7 +94,6 @@ typedef struct minis
 // en cours
 
 void	parse_builtin(char *line);
-
 
 // ======================================================= token =======================================================
 
