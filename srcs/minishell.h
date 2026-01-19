@@ -106,7 +106,7 @@ int		check_quote_debut_ok(char *line); // verifier s'il y a 2 quotes pareils dan
 int		check_2_quotes_debut_puis_fin(char *line); // fonction qui verifie (' ', '\0', redir, pipe) apres la 2e quote
 
 // quote au milieu
-int		check_quotes(char *line); // Verifie les quotes, dès qu’on croise une quote, on cherche sa paire
+int		check_quotes(char *line); // Verifier une quote qui n'est pas fermee
 int		check_quote_milieu_ok(char *line);
 int 	check_avant_quote_espace(char *line); // verifier s'il y a espace avant la quote au milieu
 char	caractere_quote_debut(char *line); // recuprer le caractere de la premiere quote
