@@ -105,12 +105,14 @@ int	len_mot_sans_quote(char *line)
 // Verifie les quotes, dès qu’on croise une quote, on cherche sa paire
 // si on arrive a la fin avant = unclose quote
 // a verifier avant de commencer le parsing
-int	ft_check_quotes(char *line)
+int	check_quotes(char *line)
 {
 	int		i;
 	char	quote;
 
 	i = 0;
+	if (!line[i])
+		return (0);
 	while (line[i])
 	{
 		if (line[i] == '"' || line[i] == '\'') // si on croise une quote, on entre dans la boucle pour trouver une autre
@@ -121,6 +123,8 @@ int	ft_check_quotes(char *line)
 				i++;
 			if (!line[i]) // on est a la fin sans trouver la quote fermante -> 0
 				return (0);
+			else
+				return (1);
 		}
 		i++;
 	}
@@ -131,40 +135,100 @@ int	ft_check_quotes(char *line)
 // verifier s'il y a 2 quotes pareils dans la chaine de caracteres
 // on recupere le type du premier quote 
 // soit return (1); ex) " ", ' ',  " ' "  , soit return (0); ex)  ', ", "', '", "'', '"", "'''', '''"
+// int	check_quote_debut_ok(char *line) 
+// {
+	// char	debut_quote; // on recupere le type du premier quote ( " ou ' )
+	// int		nbr_dquote;
+	// int		nbr_squote;
+	// int		i; // l'index pour parcourir la chaine de caracteres
+// 
+	// nbr_dquote = 0;
+	// nbr_squote = 0;
+	// if (line[0] == '"') // si la chaine de caractere commence par double quote
+	// {
+		// debut_quote = 'd';
+		// nbr_dquote++;
+	// }
+	// else if (line[0] == '\'') // si la chaine de caractere commence par single quote
+	// {
+		// debut_quote = 's';
+		// nbr_squote++;
+	// }
+	// i = 1;
+	// while (line[i])
+	// {
+		// if (debut_quote == 'd' && line[i] == '"') // verifier le cas " "
+			// nbr_dquote++;
+		// else if (debut_quote == 's' && line[i] == '\'') // verifier le cas ' '
+			// nbr_squote++;
+		// if ((nbr_dquote == 2) || (nbr_squote == 2))
+			// break ;
+		// i++;
+	// }
+	// if ((nbr_dquote == 2) || (nbr_squote == 2)) // si " " ou ' ' -> return (1)
+		// return (1);
+	// return (0);
+// }
+
+// verifier s'il y a 2 quotes pareils dans la chaine de caracteres
+// on recupere le type du premier quote 
+// soit return (1); ex) " ", ' ',  " ' "  , soit return (0); ex)  ', ", "', '", "'', '"", "'''', '''"
 int	check_quote_debut_ok(char *line) 
 {
 	char	debut_quote; // on recupere le type du premier quote ( " ou ' )
-	int		nbr_dquote;
-	int		nbr_squote;
+	// int		nbr_dquote;
+	// int		nbr_squote;
+	int		compter_quote; // compter le nombre de quotes (qui est bien 2)
 	int		i; // l'index pour parcourir la chaine de caracteres
 
-	nbr_dquote = 0;
-	nbr_squote = 0;
-	if (line[0] == '"') // si la chaine de caractere commence par double quote
-	{
-		debut_quote = 'd';
-		nbr_dquote++;
-	}
-	else if (line[0] == '\'') // si la chaine de caractere commence par single quote
-	{
-		debut_quote = 's';
-		nbr_squote++;
-	}
+	// nbr_dquote = 0;
+	// nbr_squote = 0;
+	if (!line || (line[0] != '"' && line[0] != '\''))
+		return (0);
+	debut_quote = line[0];
+	if (line[0] == '"' || line[0] == '\'')
+		compter_quote = 1;
+	else
+		return (0);
 	i = 1;
 	while (line[i])
 	{
-		if (debut_quote == 'd' && line[i] == '"') // verifier le cas " "
-			nbr_dquote++;
-		else if (debut_quote == 's' && line[i] == '\'') // verifier le cas ' '
-			nbr_squote++;
-		if ((nbr_dquote == 2) || (nbr_squote == 2))
+		if (line[i] == debut_quote)
+		{
+			compter_quote++;
 			break ;
+		}
 		i++;
 	}
-	if ((nbr_dquote == 2) || (nbr_squote == 2)) // si " " ou ' ' -> return (1)
+	if (compter_quote == 2) // si " " ou ' ' -> return (1)
 		return (1);
 	return (0);
 }
+
+// // verifier s'il y a 2 quotes pareils dans la chaine de caracteres
+// // on recupere le type du premier quote 
+// // soit return (1); ex) " ", ' ',  " ' "  , soit return (0); ex)  ', ", "', '", "'', '"", "'''', '''"
+// int	check_quote_debut_ok(char *line) 
+// {
+//     char debut_quote;
+//     int i, quote_count;
+
+//     if (!line || (line[0] != '"' && line[0] != '\''))
+//         return 0; // 따옴표로 시작하지 않으면 OK
+
+//     debut_quote = line[0];
+//     quote_count = 1;
+//     i = 1;
+//     while (line[i]) {
+//         if (line[i] == debut_quote)
+//             quote_count++;
+//         if (quote_count == 2)
+//             return 1; // 정상적으로 닫힘
+//         i++;
+//     }
+//     // 여기까지 오면 닫는 따옴표가 없음
+//     return 0;
+// }
 
 // fonction qui verifie l'espace (ou '\0', reir, pipe) apres la 2e quote
 // au cas ou le premier caractere commence par une quote
@@ -327,7 +391,7 @@ int	index_quote_fin(char *line, char c)
 	return (i);
 }
 
-// fonction qui verifie l'espace (ou '\0', reir, pipe) apres la 2e quote
+// fonction qui verifie l'espace (ou '\0', redir, pipe) apres la 2e quote
 // au cas ou le premier caractere ne commence pas par une quote
 int check_2_quotes_milieu_puis_fin(char *line)
 {
@@ -352,6 +416,8 @@ int check_2_quotes_milieu_puis_fin(char *line)
 				break ;
 			i++;
 		}
+		if (compter_quote != 2) // pour proteger au cas ou il y a qu'une seule quote dans la chaine
+			return (0);
 		i++; // pour verifier le caractere apres la 2e quote
 		if (line[i] == ' ' || line[i] == '\0'
 			|| line[i] == '>' || line[i] == '<' || line[i] == '|') // si on a l'espace (ou '\0', redir, pipe) apres 2e quote -> 1
@@ -396,6 +462,56 @@ int	len_mot_apres_quote(char *line)
 	return (len_apres_quote);
 }
 
+// // compter len du type mot (avec quote + sans quote)
+// int	len_mot_total(char *line)
+// {
+	// int	len;
+// 
+	// len = 0;
+	// 1. le cas ou le premier caractere est une quote  ex) "hihi", "hihi, 'hihi', 'hihi, 'hi"hi, etc
+	// if (line[0] == '"' || line[0] == '\'')
+	// {
+		// 1-1.  1) le premier caractere = quote   2) 2 quotes bien fermees   3) fin (' ' ou '\\0' ou redir ou pipe) apres la 2e quote
+		// if (check_quote_debut_ok(line) == 1 && check_2_quotes_debut_puis_fin(line) == 1) // ex) echo "hihi" coucou,  echo "hihi", echo "hihi"| ~~~
+			// len = len_mot_2_quotes_entier(line); // calcule a partir de la 1e quote a la 2e quote  ex) "..."
+		// 1-2.  1) le premier caractere = quote   2) 2 quotes bien fermees   3) un caractere apres la 2e quote
+		// else if (check_quote_debut_ok(line) == 1 && check_2_quotes_debut_puis_fin(line) == 0)
+			// len = len_mot_2_quotes_entier(line) + len_mot_apres_quote(line); // ex) 'you'pi ->  strlen("'you'") + strlen("pi")
+		// 1-3.  1) le premier caractere = quote   2) 2 quotes pas fermees
+		// else if (check_quote_debut_ok(line) == 0) // ex) ', ", "', '", "'', '"", "'''', '''", echo "hi, echo 'hi |
+			// len = len_mot_sans_quote(line);
+	// }
+	// 2. le cas ou le premier caractere ne commence pas par une quote (mais pas redir, ni pipe non plus)
+	// else if (line[0] != '"' || line[0] != '\'')
+	// {
+		// 2-1.  1) quote au milieu   2) 2 quotes bien fermees   3) apres quote ' ' ou redir ou pipe
+		// if (check_quote_milieu_ok(line) == 1 && check_avant_quote_espace(line) == 0 && check_2_quotes_milieu_puis_fin(line) == 1)
+		// {
+			// // printf("test  2-1a\\n");
+			// len = len_mot_avant_quote(line) + len_mot_2_quotes_entier(line);
+		// }
+		// 2-2.  1) quote au milieu   2) 2 quotes bien fermees   3) caractere apres la 2e quote
+		// else if (check_quote_milieu_ok(line) == 1 && check_avant_quote_espace(line) == 0 &&  check_2_quotes_milieu_puis_fin(line) == 0)
+		// {
+			// // printf("test  2-2\\n");
+			// len = len_mot_avant_quote(line) + len_mot_2_quotes_entier(line) + len_mot_apres_quote(line);
+		// }
+		// 2-3.  1) pas de quote
+		// else if (check_quote_milieu_ok(line) == 0 && check_avant_quote_espace(line) == 0)
+		// {
+			// // printf("test 2-3\\n");
+			// len = len_mot_sans_quote(line);
+		// }
+		// 2-4. proteger au cas ou on sait jamais
+		// else
+		// {
+			// // printf("test 2-4\\n");
+			// len = len_mot_sans_quote(line);
+		// }
+	// }
+	// return (len);
+// }
+
 // compter len du type mot (avec quote + sans quote)
 int	len_mot_total(char *line)
 {
@@ -406,32 +522,32 @@ int	len_mot_total(char *line)
 	if (line[0] == '"' || line[0] == '\'')
 	{
 		// 1-1.  1) le premier caractere = quote   2) 2 quotes bien fermees   3) fin (' ' ou '\\0' ou redir ou pipe) apres la 2e quote
-		if (check_quote_debut_ok(line) == 1 && check_2_quotes_debut_puis_fin(line) == 1) // ex) echo "hihi" coucou,  echo "hihi", echo "hihi"| ~~~
+		if (check_quotes(line) == 1 && check_2_quotes_debut_puis_fin(line) == 1) // ex) echo "hihi" coucou,  echo "hihi", echo "hihi"| ~~~
 			len = len_mot_2_quotes_entier(line); // calcule a partir de la 1e quote a la 2e quote  ex) "..."
 		// 1-2.  1) le premier caractere = quote   2) 2 quotes bien fermees   3) un caractere apres la 2e quote
-		else if (check_quote_debut_ok(line) == 1 && check_2_quotes_debut_puis_fin(line) == 0)
+		else if (check_quotes(line) == 1 && check_2_quotes_debut_puis_fin(line) == 0)
 			len = len_mot_2_quotes_entier(line) + len_mot_apres_quote(line); // ex) 'you'pi ->  strlen("'you'") + strlen("pi")
 		// 1-3.  1) le premier caractere = quote   2) 2 quotes pas fermees
-		else if (check_quote_debut_ok(line) == 0) // ex) ', ", "', '", "'', '"", "'''', '''", echo "hi, echo 'hi |
+		else if (check_quotes(line) == 0) // ex) ', ", "', '", "'', '"", "'''', '''", echo "hi, echo 'hi |
 			len = len_mot_sans_quote(line);
 	}
 	// 2. le cas ou le premier caractere ne commence pas par une quote (mais pas redir, ni pipe non plus)
 	else if (line[0] != '"' || line[0] != '\'')
 	{
 		// 2-1.  1) quote au milieu   2) 2 quotes bien fermees   3) apres quote ' ' ou redir ou pipe
-		if (check_quote_milieu_ok(line) == 1 && check_avant_quote_espace(line) == 0 && check_2_quotes_milieu_puis_fin(line) == 1)
+		if (check_quotes(line) == 1 && check_avant_quote_espace(line) == 0 && check_2_quotes_milieu_puis_fin(line) == 1)
 		{
 			// printf("test  2-1a\\n");
 			len = len_mot_avant_quote(line) + len_mot_2_quotes_entier(line);
 		}
 		// 2-2.  1) quote au milieu   2) 2 quotes bien fermees   3) caractere apres la 2e quote
-		else if (check_quote_milieu_ok(line) == 1 && check_avant_quote_espace(line) == 0 &&  check_2_quotes_milieu_puis_fin(line) == 0)
+		else if (check_quotes(line) == 1 && check_avant_quote_espace(line) == 0 &&  check_2_quotes_milieu_puis_fin(line) == 0)
 		{
 			// printf("test  2-2\\n");
 			len = len_mot_avant_quote(line) + len_mot_2_quotes_entier(line) + len_mot_apres_quote(line);
 		}
 		// 2-3.  1) pas de quote
-		else if (check_quote_milieu_ok(line) == 0 && check_avant_quote_espace(line) == 0)
+		else if (check_quotes(line) == 0 && check_avant_quote_espace(line) == 0)
 		{
 			// printf("test 2-3\\n");
 			len = len_mot_sans_quote(line);
@@ -445,6 +561,7 @@ int	len_mot_total(char *line)
 	}
 	return (len);
 }
+
 
 // On parse tout pour trouver les operations ou les builtins
 // chaque noeud serait d'abord divise que par soit mot, soit redir, soit pipe  (cf. t_type token)
@@ -490,6 +607,7 @@ void parse_input(char *line, t_token **token)
 	}
 }
 
+// pour la condition de token
 void parse_fd_tokens(t_token **token)
 {
 	t_token	*temp;
@@ -500,35 +618,26 @@ void parse_fd_tokens(t_token **token)
 		if (temp->type_token == T_RD_IN)
 		{
 			if (temp->next && temp->next->type_token == T_MOT)
-			{
 				temp->next->type_token = T_FD_IN;
-			}
 		}
 		else if (temp->type_token == T_RD_OUT)
 		{
 			if (temp->next && temp->next->type_token == T_MOT)
-			{
 				temp->next->type_token = T_FD_OUT;
-			}
 		}
 		else if (temp->type_token == T_RD_APPEND)
 		{
 			if (temp->next && temp->next->type_token == T_MOT)
-			{
 				temp->next->type_token = T_FD_OUT_APPEND;
-			}
 		}
 		else if (temp->type_token == T_RD_HEREDOC)
 		{
 			if (temp->next && temp->next->type_token == T_MOT)
-			{
 				temp->next->type_token = T_FD_HEREDOC;
-			}
 		}
 		temp = temp->next;
 	}
 }
-
 
 int	main(int ac, char **av, char **env)
 {
