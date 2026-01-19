@@ -97,8 +97,15 @@ void	parse_builtin(char *line);
 
 // ======================================================= token =======================================================
 
-void	parse_input(char *line, t_token **token); // mettre des token a chaque noeud (mot, redir, pipe) 
+// parsing
 void	add_token(char *line, t_type_token type_token, int len, t_token **token); // ajouter des token dans la structure
+void	parse_input(char *line, t_token **token); // mettre des token a chaque noeud (mot, redir, pipe) 
+char	**split_input_par_pipe(char *line); // decouper des commandes par pipe
+
+// tester
+const char	*get_token_type_str(t_type_token type);
+char				*get_token_type_state(t_state state);
+
 
 // quote est le premier caractere 
 int		check_quote_debut_ok(char *line); // verifier s'il y a 2 quotes pareils dans la chaine de caracteres

@@ -43,9 +43,9 @@ void add_token(char *line, t_type_token type_token, int len, t_token **token)
 {
     t_token *new_node;
     t_token *tmp;
-		char		temp_quote;
+		// char		temp_quote;
 
-		temp_quote = 0;
+		// temp_quote = 0;
     new_node = malloc(sizeof(t_token));
     if (!new_node)
         return ;
@@ -53,17 +53,17 @@ void add_token(char *line, t_type_token type_token, int len, t_token **token)
     new_node->str = ft_strndup(line, len);    
     new_node->type_token = type_token;
     new_node->type_quote = GENERAL;
-		if (type_token == T_MOT)
-		{
-			if (check_quote_debut_ok(line) == 1 || check_quote_milieu_ok(line) == 1)
-			{
-				temp_quote = caractere_quote_debut(line);
-				if (temp_quote == '"')
-					new_node->type_quote = DQUOTES;
-				else if (temp_quote == '\'')
-					new_node->type_quote = SQUOTES;
-			}
-		}
+		// if (type_token == T_MOT)
+		// {
+		// 	if (check_quote_debut_ok(line) == 1 || check_quote_milieu_ok(line) == 1)
+		// 	{
+		// 		temp_quote = caractere_quote_debut(line);
+		// 		if (temp_quote == '"')
+		// 			new_node->type_quote = DQUOTES;
+		// 		else if (temp_quote == '\'')
+		// 			new_node->type_quote = SQUOTES;
+		// 	}
+		// }
     new_node->type_bi = 0; // par defaut
     new_node->next = NULL;
 
@@ -155,45 +155,6 @@ int	check_quotes(char *line)
 	}
 	return (1); // s'il y a 2 quotes bien fermees -> 1
 }
-
-
-// verifier s'il y a 2 quotes pareils dans la chaine de caracteres
-// on recupere le type du premier quote 
-// soit return (1); ex) " ", ' ',  " ' "  , soit return (0); ex)  ', ", "', '", "'', '"", "'''', '''"
-// int	check_quote_debut_ok(char *line) 
-// {
-	// char	debut_quote; // on recupere le type du premier quote ( " ou ' )
-	// int		nbr_dquote;
-	// int		nbr_squote;
-	// int		i; // l'index pour parcourir la chaine de caracteres
-// 
-	// nbr_dquote = 0;
-	// nbr_squote = 0;
-	// if (line[0] == '"') // si la chaine de caractere commence par double quote
-	// {
-		// debut_quote = 'd';
-		// nbr_dquote++;
-	// }
-	// else if (line[0] == '\'') // si la chaine de caractere commence par single quote
-	// {
-		// debut_quote = 's';
-		// nbr_squote++;
-	// }
-	// i = 1;
-	// while (line[i])
-	// {
-		// if (debut_quote == 'd' && line[i] == '"') // verifier le cas " "
-			// nbr_dquote++;
-		// else if (debut_quote == 's' && line[i] == '\'') // verifier le cas ' '
-			// nbr_squote++;
-		// if ((nbr_dquote == 2) || (nbr_squote == 2))
-			// break ;
-		// i++;
-	// }
-	// if ((nbr_dquote == 2) || (nbr_squote == 2)) // si " " ou ' ' -> return (1)
-		// return (1);
-	// return (0);
-// }
 
 // verifier s'il y a 2 quotes pareils dans la chaine de caracteres
 // on recupere le type du premier quote 
@@ -512,7 +473,91 @@ int	len_mot_total(char *line)
 	return (len);
 }
 
+// verifier s'il y a un pipe a la fin de la chaine ou l'espace seulement apres le dernier pipe
+int	check_pipe_fin(char *line)
+{
+	int	i;
 
+	i = 0;
+	while (line[i]) // une boucle pour arriver a la fin de la chaine
+		i++;
+	i--; // quand on sort la boucle, c'est '\0'. donc on avance une fois
+	while (i >= 0 && line[i] == ' ') // avancer s'il y a l'espace a la fin
+		i--;
+	if (i >= 0 && line[i] == '|') // verifier s'il y a un pipe apres l'espace
+		return (1);
+	return (0);
+}
+
+// decouper des commandes par pipe (on les sauvegrade dans le double tableau)
+char	**split_input_par_pipe(char *line)
+{
+	int		compter_pipe; // compter le nombre de pipe (pour size de double tableau)
+	int		size_cmd;
+	int		i;
+	int		j;
+	int		start;
+	char	**cmd; // double tableau decoupe par pipe
+
+	compter_pipe = 0;
+	size_cmd = 0;
+	i = 0;
+	j = 0;
+	start = 0;
+	cmd = NULL;
+	if (!line || !line[i])
+		return (NULL);
+	while (line[i])
+	{
+		if (line[i] == '|')
+			compter_pipe++;
+		i++;
+	}
+	if (line[i-1] == '|' || check_pipe_fin(line) == 1) // soit le pipe a la fin, soit l'espace seulement apres le dernier pipe
+		size_cmd = compter_pipe;
+	else
+		size_cmd = compter_pipe + 1;
+	cmd = malloc(sizeof(char *) * (size_cmd + 1));
+	if (!cmd)
+		return (NULL);
+	i = 0;
+	while (line[i])
+	{
+    if (line[i] == '|')
+    {
+        cmd[j] = ft_strndup(line + start, i - start);
+        if (!cmd[j])
+        {
+            // a faire free avant ***
+            return (NULL);
+        }
+        j++;
+        start = i + 1;
+    }
+    i++;
+	}
+	// while (j < size_cmd)
+	// {
+	// 	while (j < size_cmd && cmd[j][i] != '|')
+	// 		i++;
+	// 	if (cmd[j][i] == '|')
+	// 	{
+	// 		cmd[j] = ft_strndup(cmd[j], i - 1);
+	// 		if (cmd[j])
+	// 			return (NULL);
+	// 		i++;
+	// 	}
+	// 	j++;
+	// }
+	cmd[j] = ft_strndup(line + start, i - start);
+	if (cmd[j])
+	{
+		// a faire free avant ***
+		return (NULL);
+	}
+	cmd[j + 1] = NULL;
+	return (cmd);
+}
 
 // On parse tout pour trouver les operations ou les builtins
 // chaque noeud serait d'abord divise que par soit mot, soit redir, soit pipe  (cf. t_type token)
@@ -596,16 +641,19 @@ int	main(int ac, char **av, char **env)
 	(void)av;
 	(void)env;
 	char	*line;
+	char	**cmd;
 	t_token	*parsing;
 	t_token	*temp;
 	int		i;
-	// t_minis	*mini;
 	// int		j;
+	// t_minis	*mini;
+	int		j;
 
 	// mini = malloc(sizeof(mini));
 	// if (!mini)
 	// 	return (0);
 	i = 0;
+	j = 0;
 	while (1)
 	{
 		line = readline("coucou$ ");
@@ -626,6 +674,14 @@ int	main(int ac, char **av, char **env)
 			printf("noeud %d '%s' | type %s | type_quote %s\n", i, temp->str, get_token_type_str(temp->type_token), get_token_type_state(temp->type_quote));
 			i++;
 			temp = temp->next;
+		}
+		cmd = split_input_par_pipe(line);
+		if (!cmd)
+			return (printf("erreur"), 1);
+		while (cmd[j])
+		{
+			printf("cmd[%d] = [%s]\n", j, cmd[j]);
+			j++;
 		}
 		free_tokens(&parsing);
 		free(line);
