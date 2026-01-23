@@ -6,13 +6,13 @@ NAME = minishell
 
 CC = cc
 CFLAGS = -Wall -Wextra -Werror  -I$(INC_DIR) -I$(LIBFT_DIR)
-LIBS = -lreadline -lncurses -ltinfo $(LIBFT_DIR)/libft.a 
+LIBS = -lreadline -lncurses $(LIBFT_DIR)/libft.a 
 
 INC_DIR 	= includes
 SRC_DIR 	= srcs
 OBJ_DIR     = objs
 
-LIBFT_DIR 	= $(INC_DIR)/ft_libft
+LIBFT_DIR 	= libft
 
 # ════════════════════════════════════════════════════════════════════════════ #
 #                                SOURCE FILES                                  #
