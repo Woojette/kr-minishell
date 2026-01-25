@@ -635,6 +635,7 @@ int	main(int ac, char **av, char **env)
 		line = readline("coucou$ ");
 		if (!line)
 			break ;
+		add_history(line);
 		parsing = NULL;
 		i = 0;
 		if (check_quotes(line) == 0)
