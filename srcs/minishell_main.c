@@ -611,6 +611,92 @@ void parse_fd_tokens(t_token **token)
 	}
 }
 
+// compter le nombre de caracteres (a partir de $ jusqu'a l'espace)
+int	len_doller_espace(char *str) // pour char *str = on donne l'adresse de $ de str / char c est ' '
+{
+	int	i;
+
+	i = 0;
+	if (!str)
+		return (0);
+	while (str[i])
+	{
+		if (str[i] == '/' || str[i] == '.' || str[i] == '-' || str[i] == ':' || str[i] == ' ' || str[i] == '}')
+			break ;
+		i++;
+	}
+	return (i);
+}
+
+// recuperer $ env variable
+char	*get_env_var(char *str, char **env)
+{
+	int	j;
+	int	len;
+
+	j = 0;
+	if (!str || !env)
+		return (NULL);
+	len = ft_strlen(str);
+	while ((env)[j])
+	{
+		if (ft_strncmp((env)[j], str, len) == 0 && env[j][len] == '=')
+			return (env[j] + (len + 1));
+		j++;
+	}
+	return (NULL);
+}
+
+int	appliquer_quote(t_token *token, char **env)
+{
+	int		i;
+	int		dollar_len;
+	char	quote;
+	char	*temp;
+	char	*env_var;
+
+	i = 0;
+	dollar_len = 0;
+	quote = 0;
+	temp = NULL;
+	env_var = NULL;
+	if (!token || !token->str || !token->str[i])
+		return (-1);
+	while (token->str[i])
+	{
+		if ((token->str[i] == '"' || token->str[i] == '\'') && quote == 0)
+		{
+			quote = token->str[i];
+			i++;
+			continue ;
+		}
+		if (token->str[i] == quote && quote != 0)
+		{
+			quote = 0;
+			i++;
+			continue ;
+		}
+		if (token->str[i] == '$' && quote != '\'')
+		{
+			i++;
+			dollar_len = len_dollar_espace(token->str + i);
+			temp = strndup(token->str + i, (size_t)dollar_len);
+			if (!temp)
+				return (-1);
+			env_var = get_env_var(temp, env);
+			if (env_var != NULL)
+				write(1, env_var, ft_strlen(env_var));
+			i += dollar_len;
+			free(temp);
+			temp = NULL;
+			continue ;
+		}
+		write(1, &token->str[i], 1);
+		i++;
+	}
+	return (0);
+}
+
 int	main(int ac, char **av, char **env)
 {
 	(void)ac;

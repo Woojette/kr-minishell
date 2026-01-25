@@ -14,9 +14,9 @@
 
 char    *ft_strndup(const char *s, size_t n)
 {
-    size_t    i;
-    size_t    len;
-    char       *dup;
+    size_t	i;
+    size_t	len;
+    char	*dup;
 
     i = 0;
     len = ft_strlen(s);

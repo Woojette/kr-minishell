@@ -56,10 +56,10 @@ typedef enum s_type_bi
 typedef struct s_token
 {
 
-	char					*str; // token = <<
+	char			*str; // token = <<
 	t_type_token	type_token; //= T_RD_HEREDOC
-	t_type_bi			type_bi; // type builtin
-	t_state				type_quote; // = GENERAL
+	t_type_bi		type_bi; // type builtin
+	t_state			type_quote; // = GENERAL
 	struct s_token	*next;
 }	t_token;
 
@@ -106,7 +106,7 @@ char	**split_input_par_pipe(char *line); // decouper des commandes par pipe
 
 // tester
 const char	*get_token_type_str(t_type_token type); // pour tester (enum -> string)	
-char				*get_token_type_state(t_state state); // pour tester type quote
+char		*get_token_type_state(t_state state); // pour tester type quote
 
 
 // quote est le premier caractere 
@@ -141,6 +141,10 @@ void	free_tokens(t_token **token); // liste free
 int		check_pipe_fin(char *line); // verifier s'il y a un pipe a la fin de la chaine ou l'espace seulement apres le dernier pipe
 void 	parse_fd_tokens(t_token **token); // pour la condition de token MOT (redir, fd)
 
+// quote
+int		appliquer_quote(t_token *token, char **env);
+int		len_doller_espace(t_token *token, char c); // compter le nombre de caracteres (a partir de $ jusqu'a l'espace)
+char	*get_env_var(char *str, char **env); // recuperer $ env variable
 
 
 // void	ft_echo(char *str, int option_n);
