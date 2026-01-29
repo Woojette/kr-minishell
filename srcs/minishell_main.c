@@ -800,22 +800,27 @@ char	*get_env_name(char *str, int start)
 }
 
 // recuperer $ env variable
-char	*get_env_var(char *str, char **env)
+char	*get_env_var(char *str, t_mini *mini)
 {
 	int	j;
 	int	len;
 
 	j = 0;
-	if (!str || !env)
+	if (!str || !mini || !mini->env)
 		return (NULL);
+	if (str[0] == '?' && str[1] == '\0') // cas special pour $? (convertir le code de sortie en chaîne)
+		return (ft_itoa(mini->exit_status)); // pour convertir exit status en str
+		// exit status est un int, donc on utilise ft_itoa pour le convertir en str, pour afficher dans notre minishell
+		// vu qu'on a alloue le memoire dans ft_itoa, il faut liberer apres l'utilisation ************
 	len = ft_strlen(str);
-	while ((env)[j]) // on va parcourir tout env
+	while ((mini->env)[j]) // on va parcourir tout env
 	{
-		if (ft_strncmp((env)[j], str, len) == 0 && env[j][len] == '=')
-			return (env[j] + (len + 1)); // on retourne le contenu apres le '='
+		if (ft_strncmp((mini->env)[j], str, len) == 0 && (mini->env)[j][len] == '=')
+			return (ft_strdup((mini->env)[j] + (len + 1))); // on retourne le contenu apres le '=' (free apres *****)
 		j++;
 	}
-	return (NULL);
+	return (ft_strdup("")); // si on ne trouve pas la variable d'env, on retourne une chaine vide
+	// penser a free apres **************
 }
 
 // ajouter un char c a la fin de la chaine resultat  
@@ -837,13 +842,11 @@ char	*ajouter_char(char *resultat, char c)
 }
 
 // appliquer la variable d'env dans str a la position i (qui est le $)
-//str = le str entier du token
-//resultat = le nouveau str qui va etre créé
-//i = la position du $ dans str (pour changer le variable d'origine, on utilise son pointeur)
-//token = la structure principale qui contient env et exit status
-// a faire : creer une nouvelle structure all (qui gere env, exit status) *************************************************************************
-// puis changer t_token *token en t_mini *mini par exemple *************************************************************************
-char	*appliquer_env_var(char *resultat, char *str, t_token *token, int *i)
+// str = le str entier du token
+// resultat = le nouveau str qui va etre créé
+// i = la position du $ dans str (pour changer le variable d'origine, on utilise son pointeur)
+// mini = la structure principale qui contient env et exit status
+char	*appliquer_env_var(char *resultat, char *str, t_mini *mini, int *i)
 {
 	char	*env_name; // le nom de la variable d'env apres $ (ex. USER de $USER)
 	char	*env_var; // la valeur de la variable d'env
@@ -854,13 +857,14 @@ char	*appliquer_env_var(char *resultat, char *str, t_token *token, int *i)
 	// cf) il est possible de nom recupere ne soit pas dans env (ex. $qui_nexiste_pas)
 	if (env_name) // si on a un nom de variable d'env
 	{	
-		env_var = get_env_var(env_name, token->env); // on recupere la valeur de la variable d'env
+		env_var = get_env_var(env_name, mini); // on recupere la valeur de la variable d'env
 		if (env_var)
 		{
 			temp = ft_strjoin(resultat, env_var); // on concatene le resultat avec la valeur de la variable d'env
 			if (!temp)
-				return (free(env_name), free(resultat), NULL);
-			free(resultat);
+				return (free(env_var), free(env_name), free(resultat), NULL);
+			free(env_var); // on libere env_var, puisqu'on l'a deja utilise
+			free(resultat); // on libere l'ancien resultat
 			resultat = temp; // on met a jour resultat
 		}
 		if (str[(*i) + 1] == '{') // si on a des accolades apres $ (ex. ${USER})
@@ -883,7 +887,9 @@ char	*appliquer_env_var(char *resultat, char *str, t_token *token, int *i)
 // parcours le token str et creer un nouveau str* result qui remplacera str;
 // Si c’est un caractere $, on cherche la variable d’environment et on remplace
 // sinon juste on copie caractere par caractere result est vide au depart et on le construit caractre par caractere
-char	*remplacer_dollar(char *str, t_token *token)
+// a gerer : accolades apres $ et single quote *******************************************************************
+// le cas de single quote a gerer aussi (ne pas remplacer $ dans des single quote) *******************************
+char	*remplacer_dollar(char *str, t_mini *mini)
 {
 	int		i; // l'index pour parcourir *str
 	char	*resultat; // le nouveau str qui remplace *str
@@ -898,7 +904,7 @@ char	*remplacer_dollar(char *str, t_token *token)
 		//si on voit $ (et pas $ a la fin de chaine)
 		// on remplace par la valeur du nom et uniquement si on est pas dans des single quote
 		if (str[i] == '$' && str[i + 1] != '\0')
-			resultat = appliquer_env_var(resultat, str, token, &i); // on passe l'adresse de i pour le modifier dans la fonction
+			resultat = appliquer_env_var(resultat, str, mini, &i); // on passe l'adresse de i pour le modifier dans la fonction
 		// sinon on copie caractere par caractere str vers resultat
 		else
 			resultat = ajouter_char(resultat, str[i++]);
@@ -970,11 +976,11 @@ int	main(int ac, char **av, char **env)
 	t_token	*parsing;
 	t_token	*temp;
 	int		i;
-	// t_minis	*mini;
+	t_mini	*mini;
 
-	// mini = malloc(sizeof(mini));
-	// if (!mini)
-	// 	return (0);
+	mini = malloc(sizeof(mini));
+	if (!mini)
+		return (0);
 	i = 0;
 	cmd = NULL;
 	while (1)

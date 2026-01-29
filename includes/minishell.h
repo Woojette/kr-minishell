@@ -52,6 +52,8 @@ typedef enum s_type_bi
 	T_EXIT,
 }	t_type_bi;
 
+// structure token issue du parsing de la ligne de commande 
+// (mot, pipe, redir, etc)
 typedef struct s_token
 {
 	char			*str; // token = <<
@@ -61,17 +63,20 @@ typedef struct s_token
 	struct s_token	*next;
 }	t_token;
 
+// structure commande apres decoupage par pipe
+// cmd = tableau de chaine de caracteres (char **)
+// ex) cmd[0] = {"echo", "hihi", NULL}
 typedef struct s_cmd
 {
 	char	**cmd;
 }	t_cmd;
 
+// structure du contexte global minishell 
+// ex) env et exit status (dernier code de sortie)
 typedef struct s_mini
 {
 	char						**env;
 	int							exit_status;
-	struct s_token	*token;
-	struct s_mini		*next;
 }	t_mini;
 
 
@@ -146,17 +151,16 @@ char**	add_double_tab(char **tab, char *str, int size); // agrandir un tableau e
 int 	add_cmd(t_token *token, t_cmd *cmd); // parcours les token, et rajoute les token dans les tableaux
 int		decouper_cmd_par_pipe(t_token *token, t_cmd **cmd);
 
-
 // ====================================================================================================================
 
 // ========================================================= quote =====================================================
 
 // dollar
 char	*get_env_name(char *str, int start); // recuperer le nom de la variable d'env apres $
-char	*get_env_var(char *str, char **env); // recuperer $ env variable
+char	*get_env_var(char *str, t_mini *mini); // recuperer $ env variable
 char	*ajouter_char(char *resultat, char c); // ajouter un char c a la fin de la chaine resultat  
-char	*appliquer_env_var(char *resultat, char *str, t_token *token, int *i); // appliquer la variable d'env dans str a la position i (qui est le $)
-char	*remplacer_dollar(char *str, t_token *token); // remplacement de $ par la valeur de la variable d'env
+char	*appliquer_env_var(char *resultat, char *str, t_mini *mini, int *i); // appliquer la variable d'env dans str a la position i (qui est le $)
+char	*remplacer_dollar(char *str, t_mini *mini); // remplacement de $ par la valeur de la variable d'env
 
 // void	ft_echo(char *str, int option_n);
 // void	ft_env(char **env);
