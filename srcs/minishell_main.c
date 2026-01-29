@@ -125,24 +125,27 @@ int	check_quotes(char *line)
 	char	quote;
 
 	i = 0;
-	if (!line[i])
+	if (!line[i]) // si la chaine est vide (line[0] = '\0')
 		return (0);
 	while (line[i])
 	{
+		// a partir de la, on cherche les quotes
 		if (line[i] == '"' || line[i] == '\'') // si on croise une quote, on entre dans la boucle pour trouver une autre
 		{
-			quote = line[i]; // sauvegrader la premiere quote
+			quote = line[i]; // sauvegarder la premiere quote
 			i++; // puis, commencer a chercher la deuxieme
 			while (line[i] && line[i] != quote) // ce qui n'est pas une quote pareille que la premiere, on passe
 				i++;
-			if (!line[i]) // on est a la fin sans trouver la quote fermante -> 0
+			// on sort de la boucle soit quand on trouve la quote pareille (bien fermee), soit a la fin de la chaine
+			if (!line[i]) // on est a la fin de la chaine ('\0'), sans trouver la quote fermante -> 0
 				return (0);
-			else
-				return (1);
 		}
-		i++;
+		i++; 
+		// soit on a trouve la quote fermante, soit on n'a pas encore trouve de quote, 
+		// on continue a parcourir le caractere suivant de la chaine
+		// ca permet de verifier toutes les quotes dans la chaine (ex. echo "hihi"coucou'you'pi)
 	}
-	return (1); // s'il y a 2 quotes bien fermees -> 1
+	return (1); // si les quotes dans la chaine sont appariees et fermees -> 1
 }
 
 // verifier s'il y a 2 quotes pareils dans la chaine de caracteres
@@ -180,7 +183,7 @@ int	check_quote_debut_ok(char *line)
 	return (0);
 }
 
-// fonction qui verifie l'espace (ou '\0', reir, pipe) apres la 2e quote
+// fonction qui verifie l'espace (ou '\0', redir, pipe) apres la 2e quote
 // au cas ou le premier caractere commence par une quote
 int check_2_quotes_debut_puis_fin(char *line)
 {
@@ -478,62 +481,200 @@ int	check_pipe_fin(char *line)
 	return (0);
 }
 
-// decouper des commandes par pipe (on les sauvegrade dans le double tableau)
-char	**split_input_par_pipe(char *line)
+// compter le nombre de pipes dans la liste chainee
+int count_pipe(t_token *token)
 {
-	int		compter_pipe; // compter le nombre de pipe (pour size de double tableau)
-	int		size_cmd;
-	int		i;
-	int		j;
-	int		start;
-	char	**cmd; // double tableau decoupe par pipe
+	int			count;
+	t_token	*temp; // temporaire pour parcourir liste chainee token
 
-	compter_pipe = 0;
-	size_cmd = 0;
-	i = 0;
-	j = 0;
-	start = 0;
-	cmd = NULL;
-	if (!line || !line[i])
-		return (NULL);
-	while (line[i])
+	count = 0;
+	temp = token;
+	while (temp)
 	{
-		if (line[i] == '|')
-			compter_pipe++;
-		i++;
+		if (temp->type_token == T_PIPE)
+			count++;
+		temp = temp->next;
 	}
-	if (line[i-1] == '|' || check_pipe_fin(line) == 1) // soit le pipe a la fin, soit l'espace seulement apres le dernier pipe
-		size_cmd = compter_pipe;
-	else
-		size_cmd = compter_pipe + 1;
-	cmd = malloc(sizeof(char *) * (size_cmd + 1));
+	return (count);
+}
+
+// allouer le tableau de structures cmd (divise par pipe)
+// on va mettre chaque commande divisee par pipe dans chaque cmd[i].cmd
+t_cmd	*malloc_cmd(t_token *token)
+{
+	int		compter_pipe; // le nombre de pipes dans la ligne de commande
+	int		nbr_cmd; // le nombre de commandes a allouer le memoire
+	int		j; // index pour parcourir le tableau de structures cmd
+	t_cmd	*cmd; // le tableau de structures pour chaque commande divisee par pipe
+
+	j = 0;
+	compter_pipe = count_pipe(token); // compter le nombre de pipes
+	nbr_cmd = compter_pipe + 1; // le nombre de commandes = le nombre de pipes + 1 
+	// ex) echo "hihi" | cat -e | cat -e  <- 2 pipes, donc 3 commandes
+	cmd = malloc(sizeof(t_cmd) * nbr_cmd); // allouer un tableau de structures t_cmd (une par commande)
 	if (!cmd)
 		return (NULL);
-	i = 0;
-	while (line[i])
+	while (j < nbr_cmd) // j est index, donc ca commence par 0
 	{
-    if (line[i] == '|')
-    {
-        cmd[j] = ft_strndup(line + start, i - start);
-        if (!cmd[j])
-        {
-            // a faire free avant ***
-            return (NULL);
-        }
-        j++;
-        start = i + 1;
-    }
-    i++;
+		cmd[j].cmd = NULL; // on initialise tous les pointeurs a NULL (pour proteger)
+		j++;
 	}
-	cmd[j] = ft_strndup(line + start, i - start);
-	if (!cmd[j])
-	{
-		// a faire free avant ***
-		return (NULL);
-	}
-	cmd[j + 1] = NULL;
 	return (cmd);
 }
+
+// fonction pour agrandir un tableau et rajouter une chaine, comme pour le builtin export
+// char **tab : double tableau actuel, *str : nouveau tableau a ajouter,
+// int  size : taille actuelle de double tableau
+char** add_double_tab(char **tab, char *str, int size)
+{
+    char **new_tab; // nouveau double tableau agrandi
+    int j; // index pour parcourir les tableaux
+
+    new_tab = malloc(sizeof(char *) * (size + 2)); // +1 pour le nouveau +1 pour NULL hihi
+    if (!new_tab)
+        return (NULL);
+    j = 0;
+    while (j < size)
+    {
+        new_tab[j] = tab[j]; // copier l'adresse de chaque chaine
+				// chaque tab[j] est un pointeur vers une chaine de caracteres
+        // cf) char **tab = *tab[] = {"pho", "malatang", NULL}; (tableau de pinteurs vers des chaines)
+				//     char tab[j] -> tab[0] = adresse de "pho", tab[1] = adresse de "malatang" (chaine de caracteres)
+				j++;
+    }
+    new_tab[j] = str; // l'adresse de nouvelle chaine ajoutee, on ajoute la nouvelle adresse ici youpiii
+    new_tab[j + 1] = NULL; // terminer par NULL
+    free(tab); // vu qu'on a bien cree un nouveau tableau agrandi, on libere l'ancien tableau de pointeurs
+    return (new_tab);
+}
+
+// parcourir les token, et rajouter les token dans les tableaux
+// ex) echo hihi | cat -e
+// l'objectif, c'est de mettre  tab[0] = {"echo", "hihi", NULL}, tab[1] = {"cat", "-e", NULL}  dans la liste chainee cmd
+// ( remplir  cmd[0].cmd = {"echo","hihi",NULL}, cmd[1].cmd = {"cat","-e",NULL} )
+int add_cmd(t_token *token, t_cmd *cmd)
+{
+	int index_cmd; // l'index pour la structure  ex) tab[0] = {"echo", "hihi", NULL}, tab[1] = {"cat", "-e", NULL}
+	int i; // l'index pour l'argument de chaque structure  ex) tab[0][0] = "echo", tab[0][1] = "hihi", tab[0][2] = NULL
+
+	index_cmd = 0;
+	i = 0;
+	while (token) // pendant que le noeud dans la liste chainee existe
+	{
+		if (token->type_token == T_MOT) // si le type de token est T_MOT
+		{
+			if (cmd[index_cmd].cmd == NULL) // si le tableau cmd[index_cmd].cmd n'est pas encore alloué (NULL)
+			{
+				cmd[index_cmd].cmd = malloc(sizeof(char *) * 2); 
+				// initialement allouer pour 2 cases (tab[0] = "~~" , tab[1] = NULL)
+				if (!cmd[index_cmd].cmd) 
+					return (-1);
+				cmd[index_cmd].cmd[1] = NULL; // vu que c'est un double tableau (tableau de pointeurs char *, donc argv), on place d'abord le NULL final
+			}
+			else // s'il y a deja un argument dans le double tableau, on agrandit le tableau (pour ajouter un nouvel arguement)
+			{
+				cmd[index_cmd].cmd = add_double_tab(cmd[index_cmd].cmd, NULL, i); 
+				// ex) tab[0] = {"echo", NULL} -> {"echo", "hihi", NULL} 
+				if (!cmd[index_cmd].cmd)
+					return (-1);
+			}
+			cmd[index_cmd].cmd[i] = ft_strdup(token->str); // on ajoute le contenu de token a cet argument de la telle structure 
+			i++; // pour passer au prochain argument, incrementer de 1
+		}
+		if (token->type_token == T_PIPE) // si on arrive a '|'
+		{
+			if(cmd[index_cmd].cmd == NULL) // proteger au cas ou il y a 2 pipes consecutifs (ex: cmd1 || cmd2)
+				return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
+			cmd[index_cmd].cmd[i] = NULL; // on met le NULL terminateur pour cloturer argv
+			index_cmd++; // on passe a la structure suivante
+			i = 0; // pour reverifier des le debut, on reinitialise l'index pour l'argument de cette nouvelle structure
+		}
+		token = token->next; // on passe au noeud suivant
+	}
+	if (index_cmd > 0 && cmd[index_cmd].cmd == NULL) // proteger au cas ou il y a un pipe a la fin (ex: cmd1 | )
+		return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
+	if (cmd[index_cmd].cmd != NULL) // on termine aussi le dernier argv (apres la boucle)
+		cmd[index_cmd].cmd[i] = NULL; // on ferme bien la fin 
+	return (0); // pour distinguer du cas qui marche bien le cas d'erreur (-1)
+}
+
+// tester le contenu de chaque cmd
+void test_print_cmds(t_cmd *cmd, int nbr_cmd)
+{
+	int	i;
+	int	j;
+
+	i = 0;
+	j = 0;
+	while (j < nbr_cmd)
+	{
+		printf("command%d:\n", i);
+		while (cmd[j].cmd && cmd[j].cmd[i] != NULL)
+		{
+			printf("arg %d: %s\n", j, cmd[j].cmd[i]);
+			i++;
+		}
+		j++;
+		i = 0;
+	}
+}
+
+// // decouper des commandes par pipe (on les sauvegrade dans le double tableau)
+// char	**split_input_par_pipe(char *line)
+// {
+// 	int		compter_pipe; // compter le nombre de pipe (pour size de double tableau)
+// 	int		size_cmd;
+// 	int		i;
+// 	int		j;
+// 	int		start;
+// 	char	**cmd; // double tableau decoupe par pipe
+
+// 	compter_pipe = 0;
+// 	size_cmd = 0;
+// 	i = 0;
+// 	j = 0;
+// 	start = 0;
+// 	cmd = NULL;
+// 	if (!line || !line[i])
+// 		return (NULL);
+// 	while (line[i])
+// 	{
+// 		if (line[i] == '|')
+// 			compter_pipe++;
+// 		i++;
+// 	}
+// 	if (line[i-1] == '|' || check_pipe_fin(line) == 1) // soit le pipe a la fin, soit l'espace seulement apres le dernier pipe
+// 		size_cmd = compter_pipe;
+// 	else
+// 		size_cmd = compter_pipe + 1;
+// 	cmd = malloc(sizeof(char *) * (size_cmd + 1));
+// 	if (!cmd)
+// 		return (NULL);
+// 	i = 0;
+// 	while (line[i])
+// 	{
+//     if (line[i] == '|')
+//     {
+//         cmd[j] = ft_strndup(line + start, i - start);
+//         if (!cmd[j])
+//         {
+//             // a faire free avant ***
+//             return (NULL);
+//         }
+//         j++;
+//         start = i + 1;
+//     }
+//     i++;
+// 	}
+// 	cmd[j] = ft_strndup(line + start, i - start);
+// 	if (!cmd[j])
+// 	{
+// 		// a faire free avant ***
+// 		return (NULL);
+// 	}
+// 	cmd[j + 1] = NULL;
+// 	return (cmd);
+// }
 
 // On parse tout pour trouver les operations ou les builtins
 // chaque noeud serait d'abord divise que par soit mot, soit redir, soit pipe  (cf. t_type token)
@@ -610,24 +751,6 @@ void parse_fd_tokens(t_token **token)
 		temp = temp->next;
 	}
 }
-
-// // compter le nombre de caracteres (a partir de $ jusqu'a l'espace)
-// int	len_doller_espace(char *str) // pour char *str = on donne l'adresse de $ de str / char c est ' '
-// {
-// 	int	i;
-
-// 	i = 0;
-// 	if (!str)
-// 		return (0);
-// 	while (str[i])
-// 	{
-// 		if (str[i] == '/' || str[i] == '.' || str[i] == '-' || str[i] == ':' || str[i] == ' ' || str[i] == '}')
-// 			break ;
-// 		i++;
-// 	}
-// 	return (i);
-// }
-
 
 // recuperer le nom de la variable d'env apres $
 // a partir de l'index start (apres $) de str, on va recuperer le nom de la variable d'env
@@ -764,19 +887,17 @@ char	*remplacer_dollar(char *str, t_token *token)
 {
 	int		i; // l'index pour parcourir *str
 	char	*resultat; // le nouveau str qui remplace *str
-	int		entree_s_quote; // pour verifier si on est dans des single quote
 
 	resultat = malloc(sizeof(char) * 1); // on initialise resultat avec 1 caractere (pour resultat[0]='\0')
 	if (!resultat)
 		return (NULL);
 	resultat[0] = '\0'; // resultat est vide au depart
 	i = 0;
-	entree_s_quote = 0;
 	while (str[i])
 	{
 		//si on voit $ (et pas $ a la fin de chaine)
 		// on remplace par la valeur du nom et uniquement si on est pas dans des single quote
-		if (str[i] == '$' && str[i + 1] != '\0' /* && entree_s_quote == 0*/)
+		if (str[i] == '$' && str[i + 1] != '\0')
 			resultat = appliquer_env_var(resultat, str, token, &i); // on passe l'adresse de i pour le modifier dans la fonction
 		// sinon on copie caractere par caractere str vers resultat
 		else
@@ -838,36 +959,46 @@ char	*remplacer_dollar(char *str, t_token *token)
 // 	return (0);
 // }
 
+
 int	main(int ac, char **av, char **env)
 {
 	(void)ac;
 	(void)av;
 	(void)env;
 	char	*line;
-	char	**cmd;
+	t_cmd	*cmd;
 	t_token	*parsing;
 	t_token	*temp;
 	int		i;
-	// int		j;
 	// t_minis	*mini;
-	int		j;
 
 	// mini = malloc(sizeof(mini));
 	// if (!mini)
 	// 	return (0);
 	i = 0;
-	j = 0;
+	cmd = NULL;
 	while (1)
 	{
 		line = readline("coucou$ ");
 		if (!line)
 			break ;
+		if (line[0] == '\0')
+		{
+			free(line);
+			continue ;
+		}
 		add_history(line);
 		parsing = NULL;
 		i = 0;
 		if (check_quotes(line) == 0)
 		{
 			printf("Error: unclosed quotes\n");
+			free(line);
+			continue ;
+		}
+		if (check_pipe_fin(line) == 1)
+		{
+			printf("Error: syntax error near unexpected token '|'\n");
 			free(line);
 			continue ;
 		}
@@ -879,14 +1010,15 @@ int	main(int ac, char **av, char **env)
 			i++;
 			temp = temp->next;
 		}
-		cmd = split_input_par_pipe(line);
-		if (!cmd)
-			return (printf("erreur"), 1);
-		while (cmd[j])
+		int result = decouper_cmd_par_pipe(parsing, &cmd);
+		if (result == -1)
+			return (-1);
+		else if (result == -2)
 		{
-			printf("cmd[%d] = [%s]\n", j, cmd[j]);
-			j++;
+			continue ;
 		}
+		ft_print_cmds(cmd, count_pipe(parsing) + 1);
+
 		free_tokens(&parsing);
 		free(line);
 	}

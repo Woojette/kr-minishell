@@ -14,17 +14,16 @@
 
 char    *ft_strcpy(char *dest, char *src)
 {
-        int     i;
+	int     i;
 
-        i = 0;
-        while (src[i] != '\0')
-        {
-                dest[i] = src[i];
-                i++;
-        }
-				dest[i] = '\0';
-        }
-        return (dest);
+	i = 0;
+	while (src[i] != '\0')
+	{
+		dest[i] = src[i];
+		i++;
+	}
+	dest[i] = '\0';
+	return (dest);
 }
 
 size_t	ft_strlcpy(char *dest, const char *src, size_t size)

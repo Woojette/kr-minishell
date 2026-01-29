@@ -35,7 +35,6 @@ typedef enum s_type_token
 	T_RD_OUT,
 	T_RD_APPEND,
 	T_RD_HEREDOC,
-
 	T_FD_IN,
 	T_FD_HEREDOC,
 	T_FD_OUT,
@@ -62,6 +61,10 @@ typedef struct s_token
 	struct s_token	*next;
 }	t_token;
 
+typedef struct s_cmd
+{
+	char	**cmd;
+}	t_cmd;
 
 typedef struct s_mini
 {
@@ -99,11 +102,12 @@ void	parse_builtin(char *line);
 void	add_token(char *line, t_type_token type_token, int len, t_token **token); // ajouter des token dans la structure
 void	parse_input(char *line, t_token **token); // mettre des token a chaque noeud (mot, redir, pipe) 
 char	**split_input_par_pipe(char *line); // decouper des commandes par pipe
+void 	parse_fd_tokens(t_token **token); // pour la condition de token MOT (redir, fd)
 
 // tester
 const char	*get_token_type_str(t_type_token type); // pour tester (enum -> string)	
 char		*get_token_type_state(t_state state); // pour tester type quote
-
+void test_print_cmds(t_cmd *cmd, int nbr_cmd); // tester le contenu de chaque cmd
 
 // quote est le premier caractere 
 int		check_quote_debut_ok(char *line); // verifier s'il y a 2 quotes pareils dans la chaine de caracteres
@@ -127,17 +131,28 @@ int		len_mot_apres_quote(char *line); // recuperer len apres la 2e quote
 // pas de quote dans la chaine
 int		len_mot_sans_quote(char *line); // compter le nombre de caracteres s'il y a pas de 2 quotes qui fonctionnent
 
+// pipe
+int		check_pipe_fin(char *line); // verifier s'il y a un pipe a la fin de la chaine ou l'espace seulement apres le dernier pipe
+
 // free
 void	free_tokens(t_token **token); // liste free
 
+
+// ======================================================= commande ===================================================
+
+int 	count_pipe(t_token *token); // compter le nombre de pipes dans la liste chainee
+t_cmd	*malloc_cmd(t_token *token); // alluer la liste chainee cmd (divisee par pipe)
+char**	add_double_tab(char **tab, char *str, int size); // agrandir un tableau et rajouter une chaine
+int 	add_cmd(t_token *token, t_cmd *cmd); // parcours les token, et rajoute les token dans les tableaux
+int		decouper_cmd_par_pipe(t_token *token, t_cmd **cmd);
+
+
 // ====================================================================================================================
 
-// pipe
+// ========================================================= quote =====================================================
 
-int		check_pipe_fin(char *line); // verifier s'il y a un pipe a la fin de la chaine ou l'espace seulement apres le dernier pipe
-void 	parse_fd_tokens(t_token **token); // pour la condition de token MOT (redir, fd)
-
-// quote
+// dollar
+char	*get_env_name(char *str, int start); // recuperer le nom de la variable d'env apres $
 char	*get_env_var(char *str, char **env); // recuperer $ env variable
 char	*ajouter_char(char *resultat, char c); // ajouter un char c a la fin de la chaine resultat  
 char	*appliquer_env_var(char *resultat, char *str, t_token *token, int *i); // appliquer la variable d'env dans str a la position i (qui est le $)
