@@ -473,9 +473,11 @@ int	check_pipe_fin(char *line)
 	i = 0;
 	while (line[i]) // une boucle pour arriver a la fin de la chaine
 		i++;
+	printf("index fin: %d\n", i);
 	i--; // quand on sort la boucle, c'est '\0'. donc on avance une fois
 	while (i >= 0 && line[i] == ' ') // avancer s'il y a l'espace a la fin
 		i--;
+	printf("index avant pipe ou char: %d\n", i);
 	if (i >= 0 && line[i] == '|') // verifier s'il y a un pipe apres l'espace
 		return (1);
 	return (0);
@@ -552,17 +554,22 @@ char** add_double_tab(char **tab, char *str, int size)
 // ex) echo hihi | cat -e
 // l'objectif, c'est de mettre  tab[0] = {"echo", "hihi", NULL}, tab[1] = {"cat", "-e", NULL}  dans la liste chainee cmd
 // ( remplir  cmd[0].cmd = {"echo","hihi",NULL}, cmd[1].cmd = {"cat","-e",NULL} )
-int add_cmd(t_token *token, t_cmd *cmd)
+int add_cmd(t_token *token, t_cmd *cmd/*, int nbr_cmd*/)
 {
 	int index_cmd; // l'index pour la structure  ex) tab[0] = {"echo", "hihi", NULL}, tab[1] = {"cat", "-e", NULL}
 	int i; // l'index pour l'argument de chaque structure  ex) tab[0][0] = "echo", tab[0][1] = "hihi", tab[0][2] = NULL
-
+	printf("--- add_cmd ---\n");
 	index_cmd = 0;
 	i = 0;
+
+	// if (!cmd || nbr_cmd <= 0)
+	// 	return (-1);
 	while (token) // pendant que le noeud dans la liste chainee existe
 	{
 		if (token->type_token == T_MOT) // si le type de token est T_MOT
 		{
+			if (index_cmd < 0 /*|| index_cmd >= nbr_cmd*/) // verifier l'index_cmd pour proteger
+				return (-1);
 			if (cmd[index_cmd].cmd == NULL) // si le tableau cmd[index_cmd].cmd n'est pas encore alloué (NULL)
 			{
 				cmd[index_cmd].cmd = malloc(sizeof(char *) * 2); 
@@ -583,6 +590,14 @@ int add_cmd(t_token *token, t_cmd *cmd)
 		}
 		if (token->type_token == T_PIPE) // si on arrive a '|'
 		{
+			// if (index_cmd >= nbr_cmd) // proteger au cas ou il y a plus de pipe que prevu
+			// 	return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
+			if (cmd[index_cmd].cmd == NULL && i == 0) // proteger au cas ou il y a un pipe au debut (ex: | cmd1 )
+				return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
+			if (token->next == NULL) // proteger au cas ou il y a un pipe a la fin (ex: cmd1 | )
+				return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
+			if (token->next->type_token == T_PIPE) // proteger au cas ou il y a 2 pipes consecutifs (ex: cmd1 || cmd2)
+				return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
 			if(cmd[index_cmd].cmd == NULL) // proteger au cas ou il y a 2 pipes consecutifs (ex: cmd1 || cmd2)
 				return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
 			cmd[index_cmd].cmd[i] = NULL; // on met le NULL terminateur pour cloturer argv
@@ -591,10 +606,20 @@ int add_cmd(t_token *token, t_cmd *cmd)
 		}
 		token = token->next; // on passe au noeud suivant
 	}
+	printf("index_cmd final: %d\n", index_cmd);
 	if (index_cmd > 0 && cmd[index_cmd].cmd == NULL) // proteger au cas ou il y a un pipe a la fin (ex: cmd1 | )
 		return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
+	printf("index_cmd final2: %d\n", index_cmd);
+	printf("i final: %d\n", i);
+	if (cmd == NULL)
+		printf("probleme cmd");
+	else 
+		printf("pas de pb");
+	printf("cmd[0] %p", &cmd);
+
 	if (cmd[index_cmd].cmd != NULL) // on termine aussi le dernier argv (apres la boucle)
 		cmd[index_cmd].cmd[i] = NULL; // on ferme bien la fin 
+	printf("fin add_cmd\n");
 	return (0); // pour distinguer du cas qui marche bien le cas d'erreur (-1)
 }
 
@@ -678,7 +703,7 @@ void test_print_cmds(t_cmd *cmd, int nbr_cmd)
 
 // On parse tout pour trouver les operations ou les builtins
 // chaque noeud serait d'abord divise que par soit mot, soit redir, soit pipe  (cf. t_type token)
-void parse_input(char *line, t_token **token) 
+int parse_input(char *line, t_token **token, t_mini *mini) 
 {
 	int	len;
 
@@ -718,6 +743,9 @@ void parse_input(char *line, t_token **token)
 			line += len;
 		}
 	}
+	if (appliquer_dollar_sur_liste_token(token, mini) == -1)
+		return (-1);
+	return (0);
 }
 
 // pour la condition de token Mot (pour gerer le cas de fd)
@@ -915,6 +943,30 @@ char	*remplacer_dollar(char *str, t_mini *mini)
 	return (resultat);
 }
 
+// appliquer le remplacement de $ pour chaque token de type T_MOT
+// ex) $USER -> username
+int	appliquer_dollar_sur_liste_token(t_token **token, t_mini *mini)
+{
+	char	*new_str; // le nouveau str apres remplacement de $
+
+	if (!(*token) || !mini)
+		return (-1);
+	while ((*token)) // parcourir toute la liste chainee token
+	{
+		if ((*token)->type_token == T_MOT) // si le type de token est T_MOT
+		{
+			if (!(*token)->str) // si str est NULL, on retourne -1 (erreur)
+				return (-1);
+			new_str = remplacer_dollar((*token)->str, mini); // remplacer $ par la valeur de la variable d'env
+			if (!new_str)
+				return (-1);
+			free((*token)->str);
+			(*token)->str = new_str; // on met a jour token->str avec le nouveau str
+		}
+		(*token) = (*token)->next; // passer au noeud suivant
+	}
+	return (0);
+}
 
 // int	appliquer_quote(t_token *token, char **env)
 // {
@@ -971,7 +1023,7 @@ int	main(int ac, char **av, char **env)
 {
 	(void)ac;
 	(void)av;
-	(void)env;
+	// (void)env;
 	char	*line;
 	t_cmd	*cmd;
 	t_token	*parsing;
@@ -979,9 +1031,11 @@ int	main(int ac, char **av, char **env)
 	int		i;
 	t_mini	*mini;
 
-	mini = malloc(sizeof(mini));
+	mini = malloc(sizeof(t_mini));
 	if (!mini)
 		return (0);
+	mini->env = env;
+	mini->exit_status = 0;
 	i = 0;
 	cmd = NULL;
 	while (1)
@@ -994,7 +1048,9 @@ int	main(int ac, char **av, char **env)
 			free(line);
 			continue ;
 		}
+		printf("Input line: %s\n", line);
 		add_history(line);
+
 		parsing = NULL;
 		i = 0;
 		if (check_quotes(line) == 0)
@@ -1003,28 +1059,44 @@ int	main(int ac, char **av, char **env)
 			free(line);
 			continue ;
 		}
+		printf("Quotes are properly closed.\n");
 		if (check_pipe_fin(line) == 1)
 		{
 			printf("Error: syntax error near unexpected token '|'\n");
 			free(line);
 			continue ;
 		}
-		parse_input(line, &parsing);
+		printf("Pipe at the end is properly handled.\n");
+		// printf("----- Parsing tokens -----\n");
+		parse_input(line, &parsing, mini);
+		
+		printf("----- parse_input applique -----\n");
 		temp = parsing;
 		while (temp)
 		{
+			printf("testing tokens:\n");
 			printf("noeud %d '%s' | type %s | type_quote %s\n", i, temp->str, get_token_type_str(temp->type_token), get_token_type_state(temp->type_quote));
 			i++;
 			temp = temp->next;
 		}
-		int result = decouper_cmd_par_pipe(parsing, &cmd);
+		printf("-----1wejwej---------------------\n");
+
+		int result = add_cmd(parsing, cmd);
 		if (result == -1)
 			return (-1);
 		else if (result == -2)
 		{
 			continue ;
 		}
-		ft_print_cmds(cmd, count_pipe(parsing) + 1);
+		printf("-----2wejwej---------------------\n");
+		test_print_cmds(cmd, count_pipe(parsing) + 1);
+		if (parse_input(line, &parsing, mini) == -1)
+		{
+			printf("Error: parse_input failed\n");
+			free_tokens(&parsing);
+			free(line);
+			continue ;
+		}
 
 		free_tokens(&parsing);
 		free(line);

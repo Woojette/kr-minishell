@@ -56,10 +56,10 @@ typedef enum s_type_bi
 // (mot, pipe, redir, etc)
 typedef struct s_token
 {
-	char			*str; // token = <<
-	t_type_token	type_token; //= T_RD_HEREDOC
-	t_type_bi		type_bi; // type builtin
-	t_state			type_quote; // = GENERAL
+	char						*str; // token = <<
+	t_type_token		type_token; //= T_RD_HEREDOC
+	t_type_bi				type_bi; // type builtin
+	t_state					type_quote; // = GENERAL
 	struct s_token	*next;
 }	t_token;
 
@@ -105,7 +105,7 @@ void	parse_builtin(char *line);
 
 // parsing
 void	add_token(char *line, t_type_token type_token, int len, t_token **token); // ajouter des token dans la structure
-void	parse_input(char *line, t_token **token); // mettre des token a chaque noeud (mot, redir, pipe) 
+int	parse_input(char *line, t_token **token, t_mini *mini); // mettre des token a chaque noeud (mot, redir, pipe) 
 char	**split_input_par_pipe(char *line); // decouper des commandes par pipe
 void 	parse_fd_tokens(t_token **token); // pour la condition de token MOT (redir, fd)
 
@@ -161,6 +161,7 @@ char	*get_env_var(char *str, t_mini *mini); // recuperer $ env variable
 char	*ajouter_char(char *resultat, char c); // ajouter un char c a la fin de la chaine resultat  
 char	*appliquer_env_var(char *resultat, char *str, t_mini *mini, int *i); // appliquer la variable d'env dans str a la position i (qui est le $)
 char	*remplacer_dollar(char *str, t_mini *mini); // remplacement de $ par la valeur de la variable d'env
+int	appliquer_dollar_sur_liste_token(t_token **token, t_mini *mini); // appliquer le remplacement de $ sur toute la liste chainee token
 
 // void	ft_echo(char *str, int option_n);
 // void	ft_env(char **env);
