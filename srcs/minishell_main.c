@@ -922,6 +922,8 @@ char	*appliquer_env_var(char *resultat, char *str, t_mini *mini, int *i)
 char	*remplacer_dollar(char *str, t_mini *mini)
 {
 	int		i; // l'index pour parcourir *str
+	int		s_quote;
+	int		d_quote;
 	char	*resultat; // le nouveau str qui remplace *str
 
 	resultat = malloc(sizeof(char) * 1); // on initialise resultat avec 1 caractere (pour resultat[0]='\0')
@@ -929,11 +931,29 @@ char	*remplacer_dollar(char *str, t_mini *mini)
 		return (NULL);
 	resultat[0] = '\0'; // resultat est vide au depart
 	i = 0;
+	s_quote = 0; // pour gerer le cas de single quote (0 = pas dans single quote, 1 = dans single quote)
+	d_quote = 0;
 	while (str[i])
 	{
+		if (str[i] == '\'' && !d_quote) // gerer le cas de single quote au debut
+		{
+			s_quote = !s_quote; // on inverse l'etat de s_quote (0 -> 1 , 1 -> 0)
+			resultat = ajouter_char(resultat, str[i++]); // on ajoute le caractere quote a resultat
+			if (!resultat)
+				return (NULL);
+			continue ; // on passe au caractere suivant
+		}
+		if (str[i] == '"' && !s_quote) // gerer le cas de double quote au debut
+		{
+			d_quote = !d_quote; // on inverse l'etat de d_quote (0 -> 1 , 1 -> 0)
+			resultat = ajouter_char(resultat, str[i++]); // on ajoute le caractere quote a resultat
+			if (!resultat)
+				return (NULL);
+			continue ; // on passe au caractere suivant
+		}
 		//si on voit $ (et pas $ a la fin de chaine)
 		// on remplace par la valeur du nom et uniquement si on est pas dans des single quote
-		if (str[i] == '$' && str[i + 1] != '\0')
+		if ((str[i] == '$' && str[i + 1] != '\0') && !s_quote)
 			resultat = appliquer_env_var(resultat, str, mini, &i); // on passe l'adresse de i pour le modifier dans la fonction
 		// sinon on copie caractere par caractere str vers resultat
 		else
