@@ -473,11 +473,11 @@ int	check_pipe_fin(char *line)
 	i = 0;
 	while (line[i]) // une boucle pour arriver a la fin de la chaine
 		i++;
-	printf("index fin: %d\n", i);
+	// printf("index fin: %d\n", i);
 	i--; // quand on sort la boucle, c'est '\0'. donc on avance une fois
 	while (i >= 0 && line[i] == ' ') // avancer s'il y a l'espace a la fin
 		i--;
-	printf("index avant pipe ou char: %d\n", i);
+	// printf("index avant pipe ou char: %d\n", i);
 	if (i >= 0 && line[i] == '|') // verifier s'il y a un pipe apres l'espace
 		return (1);
 	return (0);
@@ -558,7 +558,7 @@ int add_cmd(t_token *token, t_cmd *cmd/*, int nbr_cmd*/)
 {
 	int index_cmd; // l'index pour la structure  ex) tab[0] = {"echo", "hihi", NULL}, tab[1] = {"cat", "-e", NULL}
 	int i; // l'index pour l'argument de chaque structure  ex) tab[0][0] = "echo", tab[0][1] = "hihi", tab[0][2] = NULL
-	printf("--- add_cmd ---\n");
+	// printf("--- add_cmd ---\n");
 	index_cmd = 0;
 	i = 0;
 
@@ -606,20 +606,20 @@ int add_cmd(t_token *token, t_cmd *cmd/*, int nbr_cmd*/)
 		}
 		token = token->next; // on passe au noeud suivant
 	}
-	printf("index_cmd final: %d\n", index_cmd);
+	// printf("index_cmd final: %d\n", index_cmd);
 	if (index_cmd > 0 && cmd[index_cmd].cmd == NULL) // proteger au cas ou il y a un pipe a la fin (ex: cmd1 | )
 		return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
-	printf("index_cmd final2: %d\n", index_cmd);
-	printf("i final: %d\n", i);
-	if (cmd == NULL)
-		printf("probleme cmd");
-	else 
-		printf("pas de pb");
-	printf("cmd[0] %p", &cmd);
+	// printf("index_cmd final2: %d\n", index_cmd);
+	// printf("i final: %d\n", i);
+	// if (cmd == NULL)
+	// 	printf("probleme cmd");
+	// else 
+	// 	printf("pas de pb");
+	// printf("cmd[0] %p", &cmd);
 
 	if (cmd[index_cmd].cmd != NULL) // on termine aussi le dernier argv (apres la boucle)
 		cmd[index_cmd].cmd[i] = NULL; // on ferme bien la fin 
-	printf("fin add_cmd\n");
+	// printf("fin add_cmd\n");
 	return (0); // pour distinguer du cas qui marche bien le cas d'erreur (-1)
 }
 
@@ -705,6 +705,7 @@ void test_print_cmds(t_cmd *cmd, int nbr_cmd)
 // chaque noeud serait d'abord divise que par soit mot, soit redir, soit pipe  (cf. t_type token)
 int parse_input(char *line, t_token **token, t_mini *mini) 
 {
+	(void)mini;
 	int	len;
 
 	len = 0;
@@ -743,8 +744,8 @@ int parse_input(char *line, t_token **token, t_mini *mini)
 			line += len;
 		}
 	}
-	if (appliquer_dollar_sur_liste_token(token, mini) == -1)
-		return (-1);
+	// if (appliquer_dollar_sur_liste_token(token, mini) == -1)
+	// 	return (-1);
 	return (0);
 }
 
@@ -1048,7 +1049,7 @@ int	main(int ac, char **av, char **env)
 			free(line);
 			continue ;
 		}
-		printf("Input line: %s\n", line);
+		// printf("Input line: %s\n", line);
 		add_history(line);
 
 		parsing = NULL;
@@ -1059,18 +1060,18 @@ int	main(int ac, char **av, char **env)
 			free(line);
 			continue ;
 		}
-		printf("Quotes are properly closed.\n");
+		// printf("Quotes are properly closed.\n");
 		if (check_pipe_fin(line) == 1)
 		{
 			printf("Error: syntax error near unexpected token '|'\n");
 			free(line);
 			continue ;
 		}
-		printf("Pipe at the end is properly handled.\n");
+		// printf("Pipe at the end is properly handled.\n");
 		// printf("----- Parsing tokens -----\n");
 		parse_input(line, &parsing, mini);
 		
-		printf("----- parse_input applique -----\n");
+		// printf("----- parse_input applique -----\n");
 		temp = parsing;
 		while (temp)
 		{
@@ -1079,8 +1080,8 @@ int	main(int ac, char **av, char **env)
 			i++;
 			temp = temp->next;
 		}
-		printf("-----1wejwej---------------------\n");
-
+		// printf("-----1wejwej---------------------\n");
+		cmd = malloc_cmd(parsing);
 		int result = add_cmd(parsing, cmd);
 		if (result == -1)
 			return (-1);
@@ -1088,7 +1089,7 @@ int	main(int ac, char **av, char **env)
 		{
 			continue ;
 		}
-		printf("-----2wejwej---------------------\n");
+		// printf("-----2wejwej---------------------\n");
 		test_print_cmds(cmd, count_pipe(parsing) + 1);
 		if (parse_input(line, &parsing, mini) == -1)
 		{
