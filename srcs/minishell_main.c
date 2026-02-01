@@ -1017,7 +1017,33 @@ int	appliquer_outfile(t_mini *mini, int i)
 	return (0);
 }
 
-
+// appliquer la redirection outfile (>>) pour la commande i
+int	appliquer_append(t_mini *mini, int i)
+{
+	if (mini->cmd[i].out_fail || mini->cmd[i].in_fail) // si deja echec de redir in ou out, on ne fait rien
+		return (0);
+	if (mini->cmd[i].outfile == NULL) // proteger au cas ou outfile est NULL
+	{
+		mini->exit_status = 2;
+		return (-1);
+	}
+	if (mini->cmd[i].fd_out != -1) // si fd_out est deja ouvert, on le ferme d'abord
+	{
+		close(mini->cmd[i].fd_out);
+		mini->cmd[i].fd_out = -1; // reinitialiser fd_out
+	}
+	mini->cmd[i].fd_out = open(mini->cmd[i].outfile, O_WRONLY | O_APPEND | O_CREAT, 0644);
+	// ouvrir le fichier en ecriture, ajouter a la fin s'il existe, creer s'il n'existe pas
+	if (mini->cmd[i].fd_out < 0) // si echec d'ouverture
+	{
+		if (mini->cmd[i].out_fail == 0 && mini->cmd[i].in_fail == 0) // pour ne pas afficher plusieurs fois l'erreur
+			perror(mini->cmd[i].outfile); // afficher l'erreur
+		mini->exit_status = 1; // mettre le code de sortie a 1
+		mini->cmd[i].fd_out = -1; // marquer que l'ouverture a echoue
+		mini->cmd[i].out_fail = 1; // marquer que l'ouverture a echoue
+	}
+	return (0);
+}
 
 
 

@@ -177,6 +177,13 @@ char	*appliquer_env_var(char *resultat, char *str, t_mini *mini, int *i); // app
 char	*remplacer_dollar(char *str, t_mini *mini); // remplacement de $ par la valeur de la variable d'env
 int	appliquer_dollar_sur_liste_token(t_token **token, t_mini *mini); // appliquer le remplacement de $ sur toute la liste chainee token
 
+// =====================================================================================================================
+
+// ===================================================== redirection ===================================================
+
+int		appliquer_outfile(t_mini *mini, int i); // appliquer la redirection outfile (>) pour la commande i
+int		appliquer_append(t_mini *mini, int i); // appliquer la redirection append (>>) pour la commande i
+
 // void	ft_echo(char *str, int option_n);
 // void	ft_env(char **env);
 // int		ft_export_all(char **tab, char ***env);
