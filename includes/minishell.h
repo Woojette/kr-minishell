@@ -184,6 +184,7 @@ int	appliquer_dollar_sur_liste_token(t_token **token, t_mini *mini); // applique
 int		appliquer_outfile(t_mini *mini, int i); // appliquer la redirection outfile (>) pour la commande i
 int		appliquer_append(t_mini *mini, int i); // appliquer la redirection append (>>) pour la commande i
 void	process_out_redir(t_mini *mini, int i); // proceder a la redirection de sortie pour la commande i (> ou >>)
+int		appliquer_infile(t_mini *mini, int i); // appliquer la redirection infile (<) pour la commande i
 
 // void	ft_echo(char *str, int option_n);
 // void	ft_env(char **env);

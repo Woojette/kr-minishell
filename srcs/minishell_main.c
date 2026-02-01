@@ -1061,6 +1061,32 @@ void	process_out_redir(t_mini *mini, int i)
 		appliquer_append(mini, i);
 }
 
+// appliquer la redirection infile (<) pour la commande i
+int	appliquer_infile(t_mini *mini, int i)
+{
+	if (mini->cmd[i].in_fail || mini->cmd[i].out_fail) // si deja echec de redir in ou out, on ne fait rien
+		return (0);
+	if (mini->cmd[i].infile == NULL) // proteger au cas ou infile est NULL
+	{
+		mini->exit_status = 2;
+		return (-1);
+	}
+	if (mini->cmd[i].fd_in != -1) // si fd_in est deja ouvert, on le ferme d'abord
+	{
+		close(mini->cmd[i].fd_in);
+		mini->cmd[i].fd_in = -1; // reinitialiser fd_in
+	}
+	mini->cmd[i].fd_in = open(mini->cmd[i].infile, O_RDONLY); // ouvrir le fichier en lecture seule
+	if (mini->cmd[i].fd_in < 0) // si echec d'ouverture
+	{
+		perror(mini->cmd[i].infile); // afficher l'erreur
+		mini->exit_status = 1; // mettre le code de sortie a 1
+		mini->cmd[i].fd_in = -1; // marquer que l'ouverture a echoue
+		mini->cmd[i].in_fail = 1; // marquer que l'ouverture a echoue
+	}
+	return (0);
+}
+
 
 int	main(int ac, char **av, char **env)
 {
