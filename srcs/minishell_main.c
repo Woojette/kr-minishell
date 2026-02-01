@@ -563,17 +563,19 @@ int add_cmd(t_token *token, t_cmd *cmd/*, int nbr_cmd*/)
 {
 	int index_cmd; // l'index pour la structure  ex) tab[0] = {"echo", "hihi", NULL}, tab[1] = {"cat", "-e", NULL}
 	int i; // l'index pour l'argument de chaque structure  ex) tab[0][0] = "echo", tab[0][1] = "hihi", tab[0][2] = NULL
+	int	redir_existe;
 	// printf("--- add_cmd ---\n");
+
 	index_cmd = 0;
 	i = 0;
-
+	redir_existe = 0;
 	// if (!cmd || nbr_cmd <= 0)
 	// 	return (-1);
 	while (token) // pendant que le noeud dans la liste chainee existe
 	{
 		if (token->type_token == T_MOT) // si le type de token est T_MOT
 		{
-			if (index_cmd < 0 /*|| index_cmd >= nbr_cmd*/) // verifier l'index_cmd pour proteger
+			if (index_cmd < 0) // verifier l'index_cmd pour proteger
 				return (-1);
 			if (cmd[index_cmd].cmd == NULL) // si le tableau cmd[index_cmd].cmd n'est pas encore alloué (NULL)
 			{
@@ -593,26 +595,63 @@ int add_cmd(t_token *token, t_cmd *cmd/*, int nbr_cmd*/)
 			cmd[index_cmd].cmd[i] = ft_strdup(token->str); // on ajoute le contenu de token a cet argument de la telle structure 
 			i++; // pour passer au prochain argument, incrementer de 1
 		}
+		else if (token->type_token == T_FD_IN)
+		{
+			if (cmd[index_cmd].infile)
+				free(cmd[index_cmd].infile); // s'il y a deja un infile, on le libere avant de le remplacer pour le nouveau
+			// cf) cat < file1 < file2  -> on garde file2 seulement (donc, on libere file1 d'abord)
+			cmd[index_cmd].infile = ft_strdup(token->str); // on ajoute le nom du fichier pour redirection <
+		}
+		else if (token->type_token == T_FD_OUT)
+		{
+			if (cmd[index_cmd].outfile)
+				free(cmd[index_cmd].outfile);
+			cmd[index_cmd].outfile = ft_strdup(token->str); // on ajoute le nom du fichier pour redirection >
+			cmd[index_cmd].out_append = 0; // s'assurer que c'est pas en mode append
+		}
+		else if (token->type_token == T_FD_OUT_APPEND)
+		{
+			if (cmd[index_cmd].outfile)
+				free(cmd[index_cmd].outfile);
+			cmd[index_cmd].outfile = ft_strdup(token->str); // on ajoute le nom du fichier pour redirection >>
+			cmd[index_cmd].out_append = 1; // marquer que c'est append (>>)
+		}
+		else if (token->type_token == T_FD_HEREDOC)
+		{
+			if (cmd[index_cmd].limiter)
+				free(cmd[index_cmd].limiter);
+			cmd[index_cmd].limiter = ft_strdup(token->str); // on ajoute le limiter pour heredoc (<<)  
+			// ex) << EOF  -> limiter = "EOF"
+			cmd[index_cmd].heredoc = 1; // marquer que c'est heredoc (<<)
+		}
 		if (token->type_token == T_PIPE) // si on arrive a '|'
 		{
-			// if (index_cmd >= nbr_cmd) // proteger au cas ou il y a plus de pipe que prevu
-			// 	return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
-			if (cmd[index_cmd].cmd == NULL && i == 0) // proteger au cas ou il y a un pipe au debut (ex: | cmd1 )
-				return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
+			if (cmd[index_cmd].infile || cmd[index_cmd].outfile || cmd[index_cmd].heredoc == 1)
+				redir_existe = 1;
+			else
+				redir_existe = 0;
 			if (token->next == NULL) // proteger au cas ou il y a un pipe a la fin (ex: cmd1 | )
 				return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
 			if (token->next->type_token == T_PIPE) // proteger au cas ou il y a 2 pipes consecutifs (ex: cmd1 || cmd2)
 				return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
-			if(cmd[index_cmd].cmd == NULL) // proteger au cas ou il y a 2 pipes consecutifs (ex: cmd1 || cmd2)
+			if (cmd[index_cmd].cmd == NULL && i == 0 && !redir_existe)
+			// proteger au cas ou il y a un pipe au debut (ex: | cmd1 )
 				return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
-			cmd[index_cmd].cmd[i] = NULL; // on met le NULL terminateur pour cloturer argv
+			// if(cmd[index_cmd].cmd == NULL) // proteger au cas ou il y a 2 pipes consecutifs (ex: cmd1 || cmd2)
+			// 	return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
+			if (cmd[index_cmd].cmd != NULL) // si le tableau n'est pas vide 
+			// ex) meme s'il y a pas d'argument T_MOT, mais il y a redir et fichier peut-etre
+				cmd[index_cmd].cmd[i] = NULL; // on met le NULL terminateur pour cloturer argv
 			index_cmd++; // on passe a la structure suivante
 			i = 0; // pour reverifier des le debut, on reinitialise l'index pour l'argument de cette nouvelle structure
 		}
 		token = token->next; // on passe au noeud suivant
 	}
 	// printf("index_cmd final: %d\n", index_cmd);
-	if (index_cmd > 0 && cmd[index_cmd].cmd == NULL) // proteger au cas ou il y a un pipe a la fin (ex: cmd1 | )
+	if (index_cmd > 0 && cmd[index_cmd].cmd == NULL
+			&& cmd[index_cmd].infile == NULL && cmd[index_cmd].outfile == NULL && !cmd[index_cmd].heredoc)
+			// proteger au cas ou il y a un pipe a la fin (ex: cmd1 | )
+			// et aussi proteger le cas ou il y a un pipe avec redir mais sans mot (ex: cmd1 | < file)
 		return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
 	// printf("index_cmd final2: %d\n", index_cmd);
 	// printf("i final: %d\n", i);
@@ -621,7 +660,6 @@ int add_cmd(t_token *token, t_cmd *cmd/*, int nbr_cmd*/)
 	// else 
 	// 	printf("pas de pb");
 	// printf("cmd[0] %p", &cmd);
-
 	if (cmd[index_cmd].cmd != NULL) // on termine aussi le dernier argv (apres la boucle)
 		cmd[index_cmd].cmd[i] = NULL; // on ferme bien la fin 
 	// printf("fin add_cmd\n");
