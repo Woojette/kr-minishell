@@ -1099,12 +1099,31 @@ void	preparer_temp_file(t_mini *mini, int i)
 	mini->cmd[i].fd_in = open("temp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	// ouvrir (créer) le fichier temporaire en écriture
 	if (mini->cmd[i].fd_in == -1)
+	{
 		mini->cmd[i].in_fail = 1;
+		perror("open temp");
+	}
 }
 
-
-
-
+// recuperer les lignes de heredoc, puis les stocker dans le fichier temp
+// fd = fd de fichier temporaire temp, delimiter = limiter
+void	collecter_heredoc_lines(int fd, char *delimiter)
+{
+	char *line;
+	
+	while (1)
+	{
+		line = readline("> "); // afficher un prompte qui ressemble a heredoc
+		if (!line || strcmp(line, delimiter) == 0) // quand on croise limiter ou saisit ctrl+D -> on quitte
+		{
+			free(line); // liberer readline
+			break; // quitte la boucle (et cette fonction)
+		}
+		write(fd, line, strlen(line)); // le resultat
+		write(fd, "\n", 1); // vu que readline n'applique pas automatiquement '\n', on en ajoute a la fin
+		free(line); // free readline avant de quitter la fonction hihi
+	}
+}
 
 
 int	main(int ac, char **av, char **env)
@@ -1131,7 +1150,7 @@ int	main(int ac, char **av, char **env)
 	while (1)
 	{
 		line = readline("coucou$ ");
-		if (!line)
+		if (!line) // ctrl D
 			break ;
 		if (line[0] == '\0')
 		{

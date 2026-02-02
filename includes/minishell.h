@@ -186,8 +186,9 @@ int		appliquer_append(t_mini *mini, int i); // appliquer la redirection append (
 void	process_out_redir(t_mini *mini, int i); // proceder a la redirection de sortie pour la commande i (> ou >>)
 int		appliquer_infile(t_mini *mini, int i); // appliquer la redirection infile (<) pour la commande i
 
-
-
+// heredoc
+void	preparer_temp_file(t_mini *mini, int i); // Préparation du fichier temporaire pour heredoc
+void	collecter_heredoc_lines(int fd, char *delimiter); // recuperer les lignes de heredoc, puis les stocker dans le fichier temp
 
 
 
