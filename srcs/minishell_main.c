@@ -524,6 +524,7 @@ t_cmd	*malloc_cmd(t_token *token)
 		cmd[j].out_append = 0; // >>
 		cmd[j].heredoc = 0; // <<
 		cmd[j].limiter = NULL; // pour heredoc
+		cmd[j].pid_heredoc = -1;
 		cmd[j].fd_in = -1;
 		cmd[j].fd_out = -1;
 		cmd[j].in_fail = 0;
@@ -1116,6 +1117,8 @@ void	collecter_heredoc_lines(int fd, char *delimiter)
 		line = readline("> "); // afficher un prompte qui ressemble a heredoc
 		if (!line || strcmp(line, delimiter) == 0) // quand on croise limiter ou saisit ctrl+D -> on quitte
 		{
+			// if (!line) // ctrl d message d'erreur a faire apres *************************
+			// 	return;
 			free(line); // liberer readline
 			break; // quitte la boucle (et cette fonction)
 		}
@@ -1123,6 +1126,38 @@ void	collecter_heredoc_lines(int fd, char *delimiter)
 		write(fd, "\n", 1); // vu que readline n'applique pas automatiquement '\n', on en ajoute a la fin
 		free(line); // free readline avant de quitter la fonction hihi
 	}
+}
+
+// appliquer heredoc dans le processus enfant
+void	appliquer_heredoc_child(t_mini *mini, int i)
+{
+	// il faut gerer des signaux; plus tard *******************************************
+	preparer_temp_file(mini, i); // creer un fichier temporaire
+	if (mini->cmd[i].fd_in == -1)
+		exit (1);
+	collecter_heredoc_lines(mini->cmd[i].fd_in, mini->cmd[i].limiter); // collecter des lignes heredoc dans le fichier temp
+	close(mini->cmd[i].fd_in); //close dans l'enfant pour eviter les leak
+	exit(0);
+}
+
+
+int	appliquer_limiter(t_mini *mini, int i)
+{
+	int	status;
+	int	exit_status;
+
+	mini->cmd[i].pid_heredoc = fork();
+	if (mini->cmd[i].pid_heredoc == -1)
+		return (-1);
+	if (mini->cmd[i].pid_heredoc == 0)
+		appliquer_heredoc_child(mini, i);
+	if (waitpid(mini->cmd[i].pid_heredoc, &status, 0) == -1)
+		return (-1);
+	if (WIFEXITED(status))
+	{
+
+	}
+	return (0);
 }
 
 

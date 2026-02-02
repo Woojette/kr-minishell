@@ -75,6 +75,7 @@ typedef struct s_cmd
 	int		out_append; // 1 si redirection en mode append (>>), 0 sinon
 	int		heredoc; // 1 si redirection heredoc (<<), 0 sinon
 	char	*limiter; // limiteur pour heredoc
+	pid_t	pid_heredoc;
 	// resultat des fd
 	int		fd_in; // resultat ouverture fichier de < or <<
 	int		fd_out; // resultat ouverture fichier de > or >>
@@ -119,7 +120,7 @@ void	parse_builtin(char *line);
 
 // parsing
 void	add_token(char *line, t_type_token type_token, int len, t_token **token); // ajouter des token dans la structure
-int	parse_input(char *line, t_token **token, t_mini *mini); // mettre des token a chaque noeud (mot, redir, pipe) 
+int		parse_input(char *line, t_token **token, t_mini *mini); // mettre des token a chaque noeud (mot, redir, pipe) 
 char	**split_input_par_pipe(char *line); // decouper des commandes par pipe
 void 	parse_fd_tokens(t_token **token); // pour la condition de token MOT (redir, fd)
 
@@ -175,7 +176,7 @@ char	*get_env_var(char *str, t_mini *mini); // recuperer $ env variable
 char	*ajouter_char(char *resultat, char c); // ajouter un char c a la fin de la chaine resultat  
 char	*appliquer_env_var(char *resultat, char *str, t_mini *mini, int *i); // appliquer la variable d'env dans str a la position i (qui est le $)
 char	*remplacer_dollar(char *str, t_mini *mini); // remplacement de $ par la valeur de la variable d'env
-int	appliquer_dollar_sur_liste_token(t_token **token, t_mini *mini); // appliquer le remplacement de $ sur toute la liste chainee token
+int		appliquer_dollar_sur_liste_token(t_token **token, t_mini *mini); // appliquer le remplacement de $ sur toute la liste chainee token
 
 // =====================================================================================================================
 
@@ -189,7 +190,7 @@ int		appliquer_infile(t_mini *mini, int i); // appliquer la redirection infile (
 // heredoc
 void	preparer_temp_file(t_mini *mini, int i); // Préparation du fichier temporaire pour heredoc
 void	collecter_heredoc_lines(int fd, char *delimiter); // recuperer les lignes de heredoc, puis les stocker dans le fichier temp
-
+void	appliquer_heredoc_child(t_mini *mini, int i); // appliquer heredoc dans le processus enfant
 
 
 // void	ft_echo(char *str, int option_n);
