@@ -1193,8 +1193,14 @@ int	appliquer_heredoc_cmd(t_mini *mini, int i)
 		mini->exit_status = 1; // mettre a jour le code de sortie global
 		return (-1);
 	}
+	if (!mini->cmd[i].temp_heredoc) // proteger au cas ou temp_heredoc est NULL
+	{
+		mini->cmd[i].in_fail = 1;
+		mini->exit_status = 1;
+		return (-1);
+	}
 	if (mini->cmd[i].fd_in != -1) // si fd_in est deja ouvert, on le ferme d'abord
-		close(mini->cmd[i].fd_in); // fermer le fd_in en lecture ecriture
+		close(mini->cmd[i].fd_in); // fermer l'ancien fd_in avant de le remplacer
 	mini->cmd[i].fd_in = open(mini->cmd[i].temp_heredoc, O_RDONLY); // reouvrir le fichier temp en lecture seule
 	if (mini->cmd[i].fd_in == -1) // si echec d'ouverture de temp en lecture
 	{
