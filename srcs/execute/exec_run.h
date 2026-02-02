@@ -15,6 +15,15 @@ typedef struct s_cmd
 	int		out_fail; // 1 si echec ouverture fichier de > or >>, 0 sinon //실행이 채울거
 }	t_cmd;
 
+
+typedef struct s_exec
+{
+	int	**pipefd;
+	pid_t *pid;
+	int	save_stdin; // parent 빌트인용
+	int	save_stdout; // parent 빌트인용
+} t_exec;
+
 heredoc 문자열 채워지고 실제 fd 생성 아직 없어서 cmd[i].heredoc == 1 임에도 cmd[i].fd_in 은 계속 -1인 중
 
 mini->nbr_cmd > 1 이면 pipe 있음

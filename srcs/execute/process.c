@@ -1,7 +1,7 @@
-void create_child(t_cmd *cmd, t_mini *mini, int id)
+void create_child(t_cmd *cmd, t_mini *mini, int i)
 {
-	px->pid[id] = fork();
-	if (px->pid[id] < 0)
+	px->pid[i] = fork();
+	if (px->pid[i] < 0)
 		msg_error(px, "fork error");
 	if (px->pid[i] == 0)
 	{
