@@ -62,7 +62,7 @@ void  exec_run(t_mini *mini)
     child_id = fork();
     printf("%d is my babyid\n", child_id);
     if (child_id == 0)
-      child_center(mini, mini->cmd, pipe_fd, i);
+      child_center(mini, mini->cmd_array, pipe_fd, i);
     else
       parent_center(mini);
   }

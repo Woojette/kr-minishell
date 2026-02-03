@@ -28,7 +28,7 @@ typedef struct s_mini
 {
 	char	**env;
 	int		exit_status;
-	t_cmd	*cmd; // tableau de structures cmd (divise par pipe)
+	t_cmd	*cmd_array; // tableau de structures cmd (divise par pipe)
 	int		nbr_cmd; // nombre de commandes (nombre de structures cmd dans cmd_tab)
 }	t_mini;
 
