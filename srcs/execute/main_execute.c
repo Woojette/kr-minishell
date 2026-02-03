@@ -12,28 +12,26 @@ void	child_center(t_mini *mini, t_cmd cmd, int *pipe_fd, int i)
 		if (i == 0)
 		{
 			// 첫번째 커맨드 패밀리
-			dup2(pipe_fd[1], 1);
-			mini->pipe_read_end = pipe_fd[0]; // 다음 애한테 여기서 읽어. 라고 한다
-			close(pipe_fd[0]);
-			close(pipe_fd[1]);
+			close(pipe_fd[0]); // Close unused readend
+			dup2(pipe_fd[1], 1); // first argument will be useless, cuz it will be camouflaged
+			close(pipe_fd[1]); // Close the first argument of dup2
+			mini->pipe_read_end = pipe_fd[0]; // Save read end for the next command
 		}
 		else if (i != 0 && i != mini->nbr_cmd - 1)
 		{
 			// 중간 커맨드 패밀리
-			dup2(mini->pipe_read_end, 0);
-			close(mini->pipe_read_end);
+			dup2(mini->pipe_read_end, 0); // Camouflage saved read end to 0
+			close(mini->pipe_read_end); // first argument of dup2 useless close
 			dup2(pipe_fd[1], 1);
+			close(pipe_fd[1]);
 			mini->pipe_read_end = pipe_fd[0];
 			close(pipe_fd[0]);
-			close(pipe_fd[1]);
 		}
 		else
 		{
 			// 마지막 커맨드 패밀리
 			dup2(mini->pipe_read_end, 0);
 			close(mini->pipe_read_end);
-			close(pipe_fd[0]);
-			close(pipe_fd[1]);
 		}
 	}
 	// if (redirection_center(pipeline->cmd_block->redirect))
@@ -58,7 +56,7 @@ void  exec_run(t_mini *mini)
   while(++i < mini->nbr_cmd)
   {
     printf("i : %d\n", i);
-    if (mini->nbr_cmd > 1) // 미니가 포인터이니 화살표(함수 인자기준)
+    if (i < mini->nbr_cmd - 1) // 미니가 포인터이니 화살표(함수 인자기준)
       pipe(pipe_fd);
     child_id = fork();
     printf("child_id : %d\n", child_id);
