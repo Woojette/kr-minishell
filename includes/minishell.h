@@ -128,7 +128,7 @@ void 	parse_fd_tokens(t_token **token); // pour la condition de token MOT (redir
 // tester
 const char	*get_token_type_str(t_type_token type); // pour tester (enum -> string)	
 char		*get_token_type_state(t_state state); // pour tester type quote
-void test_print_cmds(t_cmd *cmd, int nbr_cmd); // tester le contenu de chaque cmd
+void 		test_print_cmds(t_cmd *cmd, int nbr_cmd); // tester le contenu de chaque cmd
 
 // quote est le premier caractere 
 int		check_quote_debut_ok(char *line); // verifier s'il y a 2 quotes pareils dans la chaine de caracteres

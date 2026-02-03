@@ -1235,7 +1235,7 @@ int	appliquer_heredoc_cmd(t_mini *mini, int i)
 	{
 		exit_status = WEXITSTATUS(status); // recuperer le code de sortie
 		if (exit_status != 0) 
-		// si le code de sortie n'est pas 0, ni 2 (erreur dans heredoc)
+		// si le code de sortie n'est pas 0 (erreur dans heredoc)
 		{
 			mini->cmd[i].in_fail = 1; // marquer l'echec de heredoc
 			mini->exit_status = exit_status; // mettre a jour le code de sortie global
@@ -1268,6 +1268,106 @@ int	appliquer_heredoc_cmd(t_mini *mini, int i)
 }
 
 
+// juste pour tester les redir 
+static void	print_preview_path(const char *path)
+{
+	int		fd;
+	char	buf[256];
+	ssize_t	n;
+
+	if (!path)
+		return ;
+
+	fd = open(path, O_RDONLY);
+	if (fd < 0)
+	{
+		printf("    [preview stdin] (cannot open: %s)\n", path);
+		return ;
+	}
+	n = read(fd, buf, sizeof(buf) - 1);
+	if (n > 0)
+	{
+		buf[n] = '\0';
+		printf("    [preview stdin] ----\n%s\n    -------------------\n", buf);
+	}
+	else
+		printf("    [preview stdin] (empty)\n");
+
+	close(fd);
+}
+
+// ca aussi juste pour tester redir j'en ai maaaaaare
+void	test_redirs(t_mini *mini)
+{
+	int			i;
+	const char	*preview_path;
+
+	if (!mini || !mini->cmd)
+		return ;
+
+	i = 0;
+	while (i < mini->nbr_cmd)
+	{
+		printf("\n========== CMD %d ==========\n", i);
+		printf("raw: infile=%s | outfile=%s | append=%d | heredoc=%d | limiter=%s | temp=%s\n",
+			mini->cmd[i].infile ? mini->cmd[i].infile : "(null)",
+			mini->cmd[i].outfile ? mini->cmd[i].outfile : "(null)",
+			mini->cmd[i].out_append,
+			mini->cmd[i].heredoc,
+			mini->cmd[i].limiter ? mini->cmd[i].limiter : "(null)",
+			mini->cmd[i].temp_heredoc ? mini->cmd[i].temp_heredoc : "(null)");
+
+		// 1) heredoc
+		if (mini->cmd[i].heredoc)
+		{
+			if (appliquer_heredoc_cmd(mini, i) == -1)
+				printf("    heredoc: FAIL (exit_status=%d)\n", mini->exit_status);
+			else
+				printf("    heredoc: OK (fd_in=%d)\n", mini->cmd[i].fd_in);
+		}
+
+		// 2) infile (s'il y a heredoc, pas de infile)
+		if (!mini->cmd[i].heredoc && mini->cmd[i].infile)
+		{
+			if (appliquer_infile(mini, i) == -1)
+				printf("    infile: FAIL (exit_status=%d)\n", mini->exit_status);
+			else
+				printf("    infile: OK (fd_in=%d)\n", mini->cmd[i].fd_in);
+		}
+
+		// 3) outfile
+		if (mini->cmd[i].outfile)
+		{
+			process_out_redir(mini, i);
+			if (mini->cmd[i].out_fail)
+				printf("    outfile: FAIL (exit_status=%d)\n", mini->exit_status);
+			else
+				printf("    outfile: OK (fd_out=%d)\n", mini->cmd[i].fd_out);
+		}
+
+		// resultat
+		printf("[summary] fd_in=%d fd_out=%d in_fail=%d out_fail=%d exit_status=%d\n",
+			mini->cmd[i].fd_in, mini->cmd[i].fd_out,
+			mini->cmd[i].in_fail, mini->cmd[i].out_fail, mini->exit_status);
+
+		// heredoc: temp, sinon infile
+		preview_path = NULL;
+		if (!mini->cmd[i].in_fail)
+		{
+			if (mini->cmd[i].heredoc && mini->cmd[i].temp_heredoc)
+				preview_path = mini->cmd[i].temp_heredoc;
+			else if (!mini->cmd[i].heredoc && mini->cmd[i].infile)
+				preview_path = mini->cmd[i].infile;
+		}
+		if (preview_path)
+			print_preview_path(preview_path);
+
+		i++;
+	}
+	printf("\n============================\n");
+}
+
+
 int	main(int ac, char **av, char **env)
 {
 	(void)ac;
@@ -1292,6 +1392,7 @@ int	main(int ac, char **av, char **env)
 	while (1)
 	{
 		init_signaux();
+		mini->exit_status = 0;
 		line = readline("coucou$ ");
 		if (!line) // ctrl D
 		{
@@ -1348,7 +1449,8 @@ int	main(int ac, char **av, char **env)
 
 		// printf("-----2wejwej---------------------\n");
 		test_print_cmds(cmd, count_pipe(parsing) + 1);
-		if (parse_input(line, &parsing, mini) == -1)
+		test_redirs(mini);
+		if (parse_input(line, &parsing, mini) < 0)
 		{
 			printf("Error: parse_input failed\n");
 			free_tokens(&parsing);
