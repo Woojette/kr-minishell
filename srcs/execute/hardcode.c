@@ -16,7 +16,7 @@ t_mini *build_echo_cat_wc(void)
 
 	/* ---------- cmd 0: echo hello ---------- */
 	mini->cmd_array[0].cmd = malloc(sizeof(char *) * 3);
-	mini->cmd_array[0].cmd[0] = strdup("echo");
+	mini->cmd_array[0].cmd[0] = strdup("/usr/bin/echo");
 	mini->cmd_array[0].cmd[1] = strdup("hello");
 	mini->cmd_array[0].cmd[2] = NULL;
 
@@ -30,7 +30,7 @@ t_mini *build_echo_cat_wc(void)
 
 	/* ---------- cmd 1: cat -e ---------- */
 	mini->cmd_array[1].cmd = malloc(sizeof(char *) * 3);
-	mini->cmd_array[1].cmd[0] = strdup("cat");
+	mini->cmd_array[1].cmd[0] = strdup("/usr/bin/cat");
 	mini->cmd_array[1].cmd[1] = strdup("-e");
 	mini->cmd_array[1].cmd[2] = NULL;
 
@@ -44,7 +44,7 @@ t_mini *build_echo_cat_wc(void)
 
 	/* ---------- cmd 2: wc -l ---------- */
 	mini->cmd_array[2].cmd = malloc(sizeof(char *) * 3);
-	mini->cmd_array[2].cmd[0] = strdup("wc");
+	mini->cmd_array[2].cmd[0] = strdup("/usr/bin/wc");
 	mini->cmd_array[2].cmd[1] = strdup("-l");
 	mini->cmd_array[2].cmd[2] = NULL;
 
