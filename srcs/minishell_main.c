@@ -1138,7 +1138,9 @@ void	collecter_heredoc_lines(int fd, char *delimiter)
 	while (1)
 	{
 		line = readline("> "); // afficher un prompte qui ressemble a heredoc
-		if (!line || strcmp(line, delimiter) == 0) // quand on croise limiter ou saisit ctrl+D -> on quitte
+		if (!line) // saisit ctrl+D -> on quitte
+			break; // dans ce cas (ctrl+D), pas besoin de liberer le memoire, puisqu'il y en a pas
+		if (strcmp(line, delimiter) == 0) // quand on croise limiter -> on quitte
 		{
 			// if (!line) // ctrl d message d'erreur a faire apres *************************
 			// 	return;
