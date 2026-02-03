@@ -1156,6 +1156,7 @@ void	appliquer_heredoc_enfant(t_mini *mini, int i)
 {
 	// il faut gerer des signaux; plus tard *******************************************
 	signal(SIGINT, SIG_DFL); // quand on saisit ctrl+C, le processus enfant doit etre termine
+	signal(SIGQUIT, SIG_IGN); // quand on saisit ctrt+\, on l'ignore (ca change rien)
 	preparer_temp_file(mini, i); // creer un fichier temporaire
 	if (mini->cmd[i].fd_in == -1)
 		exit (1);
@@ -1164,11 +1165,18 @@ void	appliquer_heredoc_enfant(t_mini *mini, int i)
 	exit(0);
 }
 
-
+// gerer au cas de ctrl-C
 void	appliquer_sigint_prompt(int sig)
 {
 	(void)sig;
-	write(1, "^C\n", 3);
+	write(1, "\n", 1);
+}
+
+// gerer les sigaux (ctrl-C, ctrl-\)
+void	init_signaux(void)
+{
+	signal(SIGINT, appliquer_sigint_prompt);
+	signal(SIGQUIT, SIG_IGN);
 }
 
 // appliquer heredoc pour la commande i
@@ -1178,14 +1186,15 @@ int	appliquer_heredoc_cmd(t_mini *mini, int i)
 	int	exit_status; // pour resultat du waitpid (code de sortie du processus enfant)
 
 	signal(SIGINT, SIG_IGN); // le processus parent ignore ctrl+C pendant le processus enfant (heredoc fork)
+	signal(SIGQUIT, SIG_IGN);
 	mini->cmd[i].pid_heredoc = fork(); // creer un processus enfant pour gerer heredoc
 	if (mini->cmd[i].pid_heredoc == -1) // si echec de fork
 		return (-1);
 	if (mini->cmd[i].pid_heredoc == 0) // processus enfant
 		appliquer_heredoc_enfant(mini, i);
 	if (waitpid(mini->cmd[i].pid_heredoc, &status, 0) == -1) // attendre la fin du processus enfant
-		return (-1); // si echec de waitpid
-	signal(SIGINT, appliquer_sigint_prompt); // apres la fin du processus enfant, 
+		return (init_signaux(), -1); // si echec de waitpid
+	init_signaux(); // apres la fin du processus enfant, on applique des signaux pareils que shell
 	if (WIFEXITED(status)) // si le processus enfant s'est termine correctement
 	{
 		exit_status = WEXITSTATUS(status); // recuperer le code de sortie
@@ -1245,9 +1254,13 @@ int	main(int ac, char **av, char **env)
 	cmd = NULL;
 	while (1)
 	{
+		init_signaux();
 		line = readline("coucou$ ");
 		if (!line) // ctrl D
+		{
+			write(1, "exit\n", 5);
 			break ;
+		}
 		if (line[0] == '\0')
 		{
 			free(line);
@@ -1289,12 +1302,13 @@ int	main(int ac, char **av, char **env)
 		int result = add_cmd(parsing, cmd);
 		if (result == -1)
 			return (-1);
-		mini->cmd = cmd;
-		mini->nbr_cmd = count_pipe(parsing) + 1;
 		else if (result == -2)
 		{
 			continue ;
 		}
+		mini->cmd = cmd;
+		mini->nbr_cmd = count_pipe(parsing) + 1;
+
 		// printf("-----2wejwej---------------------\n");
 		test_print_cmds(cmd, count_pipe(parsing) + 1);
 		if (parse_input(line, &parsing, mini) == -1)

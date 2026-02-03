@@ -193,6 +193,9 @@ void	preparer_temp_file(t_mini *mini, int i); // Préparation du fichier tempora
 void	collecter_heredoc_lines(int fd, char *delimiter); // recuperer les lignes de heredoc, puis les stocker dans le fichier temp
 void	appliquer_heredoc_enfant(t_mini *mini, int i); // appliquer heredoc dans le processus enfant
 
+// signaux
+void	init_signaux(void); // gerer les sigaux (ctrl-C, ctrl-\)
+void	appliquer_sigint_prompt(int sig); // gerer au cas de ctrl-C
 
 // void	ft_echo(char *str, int option_n);
 // void	ft_env(char **env);
