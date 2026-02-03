@@ -9,7 +9,7 @@
 
 typedef struct s_cmd
 {
-	char	**cmd;
+	char	**cmd; // 이름 바꾸자고 건의하기..
 	// cmd redir
 	char	**infile; // fichier de redirection entree (<)
 	char	**outfile; // fichier de redirection sortie (>)
@@ -26,11 +26,13 @@ typedef struct s_cmd
 
 typedef struct s_mini
 {
+	int	    pipe_read_end;
 	char	**env;
 	int		exit_status;
-	t_cmd	*cmd_array; // tableau de structures cmd (divise par pipe)
+	t_cmd	*cmd_array; // tableau de structures cmd (divise par pipe) // 얘도 이름 바꾸자고..
 	int		nbr_cmd; // nombre de commandes (nombre de structures cmd dans cmd_tab)
 }	t_mini;
+
 
 
 t_mini *build_echo_cat_wc(void);
