@@ -72,7 +72,7 @@ void	run_child(t_pipex *parent, t_pipex *px, t_mini *mini)
 	exit(127);
 }
 
-int parent_process (t_cmd cmd, mini)
+int parent_process (t_mini *mini)
 {
 	int	i = 0;
 	int	j = 0;

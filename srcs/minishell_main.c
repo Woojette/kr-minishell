@@ -519,6 +519,15 @@ t_cmd	*malloc_cmd(t_token *token)
 	while (j < nbr_cmd) // j est index, donc ca commence par 0
 	{
 		cmd[j].cmd = NULL; // on initialise tous les pointeurs a NULL (pour proteger)
+		cmd[j].infile = NULL; // <
+		cmd[j].outfile = NULL; // >
+		cmd[j].out_append = 0; // >>
+		cmd[j].heredoc = 0; // <<
+		cmd[j].limiter = NULL; // pour heredoc
+		cmd[j].fd_in = -1;
+		cmd[j].fd_out = -1;
+		cmd[j].in_fail = 0;
+		cmd[j].out_fail = 0;
 		j++;
 	}
 	return (cmd);
@@ -558,17 +567,19 @@ int add_cmd(t_token *token, t_cmd *cmd/*, int nbr_cmd*/)
 {
 	int index_cmd; // l'index pour la structure  ex) tab[0] = {"echo", "hihi", NULL}, tab[1] = {"cat", "-e", NULL}
 	int i; // l'index pour l'argument de chaque structure  ex) tab[0][0] = "echo", tab[0][1] = "hihi", tab[0][2] = NULL
+	int	redir_existe;
 	// printf("--- add_cmd ---\n");
+
 	index_cmd = 0;
 	i = 0;
-
+	redir_existe = 0;
 	// if (!cmd || nbr_cmd <= 0)
 	// 	return (-1);
 	while (token) // pendant que le noeud dans la liste chainee existe
 	{
 		if (token->type_token == T_MOT) // si le type de token est T_MOT
 		{
-			if (index_cmd < 0 /*|| index_cmd >= nbr_cmd*/) // verifier l'index_cmd pour proteger
+			if (index_cmd < 0) // verifier l'index_cmd pour proteger
 				return (-1);
 			if (cmd[index_cmd].cmd == NULL) // si le tableau cmd[index_cmd].cmd n'est pas encore alloué (NULL)
 			{
@@ -588,26 +599,63 @@ int add_cmd(t_token *token, t_cmd *cmd/*, int nbr_cmd*/)
 			cmd[index_cmd].cmd[i] = ft_strdup(token->str); // on ajoute le contenu de token a cet argument de la telle structure 
 			i++; // pour passer au prochain argument, incrementer de 1
 		}
+		else if (token->type_token == T_FD_IN)
+		{
+			if (cmd[index_cmd].infile)
+				free(cmd[index_cmd].infile); // s'il y a deja un infile, on le libere avant de le remplacer pour le nouveau
+			// cf) cat < file1 < file2  -> on garde file2 seulement (donc, on libere file1 d'abord)
+			cmd[index_cmd].infile = ft_strdup(token->str); // on ajoute le nom du fichier pour redirection <
+		}
+		else if (token->type_token == T_FD_OUT)
+		{
+			if (cmd[index_cmd].outfile)
+				free(cmd[index_cmd].outfile);
+			cmd[index_cmd].outfile = ft_strdup(token->str); // on ajoute le nom du fichier pour redirection >
+			cmd[index_cmd].out_append = 0; // s'assurer que c'est pas en mode append
+		}
+		else if (token->type_token == T_FD_OUT_APPEND)
+		{
+			if (cmd[index_cmd].outfile)
+				free(cmd[index_cmd].outfile);
+			cmd[index_cmd].outfile = ft_strdup(token->str); // on ajoute le nom du fichier pour redirection >>
+			cmd[index_cmd].out_append = 1; // marquer que c'est append (>>)
+		}
+		else if (token->type_token == T_FD_HEREDOC)
+		{
+			if (cmd[index_cmd].limiter)
+				free(cmd[index_cmd].limiter);
+			cmd[index_cmd].limiter = ft_strdup(token->str); // on ajoute le limiter pour heredoc (<<)  
+			// ex) << EOF  -> limiter = "EOF"
+			cmd[index_cmd].heredoc = 1; // marquer que c'est heredoc (<<)
+		}
 		if (token->type_token == T_PIPE) // si on arrive a '|'
 		{
-			// if (index_cmd >= nbr_cmd) // proteger au cas ou il y a plus de pipe que prevu
-			// 	return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
-			if (cmd[index_cmd].cmd == NULL && i == 0) // proteger au cas ou il y a un pipe au debut (ex: | cmd1 )
-				return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
+			if (cmd[index_cmd].infile || cmd[index_cmd].outfile || cmd[index_cmd].heredoc == 1)
+				redir_existe = 1;
+			else
+				redir_existe = 0;
 			if (token->next == NULL) // proteger au cas ou il y a un pipe a la fin (ex: cmd1 | )
 				return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
 			if (token->next->type_token == T_PIPE) // proteger au cas ou il y a 2 pipes consecutifs (ex: cmd1 || cmd2)
 				return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
-			if(cmd[index_cmd].cmd == NULL) // proteger au cas ou il y a 2 pipes consecutifs (ex: cmd1 || cmd2)
+			if (cmd[index_cmd].cmd == NULL && i == 0 && !redir_existe)
+			// proteger au cas ou il y a un pipe au debut (ex: | cmd1 )
 				return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
-			cmd[index_cmd].cmd[i] = NULL; // on met le NULL terminateur pour cloturer argv
+			// if(cmd[index_cmd].cmd == NULL) // proteger au cas ou il y a 2 pipes consecutifs (ex: cmd1 || cmd2)
+			// 	return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
+			if (cmd[index_cmd].cmd != NULL) // si le tableau n'est pas vide 
+			// ex) meme s'il y a pas d'argument T_MOT, mais il y a redir et fichier peut-etre
+				cmd[index_cmd].cmd[i] = NULL; // on met le NULL terminateur pour cloturer argv
 			index_cmd++; // on passe a la structure suivante
 			i = 0; // pour reverifier des le debut, on reinitialise l'index pour l'argument de cette nouvelle structure
 		}
 		token = token->next; // on passe au noeud suivant
 	}
 	// printf("index_cmd final: %d\n", index_cmd);
-	if (index_cmd > 0 && cmd[index_cmd].cmd == NULL) // proteger au cas ou il y a un pipe a la fin (ex: cmd1 | )
+	if (index_cmd > 0 && cmd[index_cmd].cmd == NULL
+			&& cmd[index_cmd].infile == NULL && cmd[index_cmd].outfile == NULL && !cmd[index_cmd].heredoc)
+			// proteger au cas ou il y a un pipe a la fin (ex: cmd1 | )
+			// et aussi proteger le cas ou il y a un pipe avec redir mais sans mot (ex: cmd1 | < file)
 		return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
 	// printf("index_cmd final2: %d\n", index_cmd);
 	// printf("i final: %d\n", i);
@@ -616,7 +664,6 @@ int add_cmd(t_token *token, t_cmd *cmd/*, int nbr_cmd*/)
 	// else 
 	// 	printf("pas de pb");
 	// printf("cmd[0] %p", &cmd);
-
 	if (cmd[index_cmd].cmd != NULL) // on termine aussi le dernier argv (apres la boucle)
 		cmd[index_cmd].cmd[i] = NULL; // on ferme bien la fin 
 	// printf("fin add_cmd\n");
@@ -634,13 +681,18 @@ void test_print_cmds(t_cmd *cmd, int nbr_cmd)
 	while (j < nbr_cmd)
 	{
 		printf("command%d:\n", i);
-		while (cmd[j].cmd && cmd[j].cmd[i] != NULL)
+		if (cmd[j].cmd == NULL)
+			printf("cmd: NULL\n");
+		else
 		{
-			printf("arg %d: %s\n", j, cmd[j].cmd[i]);
-			i++;
+			while (cmd[j].cmd && cmd[j].cmd[i] != NULL)
+			{
+				printf("arg %d: %s\n", j, cmd[j].cmd[i]);
+				i++;
+			}
+			j++;
+			i = 0;
 		}
-		j++;
-		i = 0;
 	}
 }
 
@@ -650,9 +702,11 @@ void test_print_cmds(t_cmd *cmd, int nbr_cmd)
 int parse_input(char *line, t_token **token, t_mini *mini) 
 {
 	// (void)mini;
-	int	len;
+	int						len;
+	t_type_token	fd_type;
 
 	len = 0;
+	fd_type = (t_type_token) - 1;
 	while (*line)
 	{
 		if ((*line) == ' ' || (*line) == '\t') // passer l'espace tout au debut
@@ -663,31 +717,53 @@ int parse_input(char *line, t_token **token, t_mini *mini)
 		else if (!ft_strncmp(line, ">>", 2) || !ft_strncmp(line, "<<", 2)) // redirection 
 		{
 			if (!ft_strncmp(line, ">>", 2))
+			{
 				add_token(line, T_RD_APPEND, 2, token); // on ajoute dans la liste chainee : >>, type : T_RD_APPEND;
+				fd_type = T_FD_OUT_APPEND;
+			}
 			else if (!ft_strncmp(line, "<<", 2))
+			{
 				add_token(line, T_RD_HEREDOC, 2, token);
+				fd_type = T_FD_HEREDOC;
+			}
 			line += 2;
 		}
 		else if (!ft_strncmp(line, ">", 1) || !ft_strncmp(line, "<", 1))
 		{
 			if (!ft_strncmp(line, ">", 1))
+			{
 				add_token(line, T_RD_OUT, 1, token);
+				fd_type = T_FD_OUT;
+			}
 			else if (!ft_strncmp(line, "<", 1))
+			{
 				add_token(line, T_RD_IN, 1, token);
+				fd_type = T_FD_IN;
+			}
 			line += 1;
 		}
 		else if (!ft_strncmp(line, "|", 1)) // pipe  (noeud '|'  /  type : T_PIPE)
 		{
+			if (fd_type != (t_type_token) - 1)
+				return (write(2, "syntax error near unexpected token `|'\n", 40), -2);
 			add_token(line, T_PIPE, 1, token);
 			line += 1;
 		}
 		else
 		{
 			len = len_mot_total(line);
-			add_token(line, T_MOT, len, token);
+			if (fd_type != (t_type_token) - 1)
+			{
+				add_token(line, fd_type, len, token);
+				fd_type = (t_type_token) - 1;
+			}
+			else
+				add_token(line, T_MOT, len, token);
 			line += len;
 		}
 	}
+	if (fd_type != (t_type_token) - 1)
+		return (write(2, "syntax error near unexpected token `newline'\n", 45), -2);
 	if (appliquer_dollar_sur_liste_token(token, mini) == -1)
 		return (-1);
 	return (0);
@@ -913,6 +989,143 @@ int	appliquer_dollar_sur_liste_token(t_token **token, t_mini *mini)
 	return (0);
 }
 
+// appliquer la redirection outfile (>) pour la commande i
+int	appliquer_outfile(t_mini *mini, int i)
+{
+	if (mini->cmd[i].out_fail || mini->cmd[i].in_fail) // si deja echec de redir in ou out, on ne fait rien
+		return (0);
+	if (mini->cmd[i].outfile == NULL) // proteger au cas ou outfile est NULL
+	{
+		mini->exit_status = 2;
+		return (-1);
+	}
+	if (mini->cmd[i].fd_out != -1) // si fd_out est deja ouvert, on le ferme d'abord
+	{
+		close(mini->cmd[i].fd_out);
+		mini->cmd[i].fd_out = -1; // reinitialiser fd_out
+	}
+	mini->cmd[i].fd_out = open(mini->cmd[i].outfile, O_WRONLY | O_TRUNC | O_CREAT, 0644);
+	// ouvrir le fichier en ecriture, tronquer s'il existe, creer s'il n'existe pas
+	if (mini->cmd[i].fd_out < 0) // si echec d'ouverture
+	{
+		if (mini->cmd[i].out_fail == 0 && mini->cmd[i].in_fail == 0) // pour ne pas afficher plusieurs fois l'erreur
+			perror(mini->cmd[i].outfile); // afficher l'erreur
+		mini->exit_status = 1; // mettre le code de sortie a 1
+		mini->cmd[i].fd_out = -1; // marquer que l'ouverture a echoue
+		mini->cmd[i].out_fail = 1; // marquer que l'ouverture a echoue
+	}
+	return (0);
+}
+
+// appliquer la redirection outfile (>>) pour la commande i
+int	appliquer_append(t_mini *mini, int i)
+{
+	if (mini->cmd[i].out_fail || mini->cmd[i].in_fail) // si deja echec de redir in ou out, on ne fait rien
+		return (0);
+	if (mini->cmd[i].outfile == NULL) // proteger au cas ou outfile est NULL
+	{
+		mini->exit_status = 2;
+		return (-1);
+	}
+	if (mini->cmd[i].fd_out != -1) // si fd_out est deja ouvert, on le ferme d'abord
+	{
+		close(mini->cmd[i].fd_out);
+		mini->cmd[i].fd_out = -1; // reinitialiser fd_out
+	}
+	mini->cmd[i].fd_out = open(mini->cmd[i].outfile, O_WRONLY | O_APPEND | O_CREAT, 0644);
+	// ouvrir le fichier en ecriture, ajouter a la fin s'il existe, creer s'il n'existe pas
+	if (mini->cmd[i].fd_out < 0) // si echec d'ouverture
+	{
+		if (mini->cmd[i].out_fail == 0 && mini->cmd[i].in_fail == 0) // pour ne pas afficher plusieurs fois l'erreur
+			perror(mini->cmd[i].outfile); // afficher l'erreur
+		mini->exit_status = 1; // mettre le code de sortie a 1
+		mini->cmd[i].fd_out = -1; // marquer que l'ouverture a echoue
+		mini->cmd[i].out_fail = 1; // marquer que l'ouverture a echoue
+	}
+	return (0);
+}
+
+// Passe la structure globale et l'index de la commande en argument
+// et applique la redirection de sortie en fonction du type (>, >>)
+void	process_out_redir(t_mini *mini, int i)
+{
+	if (!mini || i < 0 || i >= mini->nbr_cmd) // si mini n'existe pas, index i est invalide
+		return ;
+	if (!mini->cmd || !mini->cmd[i].outfile) // si cmd n'existe pas ou outfile est NULL
+		return ;
+	if (mini->cmd[i].out_fail || mini->cmd[i].in_fail) // si deja echec de redir in ou out, on ne fait rien
+		return ;
+	if (!mini->cmd[i].out_append) // si out_append == 0, c'est une redirection simple (>)
+		appliquer_outfile(mini, i);
+	else if (mini->cmd[i].out_append == 1) // si out_append == 1, c'est une redirection en mode append (>>)
+		appliquer_append(mini, i);
+}
+
+// appliquer la redirection infile (<) pour la commande i
+int	appliquer_infile(t_mini *mini, int i)
+{
+	if (mini->cmd[i].in_fail || mini->cmd[i].out_fail) // si deja echec de redir in ou out, on ne fait rien
+		return (0);
+	if (mini->cmd[i].infile == NULL) // proteger au cas ou infile est NULL
+	{
+		mini->exit_status = 2;
+		return (-1);
+	}
+	if (mini->cmd[i].fd_in != -1) // si fd_in est deja ouvert, on le ferme d'abord
+	{
+		close(mini->cmd[i].fd_in);
+		mini->cmd[i].fd_in = -1; // reinitialiser fd_in
+	}
+	mini->cmd[i].fd_in = open(mini->cmd[i].infile, O_RDONLY); // ouvrir le fichier en lecture seule
+	if (mini->cmd[i].fd_in < 0) // si echec d'ouverture
+	{
+		perror(mini->cmd[i].infile); // afficher l'erreur
+		mini->exit_status = 1; // mettre le code de sortie a 1
+		mini->cmd[i].fd_in = -1; // marquer que l'ouverture a echoue
+		mini->cmd[i].in_fail = 1; // marquer que l'ouverture a echoue
+	}
+	return (0);
+}
+
+
+
+// Préparation du fichier temporaire pour heredoc
+void	preparer_temp_file(t_mini *mini, int i)
+{
+	if (mini->cmd[i].fd_in != -1)
+		close (mini->cmd[i].fd_in); // fermer l'ancien descripteur de fichier
+	if (access("temp", F_OK) == 0) // si le fichier "temp" existe deja
+		unlink("temp"); // supprimer le fichier existant
+	mini->cmd[i].fd_in = open("temp", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	// ouvrir (créer) le fichier temporaire en écriture
+	if (mini->cmd[i].fd_in == -1)
+	{
+		mini->cmd[i].in_fail = 1;
+		perror("open temp");
+	}
+}
+
+// recuperer les lignes de heredoc, puis les stocker dans le fichier temp
+// fd = fd de fichier temporaire temp, delimiter = limiter
+void	collecter_heredoc_lines(int fd, char *delimiter)
+{
+	char *line;
+	
+	while (1)
+	{
+		line = readline("> "); // afficher un prompte qui ressemble a heredoc
+		if (!line || strcmp(line, delimiter) == 0) // quand on croise limiter ou saisit ctrl+D -> on quitte
+		{
+			free(line); // liberer readline
+			break; // quitte la boucle (et cette fonction)
+		}
+		write(fd, line, strlen(line)); // le resultat
+		write(fd, "\n", 1); // vu que readline n'applique pas automatiquement '\n', on en ajoute a la fin
+		free(line); // free readline avant de quitter la fonction hihi
+	}
+}
+
+
 int	main(int ac, char **av, char **env)
 {
 	(void)ac;
@@ -930,12 +1143,14 @@ int	main(int ac, char **av, char **env)
 		return (0);
 	mini->env = env;
 	mini->exit_status = 0;
+	mini->cmd = NULL;
+	mini->nbr_cmd = 0;
 	i = 0;
 	cmd = NULL;
 	while (1)
 	{
 		line = readline("coucou$ ");
-		if (!line)
+		if (!line) // ctrl D
 			break ;
 		if (line[0] == '\0')
 		{
@@ -978,7 +1193,9 @@ int	main(int ac, char **av, char **env)
 		int result = add_cmd(parsing, cmd);
 		if (result == -1)
 			return (-1);
-		else if (result == -2)
+		mini->cmd = cmd;
+		mini->nbr_cmd = count_pipe(parsing) + 1;
+		if (result == -2)
 		{
 			continue ;
 		}
@@ -991,7 +1208,30 @@ int	main(int ac, char **av, char **env)
 			free(line);
 			continue ;
 		}
+for (int i = 0; i < mini->nbr_cmd; i++)
+{
+    t_cmd *c = &mini->cmd[i];
 
+    // argv
+    if (c->cmd)
+    {
+        for (int a = 0; c->cmd[a]; a++)
+            printf("cmd[%d].argv[%d] = %s\n", i, a, c->cmd[a]);
+    }
+    else
+        printf("cmd[%d].cmd = NULL\n", i);
+
+    // redir 정보
+    if (c->infile)  printf("  infile: %s\n", c->infile);
+    if (c->outfile) printf("  outfile: %s (append=%d)\n", c->outfile, c->out_append);
+    if (c->heredoc) printf("  heredoc limiter: %s\n", c->limiter);
+}
+
+		// free cmd a gerer ******************************
+		if (cmd)
+			free(cmd); // il faut ameliorer apres *************************
+		mini->cmd = NULL;
+		mini->nbr_cmd = 0;
 		free_tokens(&parsing);
 		free(line);
 	}

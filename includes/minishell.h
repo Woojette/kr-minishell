@@ -56,10 +56,10 @@ typedef enum s_type_bi
 // (mot, pipe, redir, etc)
 typedef struct s_token
 {
-	char						*str; // token = <<
-	t_type_token		type_token; //= T_RD_HEREDOC
-	t_type_bi				type_bi; // type builtin
-	t_state					type_quote; // = GENERAL
+	char			*str; // token = <<
+	t_type_token	type_token; //= T_RD_HEREDOC
+	t_type_bi		type_bi; // type builtin
+	t_state			type_quote; // = GENERAL
 	struct s_token	*next;
 }	t_token;
 
@@ -69,14 +69,28 @@ typedef struct s_token
 typedef struct s_cmd
 {
 	char	**cmd;
+	// cmd redir
+	char	**infile; // fichier de redirection entree (<)
+	char	**outfile; // fichier de redirection sortie (>)
+	int		out_append; // 1 si redirection en mode append (>>), 0 sinon
+	int		heredoc; // 1 si redirection heredoc (<<), 0 sinon
+	char	*limiter; // limiteur pour heredoc
+	// resultat des fd
+	int		fd_in; // resultat ouverture fichier de < or <<
+	int		fd_out; // resultat ouverture fichier de > or >>
+	// erreurs de redirection
+	int		in_fail; // 1 si echec ouverture fichier de < or <<, 0 sinon
+	int		out_fail; // 1 si echec ouverture fichier de > or >>, 0 sinon
 }	t_cmd;
 
 // structure du contexte global minishell 
 // ex) env et exit status (dernier code de sortie)
 typedef struct s_mini
 {
-	char						**env;
-	int							exit_status;
+	char	**env;
+	int		exit_status;
+	t_cmd	*cmd; // tableau de structures cmd (divise par pipe)
+	int		nbr_cmd; // nombre de commandes (nombre de structures cmd dans cmd_tab)
 }	t_mini;
 
 
@@ -162,6 +176,21 @@ char	*ajouter_char(char *resultat, char c); // ajouter un char c a la fin de la 
 char	*appliquer_env_var(char *resultat, char *str, t_mini *mini, int *i); // appliquer la variable d'env dans str a la position i (qui est le $)
 char	*remplacer_dollar(char *str, t_mini *mini); // remplacement de $ par la valeur de la variable d'env
 int	appliquer_dollar_sur_liste_token(t_token **token, t_mini *mini); // appliquer le remplacement de $ sur toute la liste chainee token
+
+// =====================================================================================================================
+
+// ===================================================== redirection ===================================================
+
+int		appliquer_outfile(t_mini *mini, int i); // appliquer la redirection outfile (>) pour la commande i
+int		appliquer_append(t_mini *mini, int i); // appliquer la redirection append (>>) pour la commande i
+void	process_out_redir(t_mini *mini, int i); // proceder a la redirection de sortie pour la commande i (> ou >>)
+int		appliquer_infile(t_mini *mini, int i); // appliquer la redirection infile (<) pour la commande i
+
+// heredoc
+void	preparer_temp_file(t_mini *mini, int i); // Préparation du fichier temporaire pour heredoc
+void	collecter_heredoc_lines(int fd, char *delimiter); // recuperer les lignes de heredoc, puis les stocker dans le fichier temp
+
+
 
 // void	ft_echo(char *str, int option_n);
 // void	ft_env(char **env);
