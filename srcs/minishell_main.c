@@ -917,7 +917,6 @@ char	*appliquer_env_var(char *resultat, char *str, t_mini *mini, int *i)
 // parcours le token str et creer un nouveau str* result qui remplacera str;
 // Si c’est un caractere $, on cherche la variable d’environment et on remplace
 // sinon juste on copie caractere par caractere result est vide au depart et on le construit caractre par caractere
-// a gerer : accolades apres $ et single quote *******************************************************************
 // le cas de single quote a gerer aussi (ne pas remplacer $ dans des single quote) *******************************
 char	*remplacer_dollar(char *str, t_mini *mini)
 {
@@ -991,6 +990,11 @@ int	appliquer_dollar_sur_liste_token(t_token **token, t_mini *mini)
 	return (0);
 }
 
+
+
+// ===================================== redirection ===================================== 
+// ======================================================================================= 
+
 // appliquer la redirection outfile (>) pour la commande i
 int	appliquer_outfile(t_mini *mini, int i)
 {
@@ -1013,7 +1017,7 @@ int	appliquer_outfile(t_mini *mini, int i)
 		if (mini->cmd[i].out_fail == 0 && mini->cmd[i].in_fail == 0) // pour ne pas afficher plusieurs fois l'erreur
 			perror(mini->cmd[i].outfile); // afficher l'erreur
 		mini->exit_status = 1; // mettre le code de sortie a 1
-		mini->cmd[i].ft_out = -1; // marquer que l'ouverture a echoue
+		mini->cmd[i].fd_out = -1; // marquer que l'ouverture a echoue
 		mini->cmd[i].out_fail = 1; // marquer que l'ouverture a echoue
 	}
 	return (0);
@@ -1129,9 +1133,20 @@ void	preparer_temp_file(t_mini *mini, int i)
 	}
 }
 
+// afficher le message d'erreur quand on saisit ctrl d dans heredoc
+void	print_heredoc_warning_ctrl_d(char *delimiter)
+{
+	if (!delimiter)
+		delimiter = "";
+	write(2, "warning: here-document delimited by end-of-file (wanted `", 57);
+	write(2, delimiter, ft_strlen(delimiter));
+	write(2, "')\n", 3);
+	// le nombre de lines a faire apres ******************************************************
+}
+
 // recuperer les lignes de heredoc, puis les stocker dans le fichier temp
 // fd = fd de fichier temporaire temp, delimiter = limiter
-void	collecter_heredoc_lines(int fd, char *delimiter)
+int	collecter_heredoc_lines(int fd, char *delimiter)
 {
 	char *line;
 	
@@ -1139,30 +1154,41 @@ void	collecter_heredoc_lines(int fd, char *delimiter)
 	{
 		line = readline("> "); // afficher un prompte qui ressemble a heredoc
 		if (!line) // saisit ctrl+D -> on quitte
-			break; // dans ce cas (ctrl+D), pas besoin de liberer le memoire, puisqu'il y en a pas
-		if (strcmp(line, delimiter) == 0) // quand on croise limiter -> on quitte
+			return (1); // dans ce cas (ctrl+D), pas besoin de liberer le memoire, puisqu'il y en a pas
+		if (delimiter && strcmp(line, delimiter) == 0) // quand on croise limiter -> on quitte
+		// si delimiter est NULL -> erreur (pour proteger on ajoute dans la condition delimiter aussi)
 		{
 			// if (!line) // ctrl d message d'erreur a faire apres *************************
 			// 	return;
 			free(line); // liberer readline
-			break; // quitte la boucle (et cette fonction)
+			return (0); // quitte la boucle (et cette fonction)
 		}
 		write(fd, line, strlen(line)); // le resultat
 		write(fd, "\n", 1); // vu que readline n'applique pas automatiquement '\n', on en ajoute a la fin
 		free(line); // free readline avant de quitter la fonction hihi
 	}
+	return (0);
 }
 
 // appliquer heredoc dans le processus enfant
 void	appliquer_heredoc_enfant(t_mini *mini, int i)
 {
+	int	resultat;
+
 	// il faut gerer des signaux; plus tard *******************************************
 	signal(SIGINT, SIG_DFL); // quand on saisit ctrl+C, le processus enfant doit etre termine
 	signal(SIGQUIT, SIG_IGN); // quand on saisit ctrt+\, on l'ignore (ca change rien)
 	preparer_temp_file(mini, i); // creer un fichier temporaire
 	if (mini->cmd[i].fd_in == -1)
 		exit (1);
-	collecter_heredoc_lines(mini->cmd[i].fd_in, mini->cmd[i].limiter); // collecter des lignes heredoc dans le fichier temp
+	resultat = collecter_heredoc_lines(mini->cmd[i].fd_in, mini->cmd[i].limiter);
+	// collecter des lignes heredoc dans le fichier temp
+	if (resultat == 1) // ctrl-D
+	{
+		print_heredoc_warning_ctrl_d(mini->cmd[i].limiter);
+		close(mini->cmd[i].fd_in);
+		exit (0);
+	}
 	close(mini->cmd[i].fd_in); //close dans l'enfant pour eviter les leak
 	exit(0);
 }
@@ -1186,6 +1212,7 @@ int	appliquer_heredoc_cmd(t_mini *mini, int i)
 {
 	int	status; // pour waitpid (si le processus enfant s'est termine correctement)
 	int	exit_status; // pour resultat du waitpid (code de sortie du processus enfant)
+	int	exit_signal;
 
 	signal(SIGINT, SIG_IGN); // le processus parent ignore ctrl+C pendant le processus enfant (heredoc fork)
 	signal(SIGQUIT, SIG_IGN);
@@ -1197,10 +1224,18 @@ int	appliquer_heredoc_cmd(t_mini *mini, int i)
 	if (waitpid(mini->cmd[i].pid_heredoc, &status, 0) == -1) // attendre la fin du processus enfant
 		return (init_signaux(), -1); // si echec de waitpid
 	init_signaux(); // apres la fin du processus enfant, on applique des signaux pareils que shell
+	if (WIFSIGNALED(status))
+	{
+		exit_signal = WTERMSIG(status);
+		mini->cmd[i].in_fail = 1;
+		mini->exit_status = 128 + exit_signal;
+		return (-1);
+	}
 	if (WIFEXITED(status)) // si le processus enfant s'est termine correctement
 	{
 		exit_status = WEXITSTATUS(status); // recuperer le code de sortie
-		if (exit_status != 0) // si le code de sortie n'est pas 0 (erreur dans heredoc)
+		if (exit_status != 0) 
+		// si le code de sortie n'est pas 0, ni 2 (erreur dans heredoc)
 		{
 			mini->cmd[i].in_fail = 1; // marquer l'echec de heredoc
 			mini->exit_status = exit_status; // mettre a jour le code de sortie global
