@@ -180,6 +180,8 @@ int		decouper_cmd_par_pipe(t_token *token, t_cmd **cmd);
 
 // ========================================================= quote =====================================================
 
+char	*enlever_quote_dans_token(char *str); // enlever les quotes dans un token str
+
 // dollar
 char	*get_env_name(char *str, int start); // recuperer le nom de la variable d'env apres $
 char	*get_env_var(char *str, t_mini *mini); // recuperer $ env variable

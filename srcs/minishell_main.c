@@ -435,7 +435,7 @@ int	len_mot_total(char *line)
 			len = len_mot_sans_quote(line);
 	}
 	// 2. le cas ou le premier caractere ne commence pas par une quote (mais pas redir, ni pipe non plus)
-	else if (line[0] != '"' || line[0] != '\'')
+	else if (line[0] != '"' && line[0] != '\'')
 	{
 		// 2-1.  1) quote au milieu   2) 2 quotes bien fermees   3) apres quote ' ' ou redir ou pipe
 		if (check_quote_milieu_ok(line) == 1 && check_avant_quote_espace(line) == 0 && check_2_quotes_milieu_puis_fin(line) == 1)
@@ -757,13 +757,6 @@ int add_cmd(t_token *token, t_cmd *cmd)
 			// proteger au cas ou il y a un pipe a la fin (ex: cmd1 | )
 			// et aussi proteger le cas ou il y a un pipe avec redir mais sans mot (ex: cmd1 | < file)
 		return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
-	// printf("index_cmd final2: %d\n", index_cmd);
-	// printf("i final: %d\n", i);
-	// if (cmd == NULL)
-	// 	printf("probleme cmd");
-	// else 
-	// 	printf("pas de pb");
-	// printf("cmd[0] %p", &cmd);
 	if (cmd[index_cmd].cmd != NULL) // on termine aussi le dernier argv (apres la boucle)
 		cmd[index_cmd].cmd[i] = NULL; // on ferme bien la fin 
 	// printf("fin add_cmd\n");
@@ -795,6 +788,7 @@ void test_print_cmds(t_cmd *cmd, int nbr_cmd)
 		}
 	}
 }
+
 
 
 // On parse tout pour trouver les operations ou les builtins
@@ -1073,7 +1067,9 @@ int	appliquer_dollar_sur_liste_token(t_token **token, t_mini *mini)
 	temp = *token;
 	while (temp) // parcourir toute la liste chainee token
 	{
-		if (temp->type_token == T_MOT) // si le type de token est T_MOT
+		if (temp->type_token == T_MOT || temp->type_token == T_FD_IN
+			|| temp->type_token == T_FD_OUT || temp->type_token == T_FD_OUT_APPEND)
+			// si le type de token est T_MOT et redir -> on applique le remplacement de $
 		{
 			if (!temp->str) // si str est NULL, on retourne -1 (erreur)
 				return (-1);
@@ -1088,6 +1084,49 @@ int	appliquer_dollar_sur_liste_token(t_token **token, t_mini *mini)
 	return (0);
 }
 
+// enlever les quotes dans un token str
+char	*enlever_quote_dans_token(char *str)
+{
+	int	i; // index pour parcourir str
+	int	n; // index pour parcourir resultat (nouveau str sans quotes)
+	int	s_quote; // entree dans single quote ou pas (1 = dans single quote, 0 sinon)
+	int	d_quote; // entree dans double quote ou pas (1 = dans double quote, 0 sinon)
+	char	*resultat; // le nouveau str sans quotes
+
+	i = 0;
+	n = 0;
+	s_quote = 0; // pour gerer le cas de dans single quote (1 = dans single quote, 0 sinon)
+	d_quote = 0; // pour gerer le cas de double quote (1 = dans double quote, 0 sinon)
+	if (!str)
+		return (NULL);
+	resultat = malloc(sizeof(char) * (ft_strlen(str) + 1)); // resultat ne peut pas etre plus long que str (puisqu'on va juste enlever les quotes)
+	// donc on alloue la taille de str + 1 pour le '\0'
+	if (!resultat)
+		return (NULL);
+	i = 0;
+	while (str[i])
+	{
+		if (str[i] == '\'' && !d_quote) // gerer le cas de single quote au debut
+		{
+			s_quote = !s_quote; // on inverse l'etat de s_quote (0 -> 1 , 1 -> 0)
+			i++; // on saute le caractere quote
+			continue ; // on passe au caractere suivant
+		}
+		if (str[i] == '"' && !s_quote) // gerer le cas de double quote au debut
+		{
+			d_quote = !d_quote; // on inverse l'etat de d_quote (0 -> 1 , 1 -> 0)
+			i++; // on saute le caractere quote
+			continue ; // on passe au caractere suivant
+		}
+		resultat[n++] = str[i++]; // on copie le caractere dans resultat et on avance les index
+		// c'est pareil que resulat[n] = str[i]; n++; i++; hihi j'ai appris
+		// ex) you"pi'i'i" -> youpii
+	}
+	resultat[n] = '\0'; // terminer resultat par '\0'
+	if (s_quote || d_quote) // si on a une quote non fermee, on retourne NULL (erreur de syntaxe)
+		return (free(resultat), NULL);
+	return (resultat); // retourner le nouveau str sans quotes
+}
 
 
 // ===================================== redirection ===================================== 
