@@ -155,7 +155,7 @@ int		len_mot_avant_quote(char *line); // recuperer len avant la quote qui est au
 int		len_mot_2_quotes_entier(char *line); // compter le nombre de caracteres entre 2 quotes, y compris les 2 quotes
 int		len_mot_apres_quote(char *line); // recuperer len apres la 2e quote
 int		len_tab_char(char **tab); // compter le nombre de chaines dans un double tableau
-int	len_tab_int(int *tab); // compter le nombre d'elements dans un tableau int*
+int		len_tab_int(int *tab); // compter le nombre d'elements dans un tableau int*
 
 // pas de quote dans la chaine
 int		len_mot_sans_quote(char *line); // compter le nombre de caracteres s'il y a pas de 2 quotes qui fonctionnent
@@ -172,7 +172,7 @@ void	free_tokens(t_token **token); // liste free
 int 	count_pipe(t_token *token); // compter le nombre de pipes dans la liste chainee
 t_cmd	*malloc_cmd(t_token *token); // alluer la liste chainee cmd (divisee par pipe)
 char**	add_double_tab_char(char **tab, char *str, int size); // agrandir un tableau et rajouter une chaine
-int	*add_double_tab_int(int *tab, int val); // agrandir un tableau int et rajouter une valeur int
+int		*add_double_tab_int(int *tab, int val); // agrandir un tableau int et rajouter une valeur int
 int 	add_cmd(t_token *token, t_cmd *cmd); // parcours les token, et rajoute les token dans les tableaux
 int		decouper_cmd_par_pipe(t_token *token, t_cmd **cmd);
 
@@ -192,13 +192,14 @@ int		appliquer_dollar_sur_liste_token(t_token **token, t_mini *mini); // appliqu
 
 // ===================================================== redirection ===================================================
 
-int		appliquer_outfile(t_mini *mini, int i); // appliquer la redirection outfile (>) pour la commande i
-int		appliquer_append(t_mini *mini, int i); // appliquer la redirection append (>>) pour la commande i
+// int		appliquer_outfile(t_mini *mini, int i); // appliquer la redirection outfile (>) pour la commande i
+// int		appliquer_append(t_mini *mini, int i); // appliquer la redirection append (>>) pour la commande i
 void	process_out_redir(t_mini *mini, int i); // proceder a la redirection de sortie pour la commande i (> ou >>)
 int		appliquer_infile(t_mini *mini, int i); // appliquer la redirection infile (<) pour la commande i
 
 // heredoc
-void	preparer_temp_file(t_mini *mini, int i); // Préparation du fichier temporaire pour heredoc
+int		preparer_temp_file_name(t_mini *mini, int i);
+// void	preparer_temp_file(t_mini *mini, int i); // Préparation du fichier temporaire pour heredoc
 int		collecter_heredoc_lines(int fd, char *delimiter); // recuperer les lignes de heredoc, puis les stocker dans le fichier temp
 void	appliquer_heredoc_enfant(t_mini *mini, int i); // appliquer heredoc dans le processus enfant
 

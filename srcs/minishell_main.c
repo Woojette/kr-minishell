@@ -1093,60 +1093,60 @@ int	appliquer_dollar_sur_liste_token(t_token **token, t_mini *mini)
 // ===================================== redirection ===================================== 
 // ======================================================================================= 
 
-// appliquer la redirection outfile (>) pour la commande i
-int	appliquer_outfile(t_mini *mini, int i)
-{
-	if (mini->cmd[i].out_fail || mini->cmd[i].in_fail) // si deja echec de redir in ou out, on ne fait rien
-		return (0);
-	if (mini->cmd[i].outfile == NULL) // proteger au cas ou outfile est NULL
-	{
-		mini->exit_status = 2;
-		return (-1);
-	}
-	if (mini->cmd[i].fd_out != -1) // si fd_out est deja ouvert, on le ferme d'abord
-	{
-		close(mini->cmd[i].fd_out);
-		mini->cmd[i].fd_out = -1; // reinitialiser fd_out
-	}
-	mini->cmd[i].fd_out = open(mini->cmd[i].outfile, O_WRONLY | O_TRUNC | O_CREAT, 0644);
-	// ouvrir le fichier en ecriture, tronquer s'il existe, creer s'il n'existe pas
-	if (mini->cmd[i].fd_out < 0) // si echec d'ouverture
-	{
-		if (mini->cmd[i].out_fail == 0 && mini->cmd[i].in_fail == 0) // pour ne pas afficher plusieurs fois l'erreur
-			perror(mini->cmd[i].outfile); // afficher l'erreur
-		mini->exit_status = 1; // mettre le code de sortie a 1
-		mini->cmd[i].fd_out = -1; // marquer que l'ouverture a echoue
-		mini->cmd[i].out_fail = 1; // marquer que l'ouverture a echoue
-	}	return (0);
-}
+// // appliquer la redirection outfile (>) pour la commande i
+// int	appliquer_outfile(t_mini *mini, int i)
+// {
+// 	if (mini->cmd[i].out_fail || mini->cmd[i].in_fail) // si deja echec de redir in ou out, on ne fait rien
+// 		return (0);
+// 	if (mini->cmd[i].outfile == NULL) // proteger au cas ou outfile est NULL
+// 	{
+// 		mini->exit_status = 2;
+// 		return (-1);
+// 	}
+// 	if (mini->cmd[i].fd_out != -1) // si fd_out est deja ouvert, on le ferme d'abord
+// 	{
+// 		close(mini->cmd[i].fd_out);
+// 		mini->cmd[i].fd_out = -1; // reinitialiser fd_out
+// 	}
+// 	mini->cmd[i].fd_out = open(mini->cmd[i].outfile, O_WRONLY | O_TRUNC | O_CREAT, 0644);
+// 	// ouvrir le fichier en ecriture, tronquer s'il existe, creer s'il n'existe pas
+// 	if (mini->cmd[i].fd_out < 0) // si echec d'ouverture
+// 	{
+// 		if (mini->cmd[i].out_fail == 0 && mini->cmd[i].in_fail == 0) // pour ne pas afficher plusieurs fois l'erreur
+// 			perror(mini->cmd[i].outfile); // afficher l'erreur
+// 		mini->exit_status = 1; // mettre le code de sortie a 1
+// 		mini->cmd[i].fd_out = -1; // marquer que l'ouverture a echoue
+// 		mini->cmd[i].out_fail = 1; // marquer que l'ouverture a echoue
+// 	}	return (0);
+// }
 
-// appliquer la redirection outfile (>>) pour la commande i
-int	appliquer_append(t_mini *mini, int i)
-{
-	if (mini->cmd[i].out_fail || mini->cmd[i].in_fail) // si deja echec de redir in ou out, on ne fait rien
-		return (0);
-	if (mini->cmd[i].outfile == NULL) // proteger au cas ou outfile est NULL
-	{
-		mini->exit_status = 2;
-		return (-1);
-	}
-	if (mini->cmd[i].fd_out != -1) // si fd_out est deja ouvert, on le ferme d'abord
-	{
-		close(mini->cmd[i].fd_out);
-		mini->cmd[i].fd_out = -1; // reinitialiser fd_out
-	}
-	mini->cmd[i].fd_out = open(mini->cmd[i].outfile, O_WRONLY | O_APPEND | O_CREAT, 0644);
-	// ouvrir le fichier en ecriture, ajouter a la fin s'il existe, creer s'il n'existe pas
-	if (mini->cmd[i].fd_out < 0) // si echec d'ouverture
-	{
-		if (mini->cmd[i].out_fail == 0 && mini->cmd[i].in_fail == 0) // pour ne pas afficher plusieurs fois l'erreur
-			perror(mini->cmd[i].outfile); // afficher l'erreur
-		mini->exit_status = 1; // mettre le code de sortie a 1
-		mini->cmd[i].fd_out = -1; // marquer que l'ouverture a echoue
-		mini->cmd[i].out_fail = 1; // marquer que l'ouverture a echoue
-	}
-	return (0);
-}
+// // appliquer la redirection outfile (>>) pour la commande i
+// int	appliquer_append(t_mini *mini, int i)
+// {
+// 	if (mini->cmd[i].out_fail || mini->cmd[i].in_fail) // si deja echec de redir in ou out, on ne fait rien
+// 		return (0);
+// 	if (mini->cmd[i].outfile == NULL) // proteger au cas ou outfile est NULL
+// 	{
+// 		mini->exit_status = 2;
+// 		return (-1);
+// 	}
+// 	if (mini->cmd[i].fd_out != -1) // si fd_out est deja ouvert, on le ferme d'abord
+// 	{
+// 		close(mini->cmd[i].fd_out);
+// 		mini->cmd[i].fd_out = -1; // reinitialiser fd_out
+// 	}
+// 	mini->cmd[i].fd_out = open(mini->cmd[i].outfile, O_WRONLY | O_APPEND | O_CREAT, 0644);
+// 	// ouvrir le fichier en ecriture, ajouter a la fin s'il existe, creer s'il n'existe pas
+// 	if (mini->cmd[i].fd_out < 0) // si echec d'ouverture
+// 	{
+// 		if (mini->cmd[i].out_fail == 0 && mini->cmd[i].in_fail == 0) // pour ne pas afficher plusieurs fois l'erreur
+// 			perror(mini->cmd[i].outfile); // afficher l'erreur
+// 		mini->exit_status = 1; // mettre le code de sortie a 1
+// 		mini->cmd[i].fd_out = -1; // marquer que l'ouverture a echoue
+// 		mini->cmd[i].out_fail = 1; // marquer que l'ouverture a echoue
+// 	}
+// 	return (0);
+// }
 
 // Passe la structure globale et l'index de la commande en argument
 // et applique la redirection de sortie en fonction du type (>, >>)
@@ -1215,7 +1215,7 @@ int	appliquer_infile(t_mini *mini, int i)
 	while (mini->cmd[i].infile[n]) // pour chaque fichier de redirection infile
 	{
 		fd_temp = open(mini->cmd[i].infile[n], O_RDONLY);
-		// a chaque iteration de infile[n], ouvrir le fichier en lecture seule dans un fichier temporaire
+		// a chaque iteration de infile[n], ouvrir le fichier en lecture seule dans un fd temporaire
 		if (fd_temp < 0) // si echec d'ouverture
 		{
 			perror(mini->cmd[i].infile[n]); // afficher l'erreur
@@ -1233,14 +1233,15 @@ int	appliquer_infile(t_mini *mini, int i)
 	return (0);
 }
 
-
-// Préparation du fichier temporaire pour heredoc
-void	preparer_temp_file(t_mini *mini, int i)
+// Préparation du nom de fichier temporaire pour heredoc
+int	preparer_temp_file_name(t_mini *mini, int i)
 {
 	char	*temp_index; // pour faire l'etiquette de l'index du fichier temporaire
 
-	if (mini->cmd[i].fd_in != -1) // si fd_in est deja ouvert, on le ferme d'abord
-		close (mini->cmd[i].fd_in); // fermer l'ancien descripteur de fichier
+	if (!mini || i < 0 || i >= mini->nbr_cmd) // si mini n'existe pas, index i est invalide
+		return (-1);
+	// if (mini->cmd[i].fd_in != -1) // si fd_in est deja ouvert, on le ferme d'abord
+	// 	close (mini->cmd[i].fd_in); // fermer l'ancien descripteur de fichier
 	if (mini->cmd[i].temp_heredoc)
 	{
 		unlink(mini->cmd[i].temp_heredoc); // supprimer l'ancien fichier temporaire s'il existe
@@ -1250,28 +1251,61 @@ void	preparer_temp_file(t_mini *mini, int i)
 	temp_index = ft_itoa(i); // convertir l'index i en string pour nommer l'index du fichier temporaire
 	if (!temp_index)
 	{
-		mini->cmd[i].in_fail = 1;
+		// mini->cmd[i].in_fail = 1;
 		perror("malloc: temp index");
-		return ;
+		return (-1);
 	}
-	mini->cmd[i].temp_heredoc = ft_strjoin("temp_", temp_index); // nom du fichier temporaire pour heredoc"
+	mini->cmd[i].temp_heredoc = ft_strjoin("temp_", temp_index); // construire nom du fichier temporaire pour heredoc: temp_i
 	free(temp_index); // liberer temp_index apres utilisation
 	if (!mini->cmd[i].temp_heredoc) // si echec de malloc pour le nom du fichier temporaire
 	{
-		mini->cmd[i].in_fail = 1;
+		// mini->cmd[i].in_fail = 1;
 		perror("malloc: temp heredoc name");
-		return ;
+		return (-1);
 	}
-	if (access(mini->cmd[i].temp_heredoc, F_OK) == 0) // si le fichier mini->cmd[i].temp_heredoc existe deja
-		unlink(mini->cmd[i].temp_heredoc); // supprimer le fichier existant
-	mini->cmd[i].fd_in = open(mini->cmd[i].temp_heredoc, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	// ouvrir (créer) le fichier temporaire en écriture
-	if (mini->cmd[i].fd_in == -1)
-	{
-		mini->cmd[i].in_fail = 1;
-		perror("open temp");
-	}
+	if (access(mini->cmd[i].temp_heredoc, F_OK) == 0 && unlink(mini->cmd[i].temp_heredoc) == -1) // si le fichier mini->cmd[i].temp_heredoc existe deja
+		perror("unlink temp heredoc"); // supprimer le fichier existant
+	return (0);
 }
+
+// // Préparation du fichier temporaire pour heredoc
+// void	preparer_temp_file(t_mini *mini, int i)
+// {
+// 	char	*temp_index; // pour faire l'etiquette de l'index du fichier temporaire
+
+// 	if (mini->cmd[i].fd_in != -1) // si fd_in est deja ouvert, on le ferme d'abord
+// 		close (mini->cmd[i].fd_in); // fermer l'ancien descripteur de fichier
+// 	if (mini->cmd[i].temp_heredoc)
+// 	{
+// 		unlink(mini->cmd[i].temp_heredoc); // supprimer l'ancien fichier temporaire s'il existe
+// 		free(mini->cmd[i].temp_heredoc); // free l'ancien nom de fichier temporaire
+// 		mini->cmd[i].temp_heredoc = NULL; // reinitialiser a NULL
+// 	}
+// 	temp_index = ft_itoa(i); // convertir l'index i en string pour nommer l'index du fichier temporaire
+// 	if (!temp_index)
+// 	{
+// 		mini->cmd[i].in_fail = 1;
+// 		perror("malloc: temp index");
+// 		return ;
+// 	}
+// 	mini->cmd[i].temp_heredoc = ft_strjoin("temp_", temp_index); // nom du fichier temporaire pour heredoc"
+// 	free(temp_index); // liberer temp_index apres utilisation
+// 	if (!mini->cmd[i].temp_heredoc) // si echec de malloc pour le nom du fichier temporaire
+// 	{
+// 		mini->cmd[i].in_fail = 1;
+// 		perror("malloc: temp heredoc name");
+// 		return ;
+// 	}
+// 	if (access(mini->cmd[i].temp_heredoc, F_OK) == 0) // si le fichier mini->cmd[i].temp_heredoc existe deja
+// 		unlink(mini->cmd[i].temp_heredoc); // supprimer le fichier existant
+// 	mini->cmd[i].fd_in = open(mini->cmd[i].temp_heredoc, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+// 	// ouvrir (créer) le fichier temporaire en écriture
+// 	if (mini->cmd[i].fd_in == -1)
+// 	{
+// 		mini->cmd[i].in_fail = 1;
+// 		perror("open temp");
+// 	}
+// }
 
 // afficher le message d'erreur quand on saisit ctrl d dans heredoc
 void	print_heredoc_warning_ctrl_d(char *delimiter)
@@ -1315,12 +1349,18 @@ void	appliquer_heredoc_enfant(t_mini *mini, int i)
 {
 	int	resultat;
 
-	// il faut gerer des signaux; plus tard *******************************************
 	signal(SIGINT, SIG_DFL); // quand on saisit ctrl+C, le processus enfant doit etre termine
 	signal(SIGQUIT, SIG_IGN); // quand on saisit ctrt+\, on l'ignore (ca change rien)
-	preparer_temp_file(mini, i); // creer un fichier temporaire
+	// if (preparer_temp_file_name(mini, i) == -1)
+	// 	exit (1);
+	mini->cmd[i].fd_in = open(mini->cmd[i].temp_heredoc, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	// ouvrir (créer) le fichier temporaire en écriture
 	if (mini->cmd[i].fd_in == -1)
+	{
+		mini->cmd[i].in_fail = 1;
+		perror("open temp");
 		exit (1);
+	}
 	resultat = collecter_heredoc_lines(mini->cmd[i].fd_in, mini->cmd[i].limiter);
 	// collecter des lignes heredoc dans le fichier temp
 	if (resultat == 1) // ctrl-D
@@ -1354,6 +1394,12 @@ int	appliquer_heredoc_cmd(t_mini *mini, int i)
 	int	exit_status; // pour resultat du waitpid (code de sortie du processus enfant)
 	int	exit_signal;
 
+	if (preparer_temp_file_name(mini, i) == -1)
+	{
+		mini->cmd[i].in_fail = 1;
+		mini->exit_status = 1;
+		return (-1);
+	}
 	signal(SIGINT, SIG_IGN); // le processus parent ignore ctrl+C pendant le processus enfant (heredoc fork)
 	signal(SIGQUIT, SIG_IGN);
 	mini->cmd[i].pid_heredoc = fork(); // creer un processus enfant pour gerer heredoc
@@ -1371,11 +1417,10 @@ int	appliquer_heredoc_cmd(t_mini *mini, int i)
 		mini->exit_status = 128 + exit_signal;
 		return (-1);
 	}
-	if (WIFEXITED(status)) // si le processus enfant s'est termine correctement
+	else if (WIFEXITED(status)) // si le processus enfant s'est termine correctement
 	{
 		exit_status = WEXITSTATUS(status); // recuperer le code de sortie
-		if (exit_status != 0) 
-		// si le code de sortie n'est pas 0 (erreur dans heredoc)
+		if (exit_status != 0) // si le code de sortie n'est pas 0 (erreur dans heredoc)
 		{
 			mini->cmd[i].in_fail = 1; // marquer l'echec de heredoc
 			mini->exit_status = exit_status; // mettre a jour le code de sortie global
@@ -1417,30 +1462,27 @@ static void	print_preview_path(const char *path)
 
 	if (!path)
 		return ;
-
 	fd = open(path, O_RDONLY);
 	if (fd < 0)
 	{
-		printf("    [preview stdin] (cannot open: %s)\n", path);
+		perror("preview open");
 		return ;
 	}
 	n = read(fd, buf, sizeof(buf) - 1);
 	if (n > 0)
 	{
 		buf[n] = '\0';
-		printf("    [preview stdin] ----\n%s\n    -------------------\n", buf);
+		printf("    [preview] ----\n%s\n    ------------\n", buf);
 	}
 	else
-		printf("    [preview stdin] (empty)\n");
-
+		printf("    [preview] (empty)\n");
 	close(fd);
 }
 
 // ca aussi juste pour tester redir j'en ai maaaaaare
 void	test_redirs(t_mini *mini)
 {
-	int			i;
-	const char	*preview_path;
+	int	i;
 
 	if (!mini || !mini->cmd)
 		return ;
@@ -1449,13 +1491,42 @@ void	test_redirs(t_mini *mini)
 	while (i < mini->nbr_cmd)
 	{
 		printf("\n========== CMD %d ==========\n", i);
-		printf("raw: infile=%s | outfile=%s | append=%d | heredoc=%d | limiter=%s | temp=%s\n",
-			mini->cmd[i].infile ? mini->cmd[i].infile : "(null)",
-			mini->cmd[i].outfile ? mini->cmd[i].outfile : "(null)",
-			mini->cmd[i].out_append,
+
+		printf("raw: heredoc=%d limiter=%s temp=%s\n",
 			mini->cmd[i].heredoc,
 			mini->cmd[i].limiter ? mini->cmd[i].limiter : "(null)",
 			mini->cmd[i].temp_heredoc ? mini->cmd[i].temp_heredoc : "(null)");
+
+		printf("raw: infile=");
+		if (mini->cmd[i].infile)
+		{
+			int k = 0;
+			while (mini->cmd[i].infile[k])
+			{
+				printf("[%s] ", mini->cmd[i].infile[k]);
+				k++;
+			}
+		}
+		else
+			printf("(null)");
+		printf("\n");
+
+		printf("raw: outfile=");
+		if (mini->cmd[i].outfile)
+		{
+			int k = 0;
+			while (mini->cmd[i].outfile[k])
+			{
+				int mode = 0;
+				if (mini->cmd[i].out_append && mini->cmd[i].out_append[k] != -1)
+					mode = mini->cmd[i].out_append[k];
+				printf("[%s mode=%s] ", mini->cmd[i].outfile[k], mode ? ">>" : ">");
+				k++;
+			}
+		}
+		else
+			printf("(null)");
+		printf("\n");
 
 		// 1) heredoc
 		if (mini->cmd[i].heredoc)
@@ -1464,19 +1535,33 @@ void	test_redirs(t_mini *mini)
 				printf("    heredoc: FAIL (exit_status=%d)\n", mini->exit_status);
 			else
 				printf("    heredoc: OK (fd_in=%d)\n", mini->cmd[i].fd_in);
+
+			// heredoc lire
+			if (!mini->cmd[i].in_fail && mini->cmd[i].temp_heredoc)
+				print_preview_path(mini->cmd[i].temp_heredoc);
 		}
 
-		// 2) infile (s'il y a heredoc, pas de infile)
-		if (!mini->cmd[i].heredoc && mini->cmd[i].infile)
+		// 2) infile (s'il y a heredoc, on passe)
+		if (!mini->cmd[i].heredoc && mini->cmd[i].infile && mini->cmd[i].infile[0])
 		{
 			if (appliquer_infile(mini, i) == -1)
 				printf("    infile: FAIL (exit_status=%d)\n", mini->exit_status);
 			else
 				printf("    infile: OK (fd_in=%d)\n", mini->cmd[i].fd_in);
+
+			// infile: lire le dernier infile
+			if (!mini->cmd[i].in_fail)
+			{
+				int last = 0;
+				while (mini->cmd[i].infile[last])
+					last++;
+				if (last > 0)
+					print_preview_path(mini->cmd[i].infile[last - 1]);
+			}
 		}
 
 		// 3) outfile
-		if (mini->cmd[i].outfile)
+		if (mini->cmd[i].outfile && mini->cmd[i].outfile[0])
 		{
 			process_out_redir(mini, i);
 			if (mini->cmd[i].out_fail)
@@ -1485,22 +1570,10 @@ void	test_redirs(t_mini *mini)
 				printf("    outfile: OK (fd_out=%d)\n", mini->cmd[i].fd_out);
 		}
 
-		// resultat
+		// resume
 		printf("[summary] fd_in=%d fd_out=%d in_fail=%d out_fail=%d exit_status=%d\n",
 			mini->cmd[i].fd_in, mini->cmd[i].fd_out,
 			mini->cmd[i].in_fail, mini->cmd[i].out_fail, mini->exit_status);
-
-		// heredoc: temp, sinon infile
-		preview_path = NULL;
-		if (!mini->cmd[i].in_fail)
-		{
-			if (mini->cmd[i].heredoc && mini->cmd[i].temp_heredoc)
-				preview_path = mini->cmd[i].temp_heredoc;
-			else if (!mini->cmd[i].heredoc && mini->cmd[i].infile)
-				preview_path = mini->cmd[i].infile;
-		}
-		if (preview_path)
-			print_preview_path(preview_path);
 
 		i++;
 	}
