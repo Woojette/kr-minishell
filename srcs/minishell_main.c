@@ -1153,41 +1153,44 @@ int	appliquer_append(t_mini *mini, int i)
 void	process_out_redir(t_mini *mini, int i)
 {
 	int	n; // index pour parcourir outfile
+	int	type_redir; // type de redirection pour le fichier (1 = append, 0 = truncate)
+	int	fd_temp; // fd temporaire pour ouvrir le fichier par mesure de precaution
 
 	n = 0;
+	type_redir = 0; // > par defaut
+	fd_temp = -1;
 	if (!mini || i < 0 || i >= mini->nbr_cmd) // si mini n'existe pas, index i est invalide
 		return ;
 	if (!mini->cmd || !mini->cmd[i].outfile) // si cmd n'existe pas ou outfile est NULL
 		return ;
 	if (mini->cmd[i].out_fail || mini->cmd[i].in_fail) // si deja echec de redir in ou out, on ne fait rien
 		return ;
-
 	while (mini->cmd[i].outfile[n]) // pour chaque fichier de redirection outfile
 	{
-		if (mini->cmd[i].fd_out != -1) // si fd_out est deja ouvert, on le ferme d'abord
-		{
-			close(mini->cmd[i].fd_out);
-			mini->cmd[i].fd_out = -1; // reinitialiser fd_out
-		}
-		if (mini->cmd[i].out_append && mini->cmd[i].out_append[n] == 1) // si out_append == 1, c'est une redirection en mode append (>>)
-			mini->cmd[i].fd_out = open(mini->cmd[i].outfile[n], O_WRONLY | O_APPEND | O_CREAT, 0644);
+		type_redir = 0; // a chaque iteration de outfile[n], type_redir commence toujours par 0 (> par defaut)
+		fd_temp = -1; // on initialise a nouveau le fd temporaire a chaque iteration
+		// si un tableau out_append existe, on recupere le type de redir associe a ce fichier
+		// out_append[n] correspond a outfile[n]
+		// -1 signifie que c'est pas defini, donc on garde d'abord le type de redir par defaut (>)
+		if (mini->cmd[i].out_append && mini->cmd[i].out_append[n] != -1)
+			type_redir = mini->cmd[i].out_append[n];
+		if (type_redir == 1) // si out_append == 1, c'est une redirection en mode append (>>)
+			fd_temp = open(mini->cmd[i].outfile[n], O_WRONLY | O_APPEND | O_CREAT, 0644);
 		else // si out_append == 0, c'est une redirection simple (>)
-			mini->cmd[i].fd_out = open(mini->cmd[i].outfile[n], O_WRONLY | O_TRUNC | O_CREAT, 0644);
-		if (mini->cmd[i].fd_out < 0) // si echec d'ouverture
+			fd_temp = open(mini->cmd[i].outfile[n], O_WRONLY | O_TRUNC | O_CREAT, 0644);
+		if (fd_temp < 0)
 		{
-			// if (mini->cmd[i].out_fail == 0 && mini->cmd[i].in_fail == 0) // pour ne pas afficher plusieurs fois l'erreur
 			perror(mini->cmd[i].outfile[n]); // afficher l'erreur
 			mini->exit_status = 1; // mettre le code de sortie a 1
-			mini->cmd[i].fd_out = -1; // marquer que l'ouverture a echoue
 			mini->cmd[i].out_fail = 1; // marquer que l'ouverture a echoue
 			return ;
 		}
+		if (mini->cmd[i].fd_out != -1) // si un ancien fichier out existe,
+			close(mini->cmd[i].fd_out); // on le ferme avant de le remplacer
+		mini->cmd[i].fd_out = fd_temp; // puis on en ajoute le nouveau
+		// ce fichier devient la sortie active (le dernier redir qui va s'effectuer)
 		n++;
 	}
-	// if (!mini->cmd[i].out_append) // si out_append == 0, c'est une redirection simple (>)
-	// 	appliquer_outfile(mini, i);
-	// else if (mini->cmd[i].out_append == 1) // si out_append == 1, c'est une redirection en mode append (>>)
-	// 	appliquer_append(mini, i);
 }
 
 // appliquer la redirection infile (<) pour la commande i
