@@ -1093,60 +1093,7 @@ int	appliquer_dollar_sur_liste_token(t_token **token, t_mini *mini)
 // ===================================== redirection ===================================== 
 // ======================================================================================= 
 
-// // appliquer la redirection outfile (>) pour la commande i
-// int	appliquer_outfile(t_mini *mini, int i)
-// {
-// 	if (mini->cmd[i].out_fail || mini->cmd[i].in_fail) // si deja echec de redir in ou out, on ne fait rien
-// 		return (0);
-// 	if (mini->cmd[i].outfile == NULL) // proteger au cas ou outfile est NULL
-// 	{
-// 		mini->exit_status = 2;
-// 		return (-1);
-// 	}
-// 	if (mini->cmd[i].fd_out != -1) // si fd_out est deja ouvert, on le ferme d'abord
-// 	{
-// 		close(mini->cmd[i].fd_out);
-// 		mini->cmd[i].fd_out = -1; // reinitialiser fd_out
-// 	}
-// 	mini->cmd[i].fd_out = open(mini->cmd[i].outfile, O_WRONLY | O_TRUNC | O_CREAT, 0644);
-// 	// ouvrir le fichier en ecriture, tronquer s'il existe, creer s'il n'existe pas
-// 	if (mini->cmd[i].fd_out < 0) // si echec d'ouverture
-// 	{
-// 		if (mini->cmd[i].out_fail == 0 && mini->cmd[i].in_fail == 0) // pour ne pas afficher plusieurs fois l'erreur
-// 			perror(mini->cmd[i].outfile); // afficher l'erreur
-// 		mini->exit_status = 1; // mettre le code de sortie a 1
-// 		mini->cmd[i].fd_out = -1; // marquer que l'ouverture a echoue
-// 		mini->cmd[i].out_fail = 1; // marquer que l'ouverture a echoue
-// 	}	return (0);
-// }
 
-// // appliquer la redirection outfile (>>) pour la commande i
-// int	appliquer_append(t_mini *mini, int i)
-// {
-// 	if (mini->cmd[i].out_fail || mini->cmd[i].in_fail) // si deja echec de redir in ou out, on ne fait rien
-// 		return (0);
-// 	if (mini->cmd[i].outfile == NULL) // proteger au cas ou outfile est NULL
-// 	{
-// 		mini->exit_status = 2;
-// 		return (-1);
-// 	}
-// 	if (mini->cmd[i].fd_out != -1) // si fd_out est deja ouvert, on le ferme d'abord
-// 	{
-// 		close(mini->cmd[i].fd_out);
-// 		mini->cmd[i].fd_out = -1; // reinitialiser fd_out
-// 	}
-// 	mini->cmd[i].fd_out = open(mini->cmd[i].outfile, O_WRONLY | O_APPEND | O_CREAT, 0644);
-// 	// ouvrir le fichier en ecriture, ajouter a la fin s'il existe, creer s'il n'existe pas
-// 	if (mini->cmd[i].fd_out < 0) // si echec d'ouverture
-// 	{
-// 		if (mini->cmd[i].out_fail == 0 && mini->cmd[i].in_fail == 0) // pour ne pas afficher plusieurs fois l'erreur
-// 			perror(mini->cmd[i].outfile); // afficher l'erreur
-// 		mini->exit_status = 1; // mettre le code de sortie a 1
-// 		mini->cmd[i].fd_out = -1; // marquer que l'ouverture a echoue
-// 		mini->cmd[i].out_fail = 1; // marquer que l'ouverture a echoue
-// 	}
-// 	return (0);
-// }
 
 // Passe la structure globale et l'index de la commande en argument
 // et applique la redirection de sortie en fonction du type (>, >>)
@@ -1268,51 +1215,12 @@ int	preparer_temp_file_name(t_mini *mini, int i)
 	return (0);
 }
 
-// // Préparation du fichier temporaire pour heredoc
-// void	preparer_temp_file(t_mini *mini, int i)
-// {
-// 	char	*temp_index; // pour faire l'etiquette de l'index du fichier temporaire
-
-// 	if (mini->cmd[i].fd_in != -1) // si fd_in est deja ouvert, on le ferme d'abord
-// 		close (mini->cmd[i].fd_in); // fermer l'ancien descripteur de fichier
-// 	if (mini->cmd[i].temp_heredoc)
-// 	{
-// 		unlink(mini->cmd[i].temp_heredoc); // supprimer l'ancien fichier temporaire s'il existe
-// 		free(mini->cmd[i].temp_heredoc); // free l'ancien nom de fichier temporaire
-// 		mini->cmd[i].temp_heredoc = NULL; // reinitialiser a NULL
-// 	}
-// 	temp_index = ft_itoa(i); // convertir l'index i en string pour nommer l'index du fichier temporaire
-// 	if (!temp_index)
-// 	{
-// 		mini->cmd[i].in_fail = 1;
-// 		perror("malloc: temp index");
-// 		return ;
-// 	}
-// 	mini->cmd[i].temp_heredoc = ft_strjoin("temp_", temp_index); // nom du fichier temporaire pour heredoc"
-// 	free(temp_index); // liberer temp_index apres utilisation
-// 	if (!mini->cmd[i].temp_heredoc) // si echec de malloc pour le nom du fichier temporaire
-// 	{
-// 		mini->cmd[i].in_fail = 1;
-// 		perror("malloc: temp heredoc name");
-// 		return ;
-// 	}
-// 	if (access(mini->cmd[i].temp_heredoc, F_OK) == 0) // si le fichier mini->cmd[i].temp_heredoc existe deja
-// 		unlink(mini->cmd[i].temp_heredoc); // supprimer le fichier existant
-// 	mini->cmd[i].fd_in = open(mini->cmd[i].temp_heredoc, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-// 	// ouvrir (créer) le fichier temporaire en écriture
-// 	if (mini->cmd[i].fd_in == -1)
-// 	{
-// 		mini->cmd[i].in_fail = 1;
-// 		perror("open temp");
-// 	}
-// }
-
 // afficher le message d'erreur quand on saisit ctrl d dans heredoc
 void	print_heredoc_warning_ctrl_d(char *delimiter)
 {
 	if (!delimiter)
 		delimiter = "";
-	write(2, "warning: here-document delimited by end-of-file (wanted `", 57);
+	write(2, "warning: here-document delimited by end-of-file (wanted '", 57);
 	write(2, delimiter, ft_strlen(delimiter));
 	write(2, "')\n", 3);
 	// le nombre de lines a faire apres ******************************************************
@@ -1329,7 +1237,7 @@ int	collecter_heredoc_lines(int fd, char *delimiter)
 		line = readline("> "); // afficher un prompte qui ressemble a heredoc
 		if (!line) // saisit ctrl+D -> on quitte
 			return (1); // dans ce cas (ctrl+D), pas besoin de liberer le memoire, puisqu'il y en a pas
-		if (delimiter && strcmp(line, delimiter) == 0) // quand on croise limiter -> on quitte
+		if (delimiter && ft_strcmp(line, delimiter) == 0) // quand on croise limiter -> on quitte
 		// si delimiter est NULL -> erreur (pour proteger on ajoute dans la condition delimiter aussi)
 		{
 			// if (!line) // ctrl d message d'erreur a faire apres *************************
@@ -1337,7 +1245,7 @@ int	collecter_heredoc_lines(int fd, char *delimiter)
 			free(line); // liberer readline
 			return (0); // quitte la boucle (et cette fonction)
 		}
-		write(fd, line, strlen(line)); // le resultat
+		write(fd, line, ft_strlen(line)); // le resultat
 		write(fd, "\n", 1); // vu que readline n'applique pas automatiquement '\n', on en ajoute a la fin
 		free(line); // free readline avant de quitter la fonction hihi
 	}
@@ -1348,28 +1256,29 @@ int	collecter_heredoc_lines(int fd, char *delimiter)
 void	appliquer_heredoc_enfant(t_mini *mini, int i)
 {
 	int	resultat;
+	int	fd_temp;
 
 	signal(SIGINT, SIG_DFL); // quand on saisit ctrl+C, le processus enfant doit etre termine
 	signal(SIGQUIT, SIG_IGN); // quand on saisit ctrt+\, on l'ignore (ca change rien)
-	// if (preparer_temp_file_name(mini, i) == -1)
-	// 	exit (1);
-	mini->cmd[i].fd_in = open(mini->cmd[i].temp_heredoc, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	// ouvrir (créer) le fichier temporaire en écriture
-	if (mini->cmd[i].fd_in == -1)
+	if (!mini->cmd[i].temp_heredoc) // si le nom du fichier n'existe pas, on finit
+		exit (1);
+	fd_temp = open(mini->cmd[i].temp_heredoc, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	// ouvrir (créer) le fichier temporaire en écriture (on ecrase le contenu prcedent)
+	if (fd_temp == -1)
 	{
-		mini->cmd[i].in_fail = 1;
 		perror("open temp");
 		exit (1);
 	}
-	resultat = collecter_heredoc_lines(mini->cmd[i].fd_in, mini->cmd[i].limiter);
+	resultat = collecter_heredoc_lines(fd_temp, mini->cmd[i].limiter);
 	// collecter des lignes heredoc dans le fichier temp
+	// (lire des lignes jusqu'a ce qu'on arrive limiter, puis les ecrire dans le fichier temp)
 	if (resultat == 1) // ctrl-D
 	{
 		print_heredoc_warning_ctrl_d(mini->cmd[i].limiter);
-		close(mini->cmd[i].fd_in);
+		close(fd_temp);
 		exit (0);
 	}
-	close(mini->cmd[i].fd_in); //close dans l'enfant pour eviter les leak
+	close(fd_temp); //fermer le fd temp dans l'enfant pour eviter les leak
 	exit(0);
 }
 
@@ -1404,11 +1313,21 @@ int	appliquer_heredoc_cmd(t_mini *mini, int i)
 	signal(SIGQUIT, SIG_IGN);
 	mini->cmd[i].pid_heredoc = fork(); // creer un processus enfant pour gerer heredoc
 	if (mini->cmd[i].pid_heredoc == -1) // si echec de fork
-		return (-1);
+	{
+		init_signaux();
+		mini->cmd[i].in_fail = 1;
+		mini->exit_status = 1;
+		return (-1); // si echec de waitpid
+	}
 	if (mini->cmd[i].pid_heredoc == 0) // processus enfant
 		appliquer_heredoc_enfant(mini, i);
 	if (waitpid(mini->cmd[i].pid_heredoc, &status, 0) == -1) // attendre la fin du processus enfant
-		return (init_signaux(), -1); // si echec de waitpid
+	{
+		init_signaux();
+		mini->cmd[i].in_fail = 1;
+		mini->exit_status = 1;
+		return (-1); // si echec de waitpid
+	}
 	init_signaux(); // apres la fin du processus enfant, on applique des signaux pareils que shell
 	if (WIFSIGNALED(status))
 	{
