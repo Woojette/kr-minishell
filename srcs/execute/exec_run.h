@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
+#include <sys/wait.h>
 
 
 typedef struct s_cmd
@@ -13,7 +15,9 @@ typedef struct s_cmd
 	// cmd redir
 	char	**infile; // fichier de redirection entree (<)
 	char	**outfile; // fichier de redirection sortie (>)
-	int		out_append; // 1 si redirection en mode append (>>), 0 sinon
+	int		*out_append; // 1 si redirection en mode append (>>), 0 sinon
+	char	*temp_heredoc;
+	pid_t	pid_heredoc;
 	int		heredoc; // 1 si redirection heredoc (<<), 0 sinon
 	char	*limiter; // limiteur pour heredoc
 	// resultat des fd
@@ -28,10 +32,13 @@ typedef struct s_mini
 {
 	int	    pipe_read_end;
 	char	**env;
+	char	**cmd_paths; //split 결과 배열
+	char	*paths;
 	int		exit_status;
 	t_cmd	*cmd_array; // tableau de structures cmd (divise par pipe) // 얘도 이름 바꾸자고..
 	int		nbr_cmd; // nombre de commandes (nombre de structures cmd dans cmd_tab)
 }	t_mini;
+
 
 
 
