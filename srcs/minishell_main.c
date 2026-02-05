@@ -1072,6 +1072,7 @@ int	appliquer_dollar_sur_liste_token(t_token **token, t_mini *mini)
 		if (temp->type_token == T_MOT || temp->type_token == T_FD_IN
 			|| temp->type_token == T_FD_OUT || temp->type_token == T_FD_OUT_APPEND)
 			// si le type de token est T_MOT et redir -> on applique le remplacement de $
+			// heredoc a faire apres ***********************************************************
 		{
 			if (!temp->str) // si str est NULL, on retourne -1 (erreur)
 				return (-1);

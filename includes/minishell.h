@@ -78,10 +78,15 @@ typedef struct s_cmd
 	// char	*outfile; // fichier de redirection sortie (>)
 
 	// heredoc
+	// char	**temp_heredoc; // tableau des fichiers temporaires pour heredoc
+
 	char	*temp_heredoc; // fichier temporaire pour heredoc
+
 	// int		out_append; // 1 si redirection en mode append (>>), 0 sinon
 	int		heredoc; // 1 si redirection heredoc (<<), 0 sinon
+
 	char	*limiter; // limiteur pour heredoc
+
 	pid_t	pid_heredoc; // pid du processus heredoc
 	// resultat des fd
 	int		fd_in; // resultat ouverture fichier de < or <<
