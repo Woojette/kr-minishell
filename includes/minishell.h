@@ -84,6 +84,11 @@ typedef struct s_cmd
 	char	**limiter; // tableau des limiters (sauvegarder pls limiters)
 	int		compter_heredoc; // le nombre de heredoc
 
+
+	int		*in_heredoc; // tableau, 1 si redirection heredoc (<<), 0 sinon (<)
+	int		*in_hd_index;
+
+
 	// char	*temp_heredoc; // fichier temporaire pour heredoc
 
 	// int		out_append; // 1 si redirection en mode append (>>), 0 sinon
