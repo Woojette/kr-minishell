@@ -68,7 +68,7 @@ typedef struct s_token
 // ex) cmd[0] = {"echo", "hihi", NULL}
 typedef struct s_cmd
 {
-	char	**cmd;
+	char	**cmd; // tableau de chaine de caracteres pour la commande et ses arguments (sans redir) ex) cmd[0] = {"echo", "hihi", NULL}
 
 	// cmd redir
 	char	**infile; // tableau des fichiers de redirection entree (<)
