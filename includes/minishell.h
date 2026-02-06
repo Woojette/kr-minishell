@@ -189,10 +189,11 @@ void	process_out_redir(t_mini *mini, int i); // proceder a la redirection de sor
 int		appliquer_infile(t_mini *mini, int i); // appliquer la redirection infile (<) pour la commande i
 
 // heredoc
-int	preparer_temp_file_name(t_mini *mini, int j, int n);
-// void	preparer_temp_file(t_mini *mini, int i); // Préparation du fichier temporaire pour heredoc
+int		preparer_temp_file_name(t_mini *mini, int j, int n);
 int		collecter_heredoc_lines(int fd, char *delimiter); // recuperer les lignes de heredoc, puis les stocker dans le fichier temp
 void	appliquer_heredoc_enfant(t_mini *mini, int j, int n); // appliquer heredoc dans le processus enfant
+int		check_quote_limiter(char *limiter); // verifier s'il y a une quote paire dans limiter
+int		check_heredoc_env(char *limiter); // verifier soit on applique l'expansion de l'env ou non par rapport a limiter
 
 // signaux
 void	init_signaux(void); // gerer les sigaux (ctrl-C, ctrl-\)

@@ -1349,6 +1349,44 @@ int	collecter_heredoc_lines(int fd, char *delimiter)
 	return (0);
 }
 
+// verifier s'il y a une quote paire dans limiter
+// 1: on trouve au moins une quote bien fermee dans limiter
+// 0: aucune quote paire ou pas de quote
+int	check_quote_limiter(char *limiter)
+{
+	int		i;
+	char	quote;
+
+	i = 0;
+	if (!limiter)
+		return (0);
+	while (limiter[i] != '\0')
+	{
+		if (limiter[i] == '\'' || limiter[i] == '"') // si on croise une quote
+		{
+			quote = limiter[i]; // sauvegarder la premiere quote
+			i++; // avancer pour chercher la quote fermante
+			while (limiter[i] && limiter[i] != quote) // tout ce qui n'est pas la meme quote, on passe
+				i++;
+			if (limiter[i] == quote) // 1 si on trouve la meme quote paire
+				return (1);
+			else
+				return (0); // 0 quote ouverte mais pas fermee
+		}
+		i++;
+	}
+	return (0); // pas de quote
+}
+
+// verifier soit on applique l'expansion de l'env ou non par rapport a limiter
+int	check_heredoc_env(char *limiter)
+{
+	if (!check_quote_limiter(limiter))
+		return (1); // 1 s'il y a pas de quote dans limiter (on applique l'expansion de l'env)
+	return (0); // 0 sinon (on n'applique pas l'expansion de l'env, on les lit comme un caractere)
+}
+
+
 // appliquer heredoc dans le processus enfant
 // le processus enfant: ecrire les lignes du heredoc n dans le fichier temporaire temp_heredoc[n] jusqu'a ce qu'on arrive a limiter[n], puis quitter
 void	appliquer_heredoc_enfant(t_mini *mini, int j, int n)
