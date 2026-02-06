@@ -81,25 +81,6 @@ void	free_tokens(t_token **token)
 	}
 }
 
-// // On parse pour les mots pour trouver les builtins, on ajoute dans la structure si on en trouve
-// void parse_builtin(char *line)
-// {
-// 	if (!ft_strncmp(line, "echo", 4))
-// 		add_token(line, T_ECHO, 4);
-// 	else if (!ft_strncmp(line, "cd", 2))
-// 		add_token(line, T_CD, 2);
-// 	else if (!ft_strncmp(line, "pwd", 3))
-// 		add_token(line, T_PWD, 3);
-// 	else if (!ft_strncmp(line, "export", 6))
-// 		add_token(line, T_EXPORT, 6);
-// 	else if (!ft_strncmp(line, "unset", 5))
-// 		add_token(line, T_UNSET, 5);
-// 	else if (!ft_strncmp(line, "env", 3))
-// 		add_token(line, T_ENV, 3);
-// 	else if (!ft_strncmp(line, "exit", 4))
-// 		add_token(line, T_EXIT, 4);
-// }
-
 // compter le nombre de caracteres s'il y a pas de 2 quotes qui fonctionnent
 int	len_mot_sans_quote(char *line)
 {
@@ -528,6 +509,10 @@ t_cmd	*malloc_cmd(t_token *token)
 		cmd[j].limiter = NULL; // tableau (char **) des limiters pour heredoc (qui termine par NULL)
 		cmd[j].compter_heredoc = 0; // pour compter le nombre de heredoc (<<) dans chaque commande
 
+		cmd[j].in_heredoc = NULL; // tableau int pour sauvegarder le type de in redir (<, <<) par ordre
+		cmd[j].in_hd_index = NULL; // index de chaque infile(<) et limiter(<<) qui concerne chaque redir de in_heredoc
+		cmd[j].compter_in_hd = 0; // compter le nombre de in redir
+
 		// out_append[j] correspond a outfile[j]: 1 pour >> (append), 0 pour > (truncate)
 		cmd[j].out_append = NULL; // initialiser a NULL pour proteger
 		// NULL au debut: on alloue et agrandit au fur et a mesure dans add_cmd()
@@ -634,11 +619,9 @@ int add_cmd(t_token *token, t_cmd *cmd)
 	int 	i; // l'index pour l'argument de chaque structure  ex) tab[0][0] = "echo", tab[0][1] = "hihi", tab[0][2] = NULL
 	int		n; // l'index pour limiters de heredoc
 	int		redir_existe;
-	// printf("--- add_cmd ---\n");
 	char	*mot_temp; // temporaire pour le mot
 	char	*file_temp; // temporaire pour le nom de fichier
 	int		size_file_tab; // pour compter la taille actuelle du tableau de fichiers (infile ou outfile) pour agrandir le tableau et ajouter un nouveau fichier
-	// int		size_mode_tab;
 
 	index_cmd = 0;
 	i = 0;
@@ -647,9 +630,6 @@ int add_cmd(t_token *token, t_cmd *cmd)
 	mot_temp = NULL;
 	file_temp = NULL;
 	size_file_tab = 0;
-	// size_mode_tab = 0;
-	// if (!cmd || nbr_cmd <= 0)
-	// 	return (-1);
 	while (token) // pendant que le noeud dans la liste chainee existe
 	{
 		if (token->type_token == T_MOT) // si le type de token est T_MOT
@@ -677,7 +657,6 @@ int add_cmd(t_token *token, t_cmd *cmd)
 				if (!cmd[index_cmd].cmd)
 					return (-1);
 			}
-			// cmd[index_cmd].cmd[i] = ft_strdup(token->str); // on ajoute le contenu de token a cet argument de la telle structure 
 			i++; // i = nombre d'arguments actuels (prochain index libre)
 		}
 		else if (token->type_token == T_FD_IN)
@@ -686,11 +665,21 @@ int add_cmd(t_token *token, t_cmd *cmd)
 			if (!file_temp)
 				return (-1);
 			size_file_tab = len_tab_char(cmd[index_cmd].infile); // compter la taille actuelle du tableau infile
-			cmd[index_cmd].infile = add_double_tab_char(cmd[index_cmd].infile, file_temp, size_file_tab); // agrandir le tableau infile pour ajouter le nouveau fichier
-			if (!cmd[index_cmd].infile)
-				return (-1);
+			cmd[index_cmd].infile = add_double_tab_char(cmd[index_cmd].infile, file_temp, size_file_tab);
+			// agrandir le tableau infile pour ajouter le nouveau fichier
 			// ex) cat < file1 < file2  -> infile = {"file1", "file2", NULL}
 			// on n'ecrase plus, on stocke tout dans l'ordre
+			if (!cmd[index_cmd].infile)
+				return (-1);
+			cmd[index_cmd].in_heredoc = add_double_tab_int(cmd[index_cmd].in_heredoc, 0, cmd[index_cmd].compter_in_hd);
+			// ajouter le type de in redir: dans ce cas c'est in (<), on ajoute 0
+			if (!cmd[index_cmd].in_heredoc)
+				return (-1);
+			cmd[index_cmd].in_hd_index = add_double_tab_int(cmd[index_cmd].in_hd_index, size_file_tab, cmd[index_cmd].compter_in_hd);
+			// sauvegarde l'index de infile de cette in redir
+			if (!cmd[index_cmd].in_hd_index)
+				return (-1);
+			cmd[index_cmd].compter_in_hd++; // des qu'on ajoute in redir, on incremente de 1 (l'index de in redir)
 		}
 		else if (token->type_token == T_FD_OUT)
 		{
@@ -733,10 +722,19 @@ int add_cmd(t_token *token, t_cmd *cmd)
 				return (-1);
 			cmd[index_cmd].compter_heredoc++; // incrementer le nombre de heredoc pour cette commande
 			cmd[index_cmd].heredoc = 1; // marquer que c'est heredoc (<<)
+			cmd[index_cmd].in_heredoc = add_double_tab_int(cmd[index_cmd].in_heredoc, 1, cmd[index_cmd].compter_in_hd);
+			// ajouter le type de in redir: dans ce cas c'est heredoc (<<), on ajoute 1
+			if (!cmd[index_cmd].in_heredoc)
+				return (-1);
+			cmd[index_cmd].in_hd_index = add_double_tab_int(cmd[index_cmd].in_hd_index, n, cmd[index_cmd].compter_in_hd);
+			// sauvegarde l'index de infile de cette heredoc redir
+			if (!cmd[index_cmd].in_hd_index)
+				return (-1);
+			cmd[index_cmd].compter_in_hd++; // des qu'on ajoute in redir, on incremente de 1 (l'index de in redir)
 		}
 		if (token->type_token == T_PIPE) // si on arrive a '|'
 		{
-			if (cmd[index_cmd].infile || cmd[index_cmd].outfile || cmd[index_cmd].heredoc == 1)
+			if (cmd[index_cmd].infile || cmd[index_cmd].outfile || cmd[index_cmd].compter_in_hd > 0)
 				redir_existe = 1;
 			else
 				redir_existe = 0;
@@ -1696,11 +1694,8 @@ int	main(int ac, char **av, char **env)
 			free(line);
 			continue ;
 		}
-		// printf("Pipe at the end is properly handled.\n");
-		// printf("----- Parsing tokens -----\n");
 		parse_input(line, &parsing, mini);
 		
-		// printf("----- parse_input applique -----\n");
 		temp = parsing;
 		while (temp)
 		{
@@ -1709,7 +1704,6 @@ int	main(int ac, char **av, char **env)
 			i++;
 			temp = temp->next;
 		}
-		// printf("-----1wejwej---------------------\n");
 		cmd = malloc_cmd(parsing);
 		int result = add_cmd(parsing, cmd);
 		if (result == -1)
@@ -1721,7 +1715,6 @@ int	main(int ac, char **av, char **env)
 		mini->cmd = cmd;
 		mini->nbr_cmd = count_pipe(parsing) + 1;
 
-		// printf("-----2wejwej---------------------\n");
 		test_print_cmds(cmd, count_pipe(parsing) + 1);
 		test_redirs(mini);
 		if (parse_input(line, &parsing, mini) < 0)
