@@ -16,7 +16,7 @@ while (mini->path_array[i])
 	printf("path_array : %s\n", mini->path_array[i]);
 	i++;
 }
-// fork_center(mini);
+fork_center(mini);
 
 (void)(mini);
 }
