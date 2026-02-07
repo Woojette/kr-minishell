@@ -1,4 +1,4 @@
 *.o
-minishell
-libft.a
 objs/
+libft.a
+minishell
