@@ -114,7 +114,7 @@ void	parse_builtin(char *line);
 // ======================================================= token =======================================================
 
 // parsing
-void	add_token(char *line, t_type_token type_token, int len, t_token **token); // ajouter des token dans la structure
+int 	add_token(char *line, t_type_token type_token, int len, t_token **token); // ajouter des token dans la structure
 int		parse_input(char *line, t_token **token, t_mini *mini); // mettre des token a chaque noeud (mot, redir, pipe) 
 char	**split_input_par_pipe(char *line); // decouper des commandes par pipe
 void 	parse_fd_tokens(t_token **token); // pour la condition de token MOT (redir, fd)

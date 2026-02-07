@@ -39,21 +39,21 @@ char	*get_token_type_state(t_state state)
 }
 
 // On ajoute le token dans la structure t_token;
-void add_token(char *line, t_type_token type_token, int len, t_token **token)
+int add_token(char *line, t_type_token type_token, int len, t_token **token)
 {
 	t_token *new_node;
 	t_token *tmp;
 
 	if (!line || !token || len <= 0)
-		return ;
+		return (-1);
 	new_node = malloc(sizeof(t_token));
 	if (!new_node)
-		return ;
+		return (-1);
 	new_node->str = ft_strndup(line, len);
 	if (!new_node->str)
 	{
 		free(new_node);
-		return ;
+		return (-1);
 	}
 	new_node->type_token = type_token;
 	new_node->type_quote = GENERAL;
@@ -68,6 +68,7 @@ void add_token(char *line, t_type_token type_token, int len, t_token **token)
 					tmp = tmp->next;
 			tmp->next = new_node;
 	}
+	return (0);
 }
 
 // compter le nombre de caracteres s'il y a pas de 2 quotes qui fonctionnent
@@ -819,9 +820,11 @@ void test_print_cmds(t_cmd *cmd, int nbr_cmd)
 // chaque noeud serait d'abord divise que par soit mot, soit redir, soit pipe  (cf. t_type token)
 int parse_input(char *line, t_token **token, t_mini *mini) 
 {
-	int				len;
+	int						len;
 	t_type_token	fd_type;
 
+	if (!line || !token || !mini) // proteger au cas ou les pointeurs sont NULL
+		return (-1);
 	len = 0;
 	fd_type = (t_type_token) - 1;
 	while (*line)
@@ -835,12 +838,15 @@ int parse_input(char *line, t_token **token, t_mini *mini)
 		{
 			if (!ft_strncmp(line, ">>", 2))
 			{
-				add_token(line, T_RD_APPEND, 2, token); // on ajoute dans la liste chainee : >>, type : T_RD_APPEND;
+				if (add_token(line, T_RD_APPEND, 2, token) < 0) // ajouter le token de redirection >> dans la liste chainee
+					return (free_tokens(token), -1);
+				// on ajoute dans la liste chainee : >>, type : T_RD_APPEND;
 				fd_type = T_FD_OUT_APPEND;
 			}
 			else if (!ft_strncmp(line, "<<", 2))
 			{
-				add_token(line, T_RD_HEREDOC, 2, token);
+				if (add_token(line, T_RD_HEREDOC, 2, token) < 0) // ajouter le token de redirection << dans la liste chainee
+					return (free_tokens(token), -1);
 				fd_type = T_FD_HEREDOC;
 			}
 			line += 2;
@@ -849,12 +855,15 @@ int parse_input(char *line, t_token **token, t_mini *mini)
 		{
 			if (!ft_strncmp(line, ">", 1))
 			{
-				add_token(line, T_RD_OUT, 1, token);
+				if (add_token(line, T_RD_OUT, 1, token) < 0) // ajouter le token de redirection > dans la liste chainee
+					return (free_tokens(token), -1);
+					// on ajoute dans la liste chainee : >, type : T_RD_OUT;
 				fd_type = T_FD_OUT;
 			}
 			else if (!ft_strncmp(line, "<", 1))
 			{
-				add_token(line, T_RD_IN, 1, token);
+				if (add_token(line, T_RD_IN, 1, token) < 0) // ajouter le token de redirection < dans la liste chainee
+					return (free_tokens(token), -1);
 				fd_type = T_FD_IN;
 			}
 			line += 1;
@@ -862,29 +871,36 @@ int parse_input(char *line, t_token **token, t_mini *mini)
 		else if (!ft_strncmp(line, "|", 1)) // pipe  (noeud '|'  /  type : T_PIPE)
 		{
 			if (fd_type != (t_type_token) - 1)
-				return (write(2, "syntax error near unexpected token `|'\n", 40), -2);
-			add_token(line, T_PIPE, 1, token);
+				return (free_tokens(token), write(2, "syntax error near unexpected token `|'\n", 40), -2);
+			if (add_token(line, T_PIPE, 1, token) < 0)
+				return (free_tokens(token), -1);
 			line += 1;
 		}
 		else
 		{
 			len = len_mot_total(line);
+			if (len <= 0)
+				return (free_tokens(token), -1);
 			if (fd_type != (t_type_token) - 1)
 			{
-				add_token(line, fd_type, len, token);
+				if (add_token(line, fd_type, len, token) < 0)
+					return (free_tokens(token), -1);
 				fd_type = (t_type_token) - 1;
 			}
 			else
-				add_token(line, T_MOT, len, token);
+			{
+				if (add_token(line, T_MOT, len, token) < 0)
+					return (free_tokens(token), -1);
+			}
 			line += len;
 		}
 	}
 	if (fd_type != (t_type_token) - 1)
-		return (write(2, "syntax error near unexpected token `newline'\n", 45), -2);
+		return (free_tokens(token), write(2, "syntax error near unexpected token `newline'\n", 45), -2);
 	if (appliquer_dollar_sur_liste_token(token, mini) == -1) // appliquer dollar en respectant a quotes
-		return (-1);
+		return (free_tokens(token), -1);
 	if (appliquer_quote_sur_liste_token(token) == -1) // apres l'expansion de dollar, on supprime quote
-		return (-1);
+		return (free_tokens(token), -1);
 	return (0);
 }
 
@@ -930,7 +946,7 @@ char	*get_env_name(char *str, int start)
 
 	len = 0;
 	i = start; // on va compter la taille a partir de l'index start
-	if (!str)
+	if (!str || start < 0 || !str[start]) // proteger au cas ou str est NULL ou start est hors de la chaine
 		return (NULL);
 	if (str[i] == '?') // cas special pour $?
 		return (ft_substr(str, start, 1));
@@ -1839,6 +1855,7 @@ void	free_tokens(t_token **token)
 		*token = (*token)->next;
 		free(tmp->str); // free la string du token
 		free(tmp); // free le token lui-meme
+		*token = NULL; // reinitialiser a NULL pour eviter les dangling pointer
 	}
 }
 
