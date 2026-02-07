@@ -11,13 +11,13 @@ t_mini *build_echo_cat_wc(void)
 	mini->exit_status = 0;
 
 	/* ---------- number of commands ---------- */
-	mini->nbr_cmd = 1;
+	mini->nbr_cmd = 2;
 	mini->cmd_array = malloc(sizeof(t_cmd) * mini->nbr_cmd);
 
 	/* ---------- cmd 0: echo hello ---------- */
 	mini->cmd_array[0].cmd = malloc(sizeof(char *) * 3);
-	mini->cmd_array[0].cmd[0] = strdup("/usr/bin/echo");
-	mini->cmd_array[0].cmd[1] = strdup("only 5 minute");
+	mini->cmd_array[0].cmd[0] = strdup("ls");
+	mini->cmd_array[0].cmd[1] = strdup("-l");
 	mini->cmd_array[0].cmd[2] = NULL;
 
 	mini->cmd_array[0].infile = NULL;
@@ -28,19 +28,19 @@ t_mini *build_echo_cat_wc(void)
 	mini->cmd_array[0].in_fail = 0;
 	mini->cmd_array[0].out_fail = 0;
 
-	// /* ---------- cmd 1: cat -e ---------- */
-	// mini->cmd_array[1].cmd = malloc(sizeof(char *) * 3);
-	// mini->cmd_array[1].cmd[0] = strdup("/usr/bin/cat");
-	// mini->cmd_array[1].cmd[1] = strdup("-e");
-	// mini->cmd_array[1].cmd[2] = NULL;
+	/* ---------- cmd 1: cat -e ---------- */
+	mini->cmd_array[1].cmd = malloc(sizeof(char *) * 3);
+	mini->cmd_array[1].cmd[0] = strdup("cat");
+	mini->cmd_array[1].cmd[1] = strdup("-e");
+	mini->cmd_array[1].cmd[2] = NULL;
 
-	// mini->cmd_array[1].infile = NULL;
-	// mini->cmd_array[1].outfile = NULL;
-	// mini->cmd_array[1].out_append = 0;
-	// mini->cmd_array[1].heredoc = 0;
-	// mini->cmd_array[1].limiter = NULL;
-	// mini->cmd_array[1].in_fail = 0;
-	// mini->cmd_array[1].out_fail = 0;
+	mini->cmd_array[1].infile = NULL;
+	mini->cmd_array[1].outfile = NULL;
+	mini->cmd_array[1].out_append = 0;
+	mini->cmd_array[1].heredoc = 0;
+	mini->cmd_array[1].limiter = NULL;
+	mini->cmd_array[1].in_fail = 0;
+	mini->cmd_array[1].out_fail = 0;
 
 	// /* ---------- cmd 2: wc -l ---------- */
 	// mini->cmd_array[2].cmd = malloc(sizeof(char *) * 3);

@@ -16,15 +16,10 @@ void	free_path(char **arr)
 }
 void	cleanup_paths(t_mini *mini)
 {
-	if (mini->cmd_paths)
+	if (mini->path_array)
 	{
-		free_path(mini->cmd_paths);
-		mini->cmd_paths = NULL;
-	}
-	if (mini->paths)
-	{
-		free(mini->paths);
-		mini->paths = NULL;
+		free_path(mini->path_array);
+		mini->path_array = NULL;
 	}
 }
 

@@ -13,6 +13,7 @@
 void	msg_error(t_mini *mini, char *err)
 {
 	// cleanup_all(mini);
+	(void)mini;
 	if (err)
 		perror(err);
 	else
