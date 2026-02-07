@@ -1626,6 +1626,8 @@ int	appliquer_heredoc_cmd(t_mini *mini, int j)
 			{
 				mini->cmd[j].in_fail = 1; // marquer l'echec de heredoc
 				mini->exit_status = exit_status; // mettre a jour le code de sortie global
+				free_temp_heredoc(mini->cmd[j].temp_heredoc);
+				mini->cmd[j].temp_heredoc = NULL;
 				init_signaux(); // reinitialiser les signaux avant de retourner
 				return (-1); // retourner -1 pour indiquer l'erreur
 			}
@@ -1634,6 +1636,8 @@ int	appliquer_heredoc_cmd(t_mini *mini, int j)
 		{
 			mini->cmd[j].in_fail = 1; // marquer l'echec de heredoc
 			mini->exit_status = 1; // mettre a jour le code de sortie global
+			free_temp_heredoc(mini->cmd[j].temp_heredoc);
+			mini->cmd[j].temp_heredoc = NULL;
 			init_signaux(); // reinitialiser les signaux avant de retourner
 			return (-1);
 		}
@@ -1649,17 +1653,18 @@ int	appliquer_heredoc_cmd(t_mini *mini, int j)
 		n++;
 	}
 	if (mini->cmd[j].fd_in != -1) // si fd_in est deja ouvert, on le ferme d'abord
+	{
 		close(mini->cmd[j].fd_in); // fermer l'ancien fd_in avant de le remplacer
+		mini->cmd[j].fd_in = -1;
+	}
 	mini->cmd[j].fd_in = open(mini->cmd[j].temp_heredoc[mini->cmd[j].compter_heredoc - 1], O_RDONLY); // reouvrir le fichier temp en lecture seule
 	if (mini->cmd[j].fd_in == -1) // si echec d'ouverture de temp en lecture
 	{
 		mini->cmd[j].in_fail = 1;
 		mini->exit_status = 1;
-		close(mini->cmd[j].fd_in);
-		mini->cmd[j].fd_in = -1;
+		perror("open temp for reading"); // afficher l'erreur
 		free_temp_heredoc(mini->cmd[j].temp_heredoc);
 		mini->cmd[j].temp_heredoc = NULL;
-		perror("open temp for reading"); // afficher l'erreur
 		init_signaux(); // reinitialiser les signaux avant de retourner
 		return (-1);
 	}
