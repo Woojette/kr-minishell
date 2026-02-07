@@ -1,62 +1,44 @@
-# ════════════════════════════════════════════════════════════════════════════ #
-#                           CONFIGURATION VARIABLES                            #
-# ════════════════════════════════════════════════════════════════════════════ #
-
 NAME = minishell
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror  -I$(INC_DIR) -I$(LIBFT_DIR)
-LIBS = -lreadline -lncurses $(LIBFT_DIR)/libft.a 
-
 INC_DIR 	= includes
 SRC_DIR 	= srcs
 OBJ_DIR     = objs
-
 LIBFT_DIR 	= libft
 
-# ════════════════════════════════════════════════════════════════════════════ #
-#                                SOURCE FILES                                  #
-# ════════════════════════════════════════════════════════════════════════════ #
+CFLAGS = -Wall -Wextra -Werror -I$(INC_DIR) -I$(LIBFT_DIR)
+LIBS = -lreadline -lncurses $(LIBFT_DIR)/libft.a
 
-SRCS = $(SRC_DIR)/minishell_main.c
+SRCS_FILES = 	minishell_main.c \
+				parsing/env_appliquer.c \
+				parsing/heredoc.c \
+				parsing/quote_enlever.c \
+				parsing/signaux.c \
+     			parsing/token_all.c \
+    			parsing/token_quote.c \
+				parsing/free_parsing.c \
+ 				parsing/pipe_check.c \
+				parsing/redir_in_out.c \
+ 				parsing/test_parsing.c \
+				parsing/token_len_mot.c \
+				parsing/commande.c
 
-# ════════════════════════════════════════════════════════════════════════════ #
-#                                OBJECT FILES                                  #
-# ════════════════════════════════════════════════════════════════════════════ #
-
-OBJS = $(addprefix $(OBJ_DIR)/, $(notdir $(SRCS:.c=.o)))
-
-# ════════════════════════════════════════════════════════════════════════════ #
-#                                PHONY TARGETS                                 #
-# ════════════════════════════════════════════════════════════════════════════ #
+SRCS = $(addprefix $(SRC_DIR)/, $(SRCS_FILES))
+OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
 .PHONY: all clean fclean re
 
-# ════════════════════════════════════════════════════════════════════════════ #
-#                                DEFAULT TARGET                                #
-# ════════════════════════════════════════════════════════════════════════════ #
-
 all: $(NAME)
-
-# ════════════════════════════════════════════════════════════════════════════ #
-#                                 BUILD RULES                                  #
-# ════════════════════════════════════════════════════════════════════════════ #
 
 $(LIBFT_DIR)/libft.a:
 	$(MAKE) -C $(LIBFT_DIR)
 
-$(OBJ_DIR):
-	mkdir -p $(OBJ_DIR)
-
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(NAME): $(OBJS) $(LIBFT_DIR)/libft.a
 	$(CC) $(CFLAGS) $(OBJS) $(LIBS) -o $(NAME)
-
-# ════════════════════════════════════════════════════════════════════════════ #
-#                                CLEANUP RULES                                 #
-# ════════════════════════════════════════════════════════════════════════════ #
 
 clean:
 	$(MAKE) -C $(LIBFT_DIR) clean
@@ -64,6 +46,6 @@ clean:
 
 fclean: clean
 	$(MAKE) -C $(LIBFT_DIR) fclean
-	rm -f $(NAME) 
+	rm -f $(NAME)
 
-re	: fclean all
+re: fclean all
