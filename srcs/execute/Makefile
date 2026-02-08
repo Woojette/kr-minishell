@@ -27,7 +27,8 @@ SRCS =  main_execute.c \
 		builtin_utils.c \
 		hardcode.c \
 		bi_cd.c \
-		../parsing/parsing_utils.c
+		../parsing/parsing_utils.c \
+		bi_echo.c
 # ════════════════════════════════════════════════════════════════════════════ #
 #                                OBJECT FILES                                  #
 # ════════════════════════════════════════════════════════════════════════════ #

@@ -1,4 +1,5 @@
-#include "minishell.h"
+// #include "minishell.h"
+#include "../execute/exec_run.h"
 
 // Si on met -n, option_n = 1, 
 // echo -nnn -n -nnn arg => option_n = 1 (affiche : arg)

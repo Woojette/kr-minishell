@@ -7,7 +7,8 @@ int	is_built_in(char *cmd)
 
 	i = 0;
 	// const char *bi_table[] = {"cd", "export", "unset", "exit", "echo", "pwd", "env", NULL};
-	const char *bi_table[] = {"cd", NULL};
+	const char *bi_table[] = {"cd", "echo", NULL};
+
 	
 
 	while (bi_table[i])
@@ -24,5 +25,9 @@ void	execute_built_in(t_mini *mini, char **cmd, int type)
 	if (type == T_CD)
 	{	
 		ft_cd_all(cmd, mini->env);
+	}
+	else if (type == T_ECHO)
+	{
+		ft_echo_all(cmd);
 	}
 }

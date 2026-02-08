@@ -84,6 +84,9 @@ int	ft_cd_sans_av(char **val, char **path, char *str, char **env);
 int	ft_cd_tiret(char *oldpwd, char **path, char **env);
 int	ft_cd_env_update(char *oldpwd, char *pwd, char **env);
 int	ft_cd_all(char **tab, char **env);
+//echo
+int	ft_echo_option_n(char *str);
+void	ft_echo_all(char **tab);
 
 
 void	copy_env(t_mini *mini, char **env);

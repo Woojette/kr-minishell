@@ -16,8 +16,8 @@ t_mini *build_echo_cat_wc(void)
 
 	/* ---------- cmd 0: echo hello ---------- */
 	mini->cmd_array[0].cmd = malloc(sizeof(char *) * 3);
-	mini->cmd_array[0].cmd[0] = strdup("cd");
-	mini->cmd_array[0].cmd[1] = strdup("/tmp");
+	mini->cmd_array[0].cmd[0] = strdup("echo");
+	mini->cmd_array[0].cmd[1] = strdup("hi");
 	mini->cmd_array[0].cmd[2] = NULL;
 
 	mini->cmd_array[0].infile = NULL;
