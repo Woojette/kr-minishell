@@ -30,4 +30,6 @@ void	execute_built_in(t_mini *mini, char **cmd, int type)
 	{
 		ft_echo_all(cmd);
 	}
+	else if (type == T_PWD)
+		ft_pwd();
 }
