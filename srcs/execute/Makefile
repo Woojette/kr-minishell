@@ -26,7 +26,8 @@ SRCS =  main_execute.c \
 		file_utils.c \
 		builtin_utils.c \
 		hardcode.c \
-		bi_cd.c
+		bi_cd.c \
+		../parsing/parsing_utils.c
 # ════════════════════════════════════════════════════════════════════════════ #
 #                                OBJECT FILES                                  #
 # ════════════════════════════════════════════════════════════════════════════ #
@@ -60,6 +61,9 @@ $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR)/%.o: ../parsing/%.c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(NAME): $(OBJS) $(LIBFT_DIR)/libft.a

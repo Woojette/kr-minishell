@@ -106,7 +106,7 @@ int	ft_cd_env_update(char *oldpwd, char *pwd, char **env)
 			temp = ft_strjoin("OLDPWD=", oldpwd);
 			if (!temp)
 				return (-1);
-			// free ((env)[j]);
+			free ((env)[j]);
 			(env)[j] = temp;
 		}
 		else if (ft_strncmp((env)[j], "PWD=", 4) == 0)
@@ -114,7 +114,7 @@ int	ft_cd_env_update(char *oldpwd, char *pwd, char **env)
 			temp = ft_strjoin("PWD=", pwd);
 			if (!temp)
 				return (-1);
-			// free ((env)[j]);
+			free ((env)[j]);
 			(env)[j] = temp;
 		}
 		j++;

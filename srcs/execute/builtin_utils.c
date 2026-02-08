@@ -21,11 +21,8 @@ int	is_built_in(char *cmd)
 
 void	execute_built_in(t_mini *mini, char **cmd, int type)
 {
-	printf("type : %d\n", type);
 	if (type == T_CD)
 	{	
-		printf("cmd : %s\n", *cmd);
 		ft_cd_all(cmd, mini->env);
-		printf("cmd : %s\n", *cmd);
 	}
 }

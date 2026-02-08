@@ -17,6 +17,7 @@ int	main(int ac, char **av, char **env)
 	mini = malloc(sizeof(t_mini));
 	if (!mini)
 		return (0);
+	// copy_env(mini, env); 보이드로 바로 복사체 스트럭트에 업뎃
 	mini->env = env;
 	mini->exit_status = 0;
 	mini->cmd = NULL;
