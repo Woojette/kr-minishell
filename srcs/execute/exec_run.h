@@ -14,8 +14,8 @@
 typedef enum s_type_bi
 {
 	T_NOT_BUILT_IN,
-	T_ECHO,
 	T_CD,
+	T_ECHO,
 	T_PWD,
 	T_EXPORT,
 	T_UNSET,
@@ -79,11 +79,11 @@ void	execute_built_in(t_mini *mini, char **cmd, int type);
 
 // built-ins
 // cd
-char *ft_cd_val_env(char *str, char ***env);
-int	ft_cd_sans_av(char **val, char **path, char *str, char ***env);
-int	ft_cd_tiret(char *oldpwd, char **path, char ***env);
-int	ft_cd_env_update(char *oldpwd, char *pwd, char ***env);
-int	ft_cd_all(char **tab, char ***env);
+char *ft_cd_val_env(char *str, char **env);
+int	ft_cd_sans_av(char **val, char **path, char *str, char **env);
+int	ft_cd_tiret(char *oldpwd, char **path, char **env);
+int	ft_cd_env_update(char *oldpwd, char *pwd, char **env);
+int	ft_cd_all(char **tab, char **env);
 
 
 #endif

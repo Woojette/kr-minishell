@@ -15,6 +15,7 @@ int main(int ac, char** av, char** env)
     if (mini->nbr_cmd == 1 && check_builtin != T_NOT_BUILT_IN)
     {
       execute_built_in(mini, mini->cmd_array[0].cmd, check_builtin);
+      printf("happy : %s\n", *mini->cmd_array[0].cmd);
       char buf[1024];
       if (getcwd(buf, sizeof(buf)))
         printf("after cd cwd = %s\n", buf);

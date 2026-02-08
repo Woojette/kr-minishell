@@ -15,10 +15,10 @@ t_mini *build_echo_cat_wc(void)
 	mini->cmd_array = malloc(sizeof(t_cmd) * mini->nbr_cmd);
 
 	/* ---------- cmd 0: echo hello ---------- */
-	mini->cmd_array[0].cmd = malloc(sizeof(char *) * 2);
+	mini->cmd_array[0].cmd = malloc(sizeof(char *) * 3);
 	mini->cmd_array[0].cmd[0] = strdup("cd");
-	// mini->cmd_array[0].cmd[1] = strdup();
-	mini->cmd_array[0].cmd[1] = NULL;
+	mini->cmd_array[0].cmd[1] = strdup("/tmp");
+	mini->cmd_array[0].cmd[2] = NULL;
 
 	mini->cmd_array[0].infile = NULL;
 	mini->cmd_array[0].outfile = NULL;
