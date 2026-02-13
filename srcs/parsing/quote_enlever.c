@@ -1,5 +1,10 @@
 #include "minishell.h"
 
+void inverser_et_incrementer(int *quote, int *i)
+{
+	*quote = !(*quote); // on inverse l'etat de quote (0 -> 1 , 1 -> 0)
+	(*i)++; // on saute le caractere quote
+}
 // enlever les quotes dans un token str
 char	*enlever_quote_dans_token(char *str)
 {
@@ -19,22 +24,15 @@ char	*enlever_quote_dans_token(char *str)
 	// donc on alloue la taille de str + 1 pour le '\0'
 	if (!resultat)
 		return (NULL);
-	i = 0;
 	while (str[i])
 	{
 		if (str[i] == '\'' && !d_quote) // gerer l'ouverture/fermeture de single quote  (on ne traite pas les quotes dans les double quotes)
-		{
-			s_quote = !s_quote; // on inverse l'etat de s_quote (0 -> 1 , 1 -> 0)
-			i++; // on saute le caractere quote
-			continue ; // on passe au caractere suivant
-		}
-		if (str[i] == '"' && !s_quote) // gerer le cas de double quote au debut
-		{
-			d_quote = !d_quote; // on inverse l'etat de d_quote (0 -> 1 , 1 -> 0)
-			i++; // on saute le caractere quote
-			continue ; // on passe au caractere suivant
-		}
-		resultat[n++] = str[i++]; // on copie le caractere dans resultat et on avance les index
+			inverser_et_incrementer(&s_quote, &i);
+
+		else if (str[i] == '"' && !s_quote) // gerer le cas de double quote au debut
+			inverser_et_incrementer(&d_quote, &i);
+		else
+			resultat[n++] = str[i++]; // on copie le caractere dans resultat et on avance les index
 		// c'est pareil que resulat[n] = str[i]; n++; i++; hihi j'ai appris
 		// ex) you"pi'i'i" -> youpii
 	}

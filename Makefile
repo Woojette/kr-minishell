@@ -11,16 +11,23 @@ LIBS = -lreadline -lncurses $(LIBFT_DIR)/libft.a
 
 SRCS_FILES = 	minishell_main.c \
 				parsing/env_appliquer.c \
+				parsing/env_dollar.c \
+				parsing/env_var.c \
 				parsing/heredoc.c \
 				parsing/quote_enlever.c \
 				parsing/signaux.c \
-     			parsing/token_all.c \
-    			parsing/token_quote.c \
+     		parsing/token_all.c \
+				parsing/token_type.c \
+    		parsing/token_quote.c \
+				parsing/token_quote_position.c \
+				parsing/token_quote_char.c \
+				parsing/free_token_tab.c \
 				parsing/free_parsing.c \
  				parsing/pipe_check.c \
 				parsing/redir_in_out.c \
  				parsing/test_parsing.c \
-				parsing/token_len_mot.c \
+				parsing/token_len_mot_all.c \
+				parsing/token_len_mot_etc.c \
 				parsing/commande.c
 
 SRCS = $(addprefix $(SRC_DIR)/, $(SRCS_FILES))

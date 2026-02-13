@@ -21,7 +21,7 @@ int	check_pipe_fin(char *line)
 // compter le nombre de pipes dans la liste chainee
 int count_pipe(t_token *token)
 {
-	int		count;
+	int			count;
 	t_token	*temp; // temporaire pour parcourir liste chainee token
 
 	count = 0;
