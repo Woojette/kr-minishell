@@ -52,6 +52,31 @@ typedef enum s_type_bi
 	T_EXIT,
 }	t_type_bi;
 
+typedef struct	s_quote // pour enlever_quote_dans_token
+{
+	int	i;
+	int	n;
+	int	s_quote; // 1 si on est dans une single quote, 0 sinon
+	int	d_quote; // 1 si on est dans une double quote, 0 sinon
+} t_quote;
+
+typedef struct s_var_cmd
+{
+	int 	index_cmd; // l'index pour la structure  ex) tab[0] = {"echo", "hihi", NULL}, tab[1] = {"cat", "-e", NULL}
+	int 	i; // l'index pour l'argument de chaque structure  ex) tab[0][0] = "echo", tab[0][1] = "hihi", tab[0][2] = NULL
+	int		n; // l'index pour limiters de heredoc
+	int		redir_existe;
+	char	*mot_temp; // temporaire pour le mot
+	char	*file_temp; // temporaire pour le nom de fichier
+	int		size_file_tab; // pour compter la taille actuelle du tableau de fichiers (infile ou outfile) pour agrandir le tableau et ajouter un nouveau fichier
+	char	*limiter_sans_quote;
+	int		limiter_env;
+	char	**new_tab_char; // temporaire pour le nom de la commande (pour proteger)
+	// si l'un des fonctions add_tab_char ou add_tab_int retourne NULL, ca risque de perdre tous les pointeurs qui etaient deja dans le tableau cmd, donc on utilise des pointeurs temporaires pour proteger (pour garder des anciens pointeurs)
+	int		*new_tab_int; // temporaire pour le tableau int (pour proteger)
+	int		size_cmd;
+} t_var_cmd;
+
 // structure token issue du parsing de la ligne de commande 
 // (mot, pipe, redir, etc)
 typedef struct s_token

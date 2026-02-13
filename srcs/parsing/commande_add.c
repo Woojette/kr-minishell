@@ -1,69 +1,103 @@
 #include "minishell.h"
 
+void	init_var_cmd(t_var_cmd *var_cmd)
+{
+	if (!var_cmd)
+		return ;
+	var_cmd->index_cmd = 0; // l'index pour la structure  ex) tab[0] = {"echo", "hihi", NULL}, tab[1] = {"cat", "-e", NULL}
+	var_cmd->i = 0; // l'index pour l'argument de chaque structure  ex) tab[0][0] = "echo", tab[0][1] = "hihi", tab[0][2] = NULL
+	var_cmd->n = 0; // l'index pour limiters de heredoc
+	var_cmd->redir_existe = 0;
+	var_cmd->mot_temp = NULL; // temporaire pour le mot
+	var_cmd->file_temp = NULL; // temporaire pour le nom de fichier
+	var_cmd->size_file_tab = 0; // pour compter la taille actuelle du tableau de fichiers (infile ou outfile) pour agrandir le tableau et ajouter un nouveau fichier
+	var_cmd->limiter_sans_quote = 0;
+	var_cmd->limiter_env = 0;
+	var_cmd->new_tab_char = NULL; // temporaire pour le nom de la commande (pour proteger)
+	// si l'un des fonctions add_tab_char ou add_tab_int retourne NULL, ca risque de perdre tous les pointeurs qui etaient deja dans le tableau cmd, donc on utilise des pointeurs temporaires pour proteger (pour garder des anciens pointeurs)
+	var_cmd->new_tab_int = NULL; // temporaire pour le tableau int (pour proteger)
+	var_cmd->size_cmd = 0;
+}
+
+int	appliquer_add_cmd_mot(t_token *token, t_cmd *cmd, t_var_cmd *var_cmd)
+{
+	if (!token || !cmd || !var_cmd || var_cmd->index_cmd < 0) // verifier l'index_cmd pour proteger
+		return (-1);
+	if (cmd[var_cmd->index_cmd].cmd == NULL) // si le tableau cmd[var_cmd->index_cmd].cmd n'est pas encore alloué (NULL)
+	{
+		cmd[var_cmd->index_cmd].cmd = malloc(sizeof(char *) * 2); 
+		// initialement allouer pour 2 cases (tab[0] = "~~" , tab[1] = NULL)
+		if (!cmd[var_cmd->index_cmd].cmd) 
+			return (-1);
+		cmd[var_cmd->index_cmd].cmd[0] = ft_strdup(token->str); // on ajoute le contenu de token a cet argument de la telle structure
+		if (!cmd[var_cmd->index_cmd].cmd[0])
+			return (free(cmd[var_cmd->index_cmd].cmd), cmd[var_cmd->index_cmd].cmd = NULL, -1);
+		cmd[var_cmd->index_cmd].cmd[1] = NULL; // vu que c'est un double tableau (tableau de pointeurs char *, donc argv), on place d'abord le NULL final
+	}
+	else // s'il y a deja un argument dans le double tableau, on agrandit le tableau (pour ajouter un nouvel arguement)
+	{
+		var_cmd->mot_temp = ft_strdup(token->str); // dupliquer le contenu de token->str (pour proteger)
+		if (!var_cmd->mot_temp)
+			return (-1);
+		var_cmd->size_cmd = len_tab_char(cmd[var_cmd->index_cmd].cmd);
+		var_cmd->new_tab_char = add_double_tab_char(cmd[var_cmd->index_cmd].cmd, var_cmd->mot_temp, var_cmd->size_cmd); // agrandir le tableau cmd[var_cmd->index_cmd].cmd pour ajouter le nouveau mot
+		// ex) tab[0] = {"echo", NULL} -> {"echo", "hihi", NULL}
+		// on le sauvegarde d'abord dans un pointeur temporaire pour proteger au cas ou add_double_tab_char retourne NULL (perte de tous les pointeurs dans cmd[var_cmd->index_cmd].cmd)
+		if (!var_cmd->new_tab_char)
+			return (free(var_cmd->mot_temp), var_cmd->mot_temp = NULL, -1);
+		cmd[var_cmd->index_cmd].cmd = var_cmd->new_tab_char; // mettre a jour le tableau de la structure avec le nouveau tableau agrandi
+		if (!cmd[var_cmd->index_cmd].cmd)
+			return (-1);
+	}
+	var_cmd->i++; // i = nombre d'arguments actuels (prochain index libre)
+	return (0);
+}
+
 // parcourir les token, et rajouter les token dans les tableaux
 // ex) echo hihi | cat -e
 // l'objectif, c'est de mettre  tab[0] = {"echo", "hihi", NULL}, tab[1] = {"cat", "-e", NULL}  dans la liste chainee cmd
 // ( remplir  cmd[0].cmd = {"echo","hihi",NULL}, cmd[1].cmd = {"cat","-e",NULL} )
 int add_cmd(t_token *token, t_cmd *cmd)
 {
-	int 	index_cmd; // l'index pour la structure  ex) tab[0] = {"echo", "hihi", NULL}, tab[1] = {"cat", "-e", NULL}
-	int 	i; // l'index pour l'argument de chaque structure  ex) tab[0][0] = "echo", tab[0][1] = "hihi", tab[0][2] = NULL
-	int		n; // l'index pour limiters de heredoc
-	int		redir_existe;
-	char	*mot_temp; // temporaire pour le mot
-	char	*file_temp; // temporaire pour le nom de fichier
-	int		size_file_tab; // pour compter la taille actuelle du tableau de fichiers (infile ou outfile) pour agrandir le tableau et ajouter un nouveau fichier
-	char	*limiter_sans_quote;
-	int		limiter_env;
-	char	**new_tab_char; // temporaire pour le nom de la commande (pour proteger)
-	// si l'un des fonctions add_tab_char ou add_tab_int retourne NULL, ca risque de perdre tous les pointeurs qui etaient deja dans le tableau cmd, donc on utilise des pointeurs temporaires pour proteger (pour garder des anciens pointeurs)
-	int		*new_tab_int; // temporaire pour le tableau int (pour proteger)
-	int		size_cmd;
+	t_var_cmd	var_cmd; // structure pour stocker les variables temporaires dans la fonction add_cmd
 
-	index_cmd = 0;
-	i = 0;
-	n = 0;
-	redir_existe = 0;
-	mot_temp = NULL;
-	file_temp = NULL;
-	size_file_tab = 0;
-	limiter_sans_quote = 0;
-	limiter_env = 0;
-	size_cmd = 0;
-	
+	init_var_cmd(&var_cmd);
+
 	while (token) // pendant que le noeud dans la liste chainee existe
 	{
 		if (token->type_token == T_MOT) // si le type de token est T_MOT
 		{
-			if (index_cmd < 0) // verifier l'index_cmd pour proteger
+			if (appliquer_add_cmd_mot(token, cmd, &var_cmd) == -1)
 				return (-1);
-			if (cmd[index_cmd].cmd == NULL) // si le tableau cmd[index_cmd].cmd n'est pas encore alloué (NULL)
-			{
-				cmd[index_cmd].cmd = malloc(sizeof(char *) * 2); 
-				// initialement allouer pour 2 cases (tab[0] = "~~" , tab[1] = NULL)
-				if (!cmd[index_cmd].cmd) 
-					return (-1);
-				cmd[index_cmd].cmd[0] = ft_strdup(token->str); // on ajoute le contenu de token a cet argument de la telle structure
-				if (!cmd[index_cmd].cmd[0])
-					return (free(cmd[index_cmd].cmd), cmd[index_cmd].cmd = NULL, -1);
-				cmd[index_cmd].cmd[1] = NULL; // vu que c'est un double tableau (tableau de pointeurs char *, donc argv), on place d'abord le NULL final
-			}
-			else // s'il y a deja un argument dans le double tableau, on agrandit le tableau (pour ajouter un nouvel arguement)
-			{
-				mot_temp = ft_strdup(token->str); // dupliquer le contenu de token->str (pour proteger)
-				if (!mot_temp)
-					return (-1);
-				size_cmd = len_tab_char(cmd[index_cmd].cmd);
-				new_tab_char = add_double_tab_char(cmd[index_cmd].cmd, mot_temp, size_cmd); // agrandir le tableau cmd[index_cmd].cmd pour ajouter le nouveau mot
-				// ex) tab[0] = {"echo", NULL} -> {"echo", "hihi", NULL}
-				// on le sauvegarde d'abord dans un pointeur temporaire pour proteger au cas ou add_double_tab_char retourne NULL (perte de tous les pointeurs dans cmd[index_cmd].cmd)
-				if (!new_tab_char)
-					return (free(mot_temp), -1);
-				cmd[index_cmd].cmd = new_tab_char; // mettre a jour le tableau de la structure avec le nouveau tableau agrandi
-				if (!cmd[index_cmd].cmd)
-					return (-1);
-			}
-			i++; // i = nombre d'arguments actuels (prochain index libre)
+			// if (index_cmd < 0) // verifier l'index_cmd pour proteger
+			// 	return (-1);
+			// if (cmd[index_cmd].cmd == NULL) // si le tableau cmd[index_cmd].cmd n'est pas encore alloué (NULL)
+			// {
+			// 	cmd[index_cmd].cmd = malloc(sizeof(char *) * 2); 
+			// 	// initialement allouer pour 2 cases (tab[0] = "~~" , tab[1] = NULL)
+			// 	if (!cmd[index_cmd].cmd) 
+			// 		return (-1);
+			// 	cmd[index_cmd].cmd[0] = ft_strdup(token->str); // on ajoute le contenu de token a cet argument de la telle structure
+			// 	if (!cmd[index_cmd].cmd[0])
+			// 		return (free(cmd[index_cmd].cmd), cmd[index_cmd].cmd = NULL, -1);
+			// 	cmd[index_cmd].cmd[1] = NULL; // vu que c'est un double tableau (tableau de pointeurs char *, donc argv), on place d'abord le NULL final
+			// }
+			// else // s'il y a deja un argument dans le double tableau, on agrandit le tableau (pour ajouter un nouvel arguement)
+			// {
+			// 	mot_temp = ft_strdup(token->str); // dupliquer le contenu de token->str (pour proteger)
+			// 	if (!mot_temp)
+			// 		return (-1);
+			// 	size_cmd = len_tab_char(cmd[index_cmd].cmd);
+			// 	new_tab_char = add_double_tab_char(cmd[index_cmd].cmd, mot_temp, size_cmd); // agrandir le tableau cmd[index_cmd].cmd pour ajouter le nouveau mot
+			// 	// ex) tab[0] = {"echo", NULL} -> {"echo", "hihi", NULL}
+			// 	// on le sauvegarde d'abord dans un pointeur temporaire pour proteger au cas ou add_double_tab_char retourne NULL (perte de tous les pointeurs dans cmd[index_cmd].cmd)
+			// 	if (!new_tab_char)
+			// 		return (free(mot_temp), -1);
+			// 	cmd[index_cmd].cmd = new_tab_char; // mettre a jour le tableau de la structure avec le nouveau tableau agrandi
+			// 	if (!cmd[index_cmd].cmd)
+			// 		return (-1);
+			// }
+			// i++; // i = nombre d'arguments actuels (prochain index libre)
 		}
 		else if (token->type_token == T_FD_IN || token->type_token == T_FD_OUT || token->type_token == T_FD_OUT_APPEND)
 		{
