@@ -16,15 +16,14 @@ int	appliquer_redir_2_len(char **line, t_token **token, t_type_token *fd_type)
 {
 	if (!ft_strncmp((*line), ">>", 2))
 	{
-		if (add_token((*line), T_RD_APPEND, 2, token) < 0) // ajouter le token de redirection >> dans la liste chainee
+		if (add_token((*line), T_RD_APPEND, 2, token) < 0)
 			return (free_tokens(token), -1);
-		// on ajoute dans la liste chainee : >>, type : T_RD_APPEND;
 		(*fd_type) = T_FD_OUT_APPEND;
 		return ((*line) += 2, 1);
 	}
 	else if (!ft_strncmp((*line), "<<", 2))
 	{
-		if (add_token((*line), T_RD_HEREDOC, 2, token) < 0) // ajouter le token de redirection << dans la liste chainee
+		if (add_token((*line), T_RD_HEREDOC, 2, token) < 0)
 			return (free_tokens(token), -1);
 		(*fd_type) = T_FD_HEREDOC;
 		return ((*line) += 2, 1);
@@ -36,15 +35,14 @@ int	appliquer_redir_1_len(char **line, t_token **token, t_type_token *fd_type)
 {
 	if (!ft_strncmp((*line), ">", 1))
 	{
-		if (add_token((*line), T_RD_OUT, 1, token) < 0) // ajouter le token de redirection > dans la liste chainee
+		if (add_token((*line), T_RD_OUT, 1, token) < 0)
 			return (free_tokens(token), -1);
-			// on ajoute dans la liste chainee : >, type : T_RD_OUT;
 		(*fd_type) = T_FD_OUT;
 		return ((*line) += 1, 1);
 	}
 	else if (!ft_strncmp((*line), "<", 1))
 	{
-		if (add_token((*line), T_RD_IN, 1, token) < 0) // ajouter le token de redirection < dans la liste chainee
+		if (add_token((*line), T_RD_IN, 1, token) < 0)
 			return (free_tokens(token), -1);
 		(*fd_type) = T_FD_IN;
 		return ((*line) += 1, 1);
@@ -54,7 +52,7 @@ int	appliquer_redir_1_len(char **line, t_token **token, t_type_token *fd_type)
 
 int	appliquer_redir_token(char **line, t_token **token, t_type_token *fd_type)
 {
-	if (!ft_strncmp((*line), ">>", 2) || !ft_strncmp((*line), "<<", 2)) // redirection 
+	if (!ft_strncmp((*line), ">>", 2) || !ft_strncmp((*line), "<<", 2))
 		return (appliquer_redir_2_len(line, token, fd_type));
 	else if (!ft_strncmp((*line), ">", 1) || !ft_strncmp((*line), "<", 1))
 		return (appliquer_redir_1_len(line, token, fd_type));

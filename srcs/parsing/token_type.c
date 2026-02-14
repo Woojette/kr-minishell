@@ -12,7 +12,8 @@
 
 #include "minishell.h"
 
-int	new_node_init(t_token **new_node, char *line, int len, t_type_token type_token)
+int	new_node_init(t_token **new_node, char *line, int len,
+		t_type_token type_token)
 {
 	(*new_node)->str = ft_strndup(line, len);
 	if (!(*new_node)->str)
@@ -22,16 +23,15 @@ int	new_node_init(t_token **new_node, char *line, int len, t_type_token type_tok
 	}
 	(*new_node)->type_token = type_token;
 	(*new_node)->type_quote = GENERAL;
-	(*new_node)->type_bi = 0; // par defaut
+	(*new_node)->type_bi = 0;
 	(*new_node)->next = NULL;
 	return (0);
 }
 
-// On ajoute le token dans la structure t_token;
-int add_token(char *line, t_type_token type_token, int len, t_token **token)
+int	add_token(char *line, t_type_token type_token, int len, t_token **token)
 {
-	t_token *new_node;
-	t_token *tmp;
+	t_token	*new_node;
+	t_token	*tmp;
 
 	if (!line || !token || len <= 0)
 		return (-1);
@@ -40,14 +40,14 @@ int add_token(char *line, t_type_token type_token, int len, t_token **token)
 		return (-1);
 	if (new_node_init(&new_node, line, len, type_token) == -1)
 		return (-1);
-	if (*token == NULL) // Si la liste est vide on met au debut
-			*token = new_node;
+	if (*token == NULL)
+		*token = new_node;
 	else
 	{
-			tmp = *token;
-			while (tmp->next)
-					tmp = tmp->next;
-			tmp->next = new_node;
+		tmp = *token;
+		while (tmp->next)
+			tmp = tmp->next;
+		tmp->next = new_node;
 	}
 	return (0);
 }
@@ -59,12 +59,12 @@ void	appliquer_token_fd(t_token *temp)
 	if (temp->type_token == T_RD_IN)
 	{
 		if (temp->next && temp->next->type_token == T_MOT)
-			temp->next->type_token = T_FD_IN; // la suite de redir concerne le nom de fichier, donc fd
+			temp->next->type_token = T_FD_IN;
 	}
 	else if (temp->type_token == T_RD_OUT)
 	{
 		if (temp->next && temp->next->type_token == T_MOT)
-			temp->next->type_token = T_FD_OUT; // la suite de redir concerne le nom de fichier, donc fd
+			temp->next->type_token = T_FD_OUT;
 	}
 	else if (temp->type_token == T_RD_APPEND)
 	{
@@ -78,8 +78,7 @@ void	appliquer_token_fd(t_token *temp)
 	}
 }
 
-// pour la condition de token Mot (pour gerer le cas de fd)
-void parse_fd_tokens(t_token **token)
+void	parse_fd_tokens(t_token **token)
 {
 	t_token	*temp;
 
@@ -91,7 +90,6 @@ void parse_fd_tokens(t_token **token)
 	}
 }
 
-// pour tester (enum -> string)	
 const char	*get_token_type_str(t_type_token type)
 {
 	if (type == T_MOT)
@@ -107,7 +105,7 @@ const char	*get_token_type_str(t_type_token type)
 	else if (type == T_RD_HEREDOC)
 		return ("T_RD_HEREDOC");
 	else if (type == T_FD_IN)
-		return ("T_FD_IN"); 
+		return ("T_FD_IN");
 	else if (type == T_FD_OUT)
 		return ("T_FD_OUT");
 	else if (type == T_FD_HEREDOC)

@@ -12,7 +12,6 @@
 
 #include "minishell.h"
 
-// recuprer le caractere de la premiere quote
 char	caractere_quote_debut(char *line)
 {
 	int		i;
@@ -32,7 +31,6 @@ char	caractere_quote_debut(char *line)
 	return (debut_quote);
 }
 
-// recuperer l'index de la premiere quote 
 int	index_quote_debut(char *line, char c)
 {
 	int	i;
@@ -47,7 +45,6 @@ int	index_quote_debut(char *line, char c)
 	return (i);
 }
 
-// recuperer l'index de la deuxieme quote 
 int	index_quote_fin(char *line, char c)
 {
 	int	i;

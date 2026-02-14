@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-void	passer_espace(char **line) // pour changer la position du pointeur, on utiliser le double pointeur
+void	passer_espace(char **line)
 {
 	while ((**line) == ' ' || (**line) == '\t')
 		(*line)++;
@@ -21,20 +21,22 @@ void	passer_espace(char **line) // pour changer la position du pointeur, on util
 
 int	appliquer_pipe_token(char **line, t_token **token, t_type_token *fd_type)
 {
-	if ((*fd_type) != (t_type_token) - 1)
-		return (free_tokens(token), write(2, "syntax error near unexpected token `|'\n", 40), -2);
+	if ((*fd_type) != (t_type_token)-1)
+		return (free_tokens(token), write(2,
+				"syntax error near unexpected token `|'\n", 40), -2);
 	if (add_token((*line), T_PIPE, 1, token) < 0)
 		return (free_tokens(token), -1);
 	(*line) += 1;
 	return (0);
 }
 
-int	appliquer_mot_token(char **line, t_token **token, t_type_token *fd_type, int *len)
+int	appliquer_mot_token(char **line, t_token **token, t_type_token *fd_type,
+		int *len)
 {
 	(*len) = len_mot_total((*line));
 	if ((*len) <= 0)
 		return (free_tokens(token), -1);
-	if ((*fd_type) != (t_type_token) - 1)
+	if ((*fd_type) != (t_type_token)-1)
 	{
 		if (add_token((*line), (*fd_type), (*len), token) < 0)
 			return (free_tokens(token), -1);
@@ -51,11 +53,12 @@ int	appliquer_mot_token(char **line, t_token **token, t_type_token *fd_type, int
 
 int	appliquer_token_final(t_token **token, t_type_token fd_type, t_mini *mini)
 {
-	if (fd_type != (t_type_token) - 1)
-		return (free_tokens(token), write(2, "syntax error near unexpected token `newline'\n", 45), -2);
-	if (appliquer_dollar_sur_liste_token(token, mini) == -1) // appliquer dollar en respectant a quotes
+	if (fd_type != (t_type_token)-1)
+		return (free_tokens(token), write(2,
+				"syntax error near unexpected token `newline'\n", 45), -2);
+	if (appliquer_dollar_sur_liste_token(token, mini) == -1)
 		return (free_tokens(token), -1);
-	if (appliquer_quote_sur_liste_token(token) == -1) // apres l'expansion de dollar, on supprime quote
+	if (appliquer_quote_sur_liste_token(token) == -1)
 		return (free_tokens(token), -1);
 	return (0);
 }

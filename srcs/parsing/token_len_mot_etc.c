@@ -12,10 +12,9 @@
 
 #include "minishell.h"
 
-// compter le nombre de caracteres entre 2 quotes, y compris les 2 quotes  ex) "...", '...' 
 int	len_mot_2_quotes_entier(char *line)
 {
-	char	debut_quote; // recuperer la quote de premier caractere de la chaine
+	char	debut_quote;
 	int		i;
 	int		len;
 
@@ -35,7 +34,6 @@ int	len_mot_2_quotes_entier(char *line)
 	return (len);
 }
 
-// recuperer len apres la 2e quote
 int	len_mot_apres_quote(char *line)
 {
 	int		i;
@@ -47,16 +45,15 @@ int	len_mot_apres_quote(char *line)
 	len_apres_quote = 0;
 	while (line[i])
 	{
-		if (line[i] == ' ' || line[i] == '\0'
-			|| line[i] == '>' || line[i] == '<' || line[i] == '|')
-			break;
+		if (line[i] == ' ' || line[i] == '\0' || line[i] == '>'
+			|| line[i] == '<' || line[i] == '|')
+			break ;
 		len_apres_quote++;
 		i++;
 	}
 	return (len_apres_quote);
 }
 
-// compter le nombre de chaines dans un double tableau char**
 int	len_tab_char(char **tab)
 {
 	int	j;
@@ -69,15 +66,14 @@ int	len_tab_char(char **tab)
 	return (j);
 }
 
-// compter le nombre de caracteres s'il y a pas de 2 quotes qui fonctionnent
 int	len_mot_sans_quote(char *line)
 {
 	int	i;
 
 	i = 0;
-	while ((*line) && (*line) != ' ' && (*line) != '\t'
-		&& (*line) != '>' && (*line) != '<' && (*line) != '|'
-		&& (*line) != '"' && (*line) != '\'')
+	while ((*line) && (*line) != ' ' && (*line) != '\t' && (*line) != '>'
+		&& (*line) != '<' && (*line) != '|' && (*line) != '"'
+		&& (*line) != '\'')
 	{
 		line++;
 		i++;
@@ -85,7 +81,6 @@ int	len_mot_sans_quote(char *line)
 	return (i);
 }
 
-// recuperer len avant la quote qui est au milieu de la chaine
 int	len_mot_avant_quote(char *line)
 {
 	int		i;
@@ -97,5 +92,5 @@ int	len_mot_avant_quote(char *line)
 	quote = index_quote_debut(line, debut_quote);
 	while (i < quote)
 		i++;
-	return (i); // ex) you"pi" (-> 3)
+	return (i);
 }

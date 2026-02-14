@@ -12,7 +12,6 @@
 
 #include "minishell.h"
 
-// supprimer tous les fichiers temporaires de heredoc (unlink), puis free le tableau temp_heredoc[]
 void	free_temp_heredoc(char **temp)
 {
 	int	i;
@@ -22,22 +21,20 @@ void	free_temp_heredoc(char **temp)
 	i = 0;
 	while (temp[i])
 	{
-		unlink(temp[i]); // supprimer le fichier temporaire du heredoc
-		free(temp[i]); // free le nom du fichier temporaire du heredoc
+		unlink(temp[i]);
+		free(temp[i]);
 		i++;
 	}
-	free(temp); // free le tableau de string (char **) apres avoir supprimer les fichiers temporaires
+	free(temp);
 }
 
-// free la structure mini apres avoir free tous les cmd
-// env: on utilise directement le env de main, donc on ne le free pas (c'est le env de main, pas une copie)
 void	free_mini(t_mini *mini)
 {
 	if (!mini)
 		return ;
 	if (mini->cmd_array)
-		free_cmd_all(mini->cmd_array, mini->nbr_cmd); // free tous les cmd (fd, tableaux de string et d'int), puis free le tableau de cmd
-	free_tab_char(mini->path_array); // free le tableau de string pour les chemins d'acces des commandes
+		free_cmd_all(mini->cmd_array, mini->nbr_cmd);
+	free_tab_char(mini->path_array);
 	mini->path_array = NULL;
-	free(mini); // free la structure mini apres avoir free tous les cmd
+	free(mini);
 }
