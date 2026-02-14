@@ -14,19 +14,23 @@
 
 int	appliquer_add_cmd_pipe(t_token *token, t_cmd *cmd, t_var_cmd *var_cmd)
 {
+	char	*erreur;
+
+	erreur = "Error: syntax error near unexpected token '|'\n";
 	if (!token || !cmd || !var_cmd || var_cmd->index_cmd < 0)
-			return (-1);
-	if (cmd[var_cmd->index_cmd].inoutfile || cmd[var_cmd->index_cmd].compter_ihoa > 0)
+		return (-1);
+	if (cmd[var_cmd->index_cmd].inoutfile
+		|| cmd[var_cmd->index_cmd].compter_ihoa > 0)
 		var_cmd->redir_existe = 1;
 	else
 		var_cmd->redir_existe = 0;
 	if (token->next == NULL) // proteger au cas ou il y a un pipe a la fin (ex: cmd1 | )
-		return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
+		return (write(2, erreur, ft_strlen(erreur)), -2);
 	if (token->next->type_token == T_PIPE) // proteger au cas ou il y a 2 pipes consecutifs (ex: cmd1 || cmd2)
-		return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
+		return (write(2, erreur, ft_strlen(erreur)), -2);
 	if (cmd[var_cmd->index_cmd].cmd == NULL && var_cmd->i == 0 && !var_cmd->redir_existe)
 	// proteger au cas ou il y a un pipe au debut (ex: | cmd1 )
-		return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
+		return (write(2, erreur, ft_strlen(erreur)), -2);
 	// if(cmd[var_cmd->index_cmd].cmd == NULL) // proteger au cas ou il y a 2 pipes consecutifs (ex: cmd1 || cmd2)
 	// 	return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
 	if (cmd[var_cmd->index_cmd].cmd != NULL) // si le tableau n'est pas vide 
@@ -43,7 +47,8 @@ int	appliquer_add_cmd_type(t_token *token, t_cmd *cmd, t_var_cmd *var_cmd)
 		return (-1);
 	if (token->type_token == T_MOT)
 		return (appliquer_add_cmd_mot_all(token, cmd, var_cmd));
-	if (token->type_token == T_FD_IN || token->type_token == T_FD_OUT || token->type_token == T_FD_OUT_APPEND)
+	if (token->type_token == T_FD_IN || token->type_token == T_FD_OUT
+		|| token->type_token == T_FD_OUT_APPEND)
 		return (appliquer_add_cmd_redir(token, cmd, var_cmd));
 	if (token->type_token == T_FD_HEREDOC)
 		return (appliquer_add_cmd_heredoc_all(token, cmd, var_cmd));
@@ -56,11 +61,12 @@ int	appliquer_add_cmd_type(t_token *token, t_cmd *cmd, t_var_cmd *var_cmd)
 // ex) echo hihi | cat -e
 // l'objectif, c'est de mettre  tab[0] = {"echo", "hihi", NULL}, tab[1] = {"cat", "-e", NULL}  dans la liste chainee cmd
 // ( remplir  cmd[0].cmd = {"echo","hihi",NULL}, cmd[1].cmd = {"cat","-e",NULL} )
-int add_cmd(t_token *token, t_cmd *cmd)
+int	add_cmd(t_token *token, t_cmd *cmd)
 {
+	int			resultat;
 	t_var_cmd	var_cmd; // structure pour stocker les variables temporaires dans la fonction add_cmd
-	int 			resultat;
 
+	resultat = 0;
 	init_var_cmd(&var_cmd, &resultat);
 	while (token) // pendant que le noeud dans la liste chainee existe
 	{
@@ -70,7 +76,7 @@ int add_cmd(t_token *token, t_cmd *cmd)
 		token = token->next; // on passe au noeud suivant
 	}
 	if (var_cmd.index_cmd > 0 && cmd[var_cmd.index_cmd].cmd == NULL
-			&& cmd[var_cmd.index_cmd].inoutfile == NULL && !cmd[var_cmd.index_cmd].heredoc)
+		&& cmd[var_cmd.index_cmd].inoutfile == NULL && !cmd[var_cmd.index_cmd].heredoc)
 	{
 		free_cmd_interieur(cmd, var_cmd.index_cmd + 1);
 		return (write(2, "Error: syntax error near unexpected token '|'\n", 47), -2);
