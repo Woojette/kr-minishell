@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   cmd_init.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: wooyang <wooyang@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/05 11:44:27 by wooyang           #+#    #+#             */
+/*   Updated: 2025/05/14 15:55:42 by wooyang          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 void	init_cmd(t_cmd *cmd, int j)
@@ -47,63 +59,22 @@ t_cmd	*malloc_cmd(t_token *token)
 	return (cmd);
 }
 
-// fonction pour agrandir un tableau et rajouter une chaine, comme pour le builtin export
-// char **tab : double tableau actuel, *str : nouveau tableau a ajouter,
-// int  size : taille actuelle de double tableau
-char** add_double_tab_char(char **tab, char *str, int size)
+void	init_var_cmd(t_var_cmd *var_cmd, int *resultat)
 {
-	char **new_tab; // nouveau double tableau agrandi
-	int j; // index pour parcourir les tableaux
-
-	if ((!tab && size > 0) || !str || size < 0) // proteger au cas ou tab est NULL mais size > 0
-		return (NULL);
-	// if (!str || size < 0) // proteger au cas ou str est NULL ou size < 0
-	// 	return (NULL);
-	new_tab = malloc(sizeof(char *) * (size + 2)); // +1 pour le nouveau +1 pour NULL hihi
-	if (!new_tab)
-			return (NULL);
-	j = 0;
-	if (tab) // si tab n'est pas NULL, on copie les valeurs existantes
-	{
-		while (j < size)
-		{
-			new_tab[j] = tab[j]; // copier l'adresse de chaque chaine
-			// cf) on copie juste le pointeur (l'adresse)
-			// chaque tab[j] est un pointeur vers une chaine de caracteres
-			// cf) char **tab = *tab[] = {"pho", "malatang", NULL}; (tableau de pinteurs vers des chaines)
-			//     char tab[j] -> tab[0] = adresse de "pho", tab[1] = adresse de "malatang" (chaine de caracteres)
-			j++;
-		}
-	}
-	new_tab[j] = str; // l'adresse de nouvelle chaine ajoutee, on ajoute la nouvelle adresse ici youpiii
-	new_tab[j + 1] = NULL; // terminer par NULL
-	return (free(tab), new_tab); // vu qu'on a bien cree un nouveau tableau agrandi, on libere l'ancien tableau de pointeurs
-}
-
-// fonction pour agrandir un tableau et rajouter une valeur int (1 ou 0), comme pour out_append
-int	*add_double_tab_int(int *tab, int val, int size)
-{
-	int *new_tab; // nouveau tableau agrandi
-	int j; // index pour parcourir les tableaux
-
-	if (!tab && size > 0) // proteger au cas ou tab est NULL mais size > 0
-		return (NULL);
-	if (size < 0)
-		return (NULL);
-	new_tab = malloc(sizeof(int) * (size + 1)); // +1 pour le nouveau 
-	// cf) int *tab n'a pas besoin d'ajouter '\0' a la fin 
-	if (!new_tab)
-			return (NULL);
-	j = 0;
-	if (tab) // si tab n'est pas NULL, on copie les valeurs existantes
-	{
-		while (j < size)
-		{
-				new_tab[j] = tab[j]; // copier chaque valeur
-				j++;
-		}
-	}
-	new_tab[j] = val; // ajouter la nouvelle valeur (1 ou 0)
-	free(tab); // vu qu'on a bien cree un nouveau tableau agrandi, on libere l'ancien tableau
-	return (new_tab);
+	if (!var_cmd)
+		return ;
+	*resultat = 0;
+	var_cmd->index_cmd = 0; // l'index pour la structure  ex) tab[0] = {"echo", "hihi", NULL}, tab[1] = {"cat", "-e", NULL}
+	var_cmd->i = 0; // l'index pour l'argument de chaque structure  ex) tab[0][0] = "echo", tab[0][1] = "hihi", tab[0][2] = NULL
+	var_cmd->n = 0; // l'index pour limiters de heredoc
+	var_cmd->redir_existe = 0;
+	var_cmd->mot_temp = NULL; // temporaire pour le mot
+	var_cmd->file_temp = NULL; // temporaire pour le nom de fichier
+	var_cmd->size_file_tab = 0; // pour compter la taille actuelle du tableau de fichiers (infile ou outfile) pour agrandir le tableau et ajouter un nouveau fichier
+	var_cmd->limiter_sans_quote = 0;
+	var_cmd->limiter_env = 0;
+	var_cmd->new_tab_char = NULL; // temporaire pour le nom de la commande (pour proteger)
+	// si l'un des fonctions add_tab_char ou add_tab_int retourne NULL, ca risque de perdre tous les pointeurs qui etaient deja dans le tableau cmd, donc on utilise des pointeurs temporaires pour proteger (pour garder des anciens pointeurs)
+	var_cmd->new_tab_int = NULL; // temporaire pour le tableau int (pour proteger)
+	var_cmd->size_cmd = 0;
 }

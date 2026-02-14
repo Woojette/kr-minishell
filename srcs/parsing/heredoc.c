@@ -202,7 +202,7 @@ int	appliquer_heredoc_cmd(t_mini *mini, int j)
 		mini->cmd[j].temp_heredoc = ft_calloc(mini->cmd[j].compter_heredoc + 1, sizeof(char *)); // +1 pour NULL (terminaison)
 		if (!mini->cmd[j].temp_heredoc)
 		{
-			mini->cmd[j].in_fail = 1;
+			mini->cmd[j].inout_fail = 1;
 			mini->exit_status = 1;
 			init_signaux(); // reinitialiser les signaux avant de retourner
 			return (-1);
@@ -212,7 +212,7 @@ int	appliquer_heredoc_cmd(t_mini *mini, int j)
 	{
 		if (preparer_temp_file_name(mini, j, n) == -1)
 		{
-			mini->cmd[j].in_fail = 1;
+			mini->cmd[j].inout_fail = 1;
 			mini->exit_status = 1;
 			free_temp_heredoc(mini->cmd[j].temp_heredoc);
 			mini->cmd[j].temp_heredoc = NULL;
@@ -222,7 +222,7 @@ int	appliquer_heredoc_cmd(t_mini *mini, int j)
 		mini->cmd[j].pid_heredoc = fork(); // creer un processus enfant pour gerer heredoc
 		if (mini->cmd[j].pid_heredoc == -1) // si echec de fork
 		{
-			mini->cmd[j].in_fail = 1;
+			mini->cmd[j].inout_fail = 1;
 			mini->exit_status = 1;
 			free_temp_heredoc(mini->cmd[j].temp_heredoc);
 			mini->cmd[j].temp_heredoc = NULL;
@@ -234,7 +234,7 @@ int	appliquer_heredoc_cmd(t_mini *mini, int j)
 		if (waitpid(mini->cmd[j].pid_heredoc, &status, 0) == -1) // attendre la fin du processus enfant
 		{
 			init_signaux();
-			mini->cmd[j].in_fail = 1;
+			mini->cmd[j].inout_fail = 1;
 			mini->exit_status = 1;
 			free_temp_heredoc(mini->cmd[j].temp_heredoc);
 			mini->cmd[j].temp_heredoc = NULL;
@@ -244,7 +244,7 @@ int	appliquer_heredoc_cmd(t_mini *mini, int j)
 		if (WIFSIGNALED(status))
 		{
 			exit_signal = WTERMSIG(status);
-			mini->cmd[j].in_fail = 1;
+			mini->cmd[j].inout_fail = 1;
 			mini->exit_status = 128 + exit_signal;
 			free_temp_heredoc(mini->cmd[j].temp_heredoc);
 			mini->cmd[j].temp_heredoc = NULL;
@@ -256,7 +256,7 @@ int	appliquer_heredoc_cmd(t_mini *mini, int j)
 			exit_status = WEXITSTATUS(status); // recuperer le code de sortie
 			if (exit_status != 0) // si le code de sortie n'est pas 0 (erreur dans heredoc)
 			{
-				mini->cmd[j].in_fail = 1; // marquer l'echec de heredoc
+				mini->cmd[j].inout_fail = 1; // marquer l'echec de heredoc
 				mini->exit_status = exit_status; // mettre a jour le code de sortie global
 				free_temp_heredoc(mini->cmd[j].temp_heredoc);
 				mini->cmd[j].temp_heredoc = NULL;
@@ -266,7 +266,7 @@ int	appliquer_heredoc_cmd(t_mini *mini, int j)
 		}
 		else // si le processus enfant ne s'est pas termine correctement
 		{
-			mini->cmd[j].in_fail = 1; // marquer l'echec de heredoc
+			mini->cmd[j].inout_fail = 1; // marquer l'echec de heredoc
 			mini->exit_status = 1; // mettre a jour le code de sortie global
 			free_temp_heredoc(mini->cmd[j].temp_heredoc);
 			mini->cmd[j].temp_heredoc = NULL;
@@ -275,7 +275,7 @@ int	appliquer_heredoc_cmd(t_mini *mini, int j)
 		}
 		if (!mini->cmd[j].temp_heredoc || !mini->cmd[j].temp_heredoc[n]) // proteger au cas ou temp_heredoc est NULL
 		{
-			mini->cmd[j].in_fail = 1;
+			mini->cmd[j].inout_fail = 1;
 			mini->exit_status = 1;
 			free_temp_heredoc(mini->cmd[j].temp_heredoc);
 			mini->cmd[j].temp_heredoc = NULL;
@@ -292,7 +292,7 @@ int	appliquer_heredoc_cmd(t_mini *mini, int j)
 	mini->cmd[j].fd_in = open(mini->cmd[j].temp_heredoc[mini->cmd[j].compter_heredoc - 1], O_RDONLY); // reouvrir le fichier temp en lecture seule
 	if (mini->cmd[j].fd_in == -1) // si echec d'ouverture de temp en lecture
 	{
-		mini->cmd[j].in_fail = 1;
+		mini->cmd[j].inout_fail = 1;
 		mini->exit_status = 1;
 		perror("open temp for reading"); // afficher l'erreur
 		free_temp_heredoc(mini->cmd[j].temp_heredoc);

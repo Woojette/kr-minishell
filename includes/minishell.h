@@ -96,17 +96,16 @@ typedef struct s_cmd
 	char	**cmd; // tableau de chaine de caracteres pour la commande et ses arguments (sans redir) ex) cmd[0] = {"echo", "hihi", NULL}
 
 	// cmd redir
-	char	**infile; // tableau des fichiers de redirection entree (<)
-	char	**outfile; // tableau des fichiers de redirection sortie (>)
-	int		*out_append; // tableau, 1 si redirection en mode append (>>), 0 sinon (>)
+	char	**inoutfile; // tableau de chaine de caracteres pour les fichiers de redirection de in (<), out (>), append (>>) et heredoc (<<) dans l'ordre d'apparition ex) inoutfile[0] = "file1" (pour < file1), inoutfile[1] = "file2" (pour > file2)
 
 	char	**temp_heredoc; // tableau des fichiers temporaires pour heredoc
 	char	**limiter; // tableau des limiters (sauvegarder pls limiters)
 	int		compter_heredoc; // le nombre de heredoc
 
 	int		*in_heredoc; // tableau qui sauvegarde le type de in redir (<, <<), 1 si redirection heredoc (<<), 0 sinon (<)
-	int		*in_hd_index; // tableau des index de chaque infile(<) et de limiter(<<) qui concerne chaque redir de in_heredoc
-	int		compter_in_hd; // compter le nombre de in/heredoc redir
+	// int		*in_hd_index; // tableau des index de chaque infile(<) et de limiter(<<) qui concerne chaque redir de in_heredoc
+	int		*ihoa; // tableau qui sauvegarde le type de redirection (in, heredoc, out, append) pour chaque redir de inoutfile, 1 pour > (truncate), 2 pour >> (append), 3 pour < (infile), 4 pour << (heredoc)
+	int		compter_ihoa; // compter le nombre de redirections de in et heredoc pour chaque commande, pour savoir la taille du tableau in_heredoc et ihoa
 
 	int		heredoc; // 1 si redirection heredoc (<<), 0 sinon
 
@@ -117,9 +116,11 @@ typedef struct s_cmd
 	int		fd_in; // resultat ouverture fichier de < or <<
 	int		fd_out; // resultat ouverture fichier de > or >>
 	// erreurs de redirection
-	int		in_fail; // 1 si echec ouverture fichier de < or <<, 0 sinon
-	int		out_fail; // 1 si echec ouverture fichier de > or >>, 0 sinon
+	// int		in_fail; // 1 si echec ouverture fichier de < or <<, 0 sinon
+	// int		out_fail; // 1 si echec ouverture fichier de > or >>, 0 sinon
+	int	inout_fail; // 1 si echec ouverture fichier de <, <<, > ou >>, 0 sinon
 }	t_cmd;
+
 
 // structure du contexte global minishell 
 // ex. env et exit status (dernier code de sortie)
@@ -127,9 +128,19 @@ typedef struct s_mini
 {
 	char	**env;
 	int		exit_status;
-	t_cmd	*cmd; // tableau de structures cmd (divise par pipe)
+	t_cmd	*cmd_array; // tableau de structures cmd (divise par pipe) // t_cmd *cmd_array로 바꿔서 씀
 	int		nbr_cmd; // nombre de commandes (nombre de structures cmd dans cmd_tab)
+	int	    pipe_read_end; // fd de lecture du pipe pour la commande precedente, pour connecter avec la commande suivante
+	char	**path_array; // tableau des chemins d'acces pour les commandes (recupere a partir de la variable d'env PATH divise par ':')
 }	t_mini;
+
+// typedef struct s_mini
+// {
+// 	char	**env;
+// 	int		exit_status;
+// 	t_cmd	*cmd; // tableau de structures cmd (divise par pipe)
+// 	int		nbr_cmd; // nombre de commandes (nombre de structures cmd dans cmd_tab)
+// }	t_mini;
 
 
 
@@ -175,14 +186,20 @@ void	free_tab_char(char **tab); // free le tableau de string
 void	free_tab_int(int *tab); // free le tableau d'int
 void	free_temp_heredoc(char **temp); // supprimer tous les fichiers temporaires de heredoc (unlink), puis free le tableau temp_heredoc[]
 void	free_cmd_fd_tab(t_cmd *cmd); // free les fd de cmd, puis free les tableaux 
+void  free_cmd_partiel(t_cmd *cmd, int nbr_cmd);
 void	free_cmd_all(t_cmd *cmd, int nbr_cmd); // free tous les cmd 
 void	free_mini(t_mini *mini);
 
 // commande.c
+void	init_cmd(t_cmd *cmd, int j); // initialiser la structure cmd
 t_cmd	*malloc_cmd(t_token *token); // alluer la liste chainee cmd (divisee par pipe)
 char	**add_double_tab_char(char **tab, char *str, int size); // agrandir un tableau et rajouter une chaine
 int		*add_double_tab_int(int *tab, int val, int size); // agrandir un tableau int et rajouter une valeur int
 int 	add_cmd(t_token *token, t_cmd *cmd); // parcours les token, et rajoute les token dans les tableaux
+int 	appliquer_add_cmd_heredoc_all(t_token *token, t_cmd *cmd, t_var_cmd *var_cmd);
+int 	appliquer_add_cmd_mot_all(t_token *token, t_cmd *cmd, t_var_cmd *var_cmd);
+int 	appliquer_add_cmd_redir(t_token *token, t_cmd *cmd, t_var_cmd *var_cmd);
+void	init_var_cmd(t_var_cmd *var_cmd, int *resultat);
 
 // quote_enlever.c
 char	*enlever_quote_dans_token(char *str); // enlever les quotes dans un token str

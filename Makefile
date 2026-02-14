@@ -17,18 +17,27 @@ SRCS_FILES = 	minishell_main.c \
 				parsing/quote_enlever.c \
 				parsing/signaux.c \
      		parsing/token_all.c \
+				parsing/token_parse_if.c \
+				parsing/token_parse_redir.c \
+				parsing/token_parse_type.c \
 				parsing/token_type.c \
     		parsing/token_quote.c \
 				parsing/token_quote_position.c \
 				parsing/token_quote_char.c \
 				parsing/free_token_tab.c \
 				parsing/free_parsing.c \
+				parsing/free_cmd.c \
  				parsing/pipe_check.c \
 				parsing/redir_in_out.c \
  				parsing/test_parsing.c \
 				parsing/token_len_mot_all.c \
 				parsing/token_len_mot_etc.c \
-				parsing/commande.c
+				parsing/cmd_add_all.c \
+				parsing/cmd_add_heredoc.c \
+				parsing/cmd_add_mot.c \
+				parsing/cmd_add_redir.c \
+				parsing/cmd_add_agrandi.c \
+				parsing/cmd_add_init.c
 
 SRCS = $(addprefix $(SRC_DIR)/, $(SRCS_FILES))
 OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
