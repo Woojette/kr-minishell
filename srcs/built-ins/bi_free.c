@@ -21,22 +21,7 @@ void	ft_free_tab(char **tab)
 	free(tab);
 }
 
-// void	ft_lst_clear(t_minis **mini)
-// {
-// 	t_minis	*temp;
-
-// 	if (!mini ||!(*mini))
-// 		return ;
-// 	while ((*mini))
-// 	{
-// 		temp = (*mini);
-// 		(*mini) = (*mini)->next;
-// 		free(*mini);
-// 	}
-// 	(*mini) = NULL;
-// }
-
-void	ft_free_all(t_minis **mini)
+void	ft_free_all(t_mini **mini)
 {
 	if ((*mini)->env)
 		ft_free_tab((*mini)->env);

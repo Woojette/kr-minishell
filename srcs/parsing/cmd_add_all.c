@@ -51,7 +51,7 @@ int	appliquer_add_cmd_type(t_token *token, t_cmd *cmd, t_var_cmd *var_cmd)
 		return (appliquer_add_cmd_heredoc_all(token, cmd, var_cmd));
 	if (token->type_token == T_PIPE)
 		return (appliquer_add_cmd_pipe(token, cmd, var_cmd));
-	return (-1);
+	return (0);
 }
 
 int	add_cmd(t_token *token, t_cmd *cmd)

@@ -1,16 +1,17 @@
 #include "minishell.h"
 
-void	ft_env(char **env)
+void	ft_env(t_mini *mini)
 {
 	int	j;
 
 	j = 0;
-	while (env[j] != NULL)
+	while (mini->env[j] != NULL)
 	{
-		printf("%s\n", env[j]);
+		printf("%s\n", mini->env[j]);
 		j++;
 	}
 }
+
 
 int	ft_check_env_egal(char *str)
 {
@@ -30,7 +31,7 @@ int	ft_check_env_egal(char *str)
 	return (i);
 }
 
-int	ft_check_env_double(char *str, char **env)
+int	ft_check_env_double(char *str, t_mini *mini)
 {
 	int	i;
 	int	j;
@@ -41,11 +42,11 @@ int	ft_check_env_double(char *str, char **env)
 	egal = ft_check_env_egal(str);
 	if (egal == -1)
 		return (-1);
-	while (env[j] != NULL)
+	while (mini->env[j] != NULL)
 	{
-		if (ft_strncmp(str, env[j], egal + 1) == 0)
+		if (ft_strncmp(str, mini->env[j], egal + 1) == 0)
 			return (j);
 		j++;
 	}
-	return (0);
+	return (-1);
 }

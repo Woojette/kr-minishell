@@ -1,98 +1,54 @@
 #include "minishell.h"
 
-int	ft_export_double(char *str, char ***env)
-{
-	int		j;
-	int		taille;
-	int		check;
-	char	**env_ajoute;
+// export 이용시 export 라고 뜨게 하기
+// ASCII 재정렬
+// 밸류 안 넣은건 안들어가게 하기
+// 성공시 엑싯코드 0 실패시 1
+// unset 역시 export 업뎃 뭉치 기준으로 해야함
 
-	check = ft_check_env_double(str, (*env));
-	j = 0;
-	taille = 0;
-	while ((*env)[taille] != NULL)
-		taille++;
-	env_ajoute = malloc(sizeof(char *) * (taille + 1));
-	if (!env_ajoute)
-		return (-1);
-	while ((*env)[j] != NULL)
+void	export_print(t_mini *mini)
+{
+	int	i;
+	int	j;
+	int	flag;
+
+	i = -1;
+	while (mini->save_ex[++i])
 	{
-		if (check == j)
-			env_ajoute[j] = ft_strdup(str);
-		else
-			env_ajoute[j] = ft_strdup((*env)[j]);
-		if (!env_ajoute[j])
-			return (ft_free_tab(env_ajoute), -1);
-		j++;
+		write(1, "export ", 7);
+		j = -1;
+		flag = 0;
+		while (mini->save_ex[i][++j])
+		{
+			write(1, &(mini->save_ex[i][j]), 1);
+			if (mini->save_ex[i][j] == '=')
+			{
+				flag = 1;
+				write(1, "\"", 1);
+			}
+		}
+		if (flag == 1)
+			write(1, "\"", 1);
+		write(1, "\n", 1);
 	}
-	env_ajoute[j] = NULL;
-	ft_free_tab((*env));
-	(*env) = env_ajoute;
-	return (0);
 }
 
-int	ft_export_sans_double(char *str, char ***env)
+int	ft_export_all(char **tab, t_mini *mini)
 {
-	int		j;
-	int		taille;
-	int		check;
-	char	**env_ajoute;
+	int	i;
 
-	check = ft_check_env_double(str, (*env));
-	j = 0;
-	taille = 0;
-	while ((*env)[taille] != NULL)
-		taille++;
-	env_ajoute = malloc(sizeof(char *) * (taille + 1 + 1));
-	if (!env_ajoute)
-		return (-1);
-	while ((*env)[j] != NULL)
+	i = 0;
+	if (tab[i] && !tab[1])
 	{
-		env_ajoute[j] = ft_strdup((*env)[j]);
-		if (!env_ajoute[j])
-			return (ft_free_tab(env_ajoute), -1);
-		j++;
-	}
-	env_ajoute[j] = ft_strdup(str);
-	if (!env_ajoute[j])
-		return (ft_free_tab(env_ajoute), -1);
-	j++;
-	env_ajoute[j] = NULL;
-	ft_free_tab((*env));
-	(*env) = env_ajoute;
-	return (0);
-}
-
-int	ft_export(char *str, char ***env)
-{
-	int		j;
-	int		taille;
-	int		check;
-
-	j = 0;
-	taille = 0;
-	check = ft_check_env_double(str, (*env));
-	if (check != 0)
-	{
-		if (ft_export_double(str, env) == -1)
-			return (-1);
+		export_sort(mini);
+		export_print(mini);
 		return (0);
 	}
-	if (ft_export_sans_double(str, env) == -1)
-		return (-1);
-	return (0);
-}
-
-int	ft_export_all(char **tab, char ***env)
-{
-	int	j;
-
-	j = 1;
-	while (tab[j] != NULL)
+	i = 1;
+	while(tab[i] != NULL)
 	{
-		if (ft_export(tab[j], env) == -1)
-			return (-1);
-		j++;
+		save_export(tab[i], mini);
+		i++;
 	}
 	return (0);
 }

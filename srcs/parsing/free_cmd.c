@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   free_cmd.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: wooyang <wooyang@student.42.fr>            +#+  +:+       +#+        */
+/*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 11:44:27 by wooyang           #+#    #+#             */
-/*   Updated: 2025/05/14 15:55:42 by wooyang          ###   ########.fr       */
+/*   Updated: 2026/02/14 17:58:04 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	free_cmd_tab_char(t_cmd *cmd)
 	cmd->limiter = NULL;
 }
 
-void	free_cmd_fd_tab(t_cmd *cmd)
+void	free_cmd_fd_tab_sans_hd(t_cmd *cmd)
 {
 	if (!cmd)
 		return ;
@@ -68,7 +68,7 @@ void	free_cmd_interieur(t_cmd *cmd, int nbr_cmd)
 	i = 0;
 	while (i < nbr_cmd)
 	{
-		free_cmd_fd_tab(&cmd[i]);
+		free_cmd_fd_tab_sans_hd(&cmd[i]);
 		i++;
 	}
 }
@@ -82,7 +82,7 @@ void	free_cmd_all(t_cmd *cmd, int nbr_cmd)
 	i = 0;
 	while (i < nbr_cmd)
 	{
-		free_cmd_fd_tab(&cmd[i]);
+		free_cmd_fd_tab_sans_hd(&cmd[i]);
 		i++;
 	}
 	free(cmd);

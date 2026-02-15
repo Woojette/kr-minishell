@@ -1,28 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strdup.c                                        :+:      :+:    :+:   */
+/*   ft_strcmp.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: wooyang <wooyang@student.42.fr>            +#+  +:+       +#+        */
+/*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/05 16:07:50 by wooyang           #+#    #+#             */
-/*   Updated: 2025/05/05 16:36:19 by wooyang          ###   ########.fr       */
+/*   Created: 2026/02/12 07:32:55 by yookyeoc          #+#    #+#             */
+/*   Updated: 2026/02/12 07:32:56 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-int     ft_strcmp(char *s1, char *s2)
+int	ft_strcmp(char *s1, char *s2)
 {
-        int     i;
+	int i;
 
-        i = 0;
-        while (s1[i] != '\0' && s2[i] != '\0')
-        {
-                if (s1[i] - s2[i] != 0)
-                        return (s1[i] - s2[i]);
-                else
-                        i++;
-        }
-        return (0);
+	i = 0;
+	while (s1[i] != '\0' && s2[i] != '\0')
+	{
+		if (s1[i] == s2[i])
+			i++;
+		else
+			return (s1[i] - s2[i]);
+	}
+	return (s1[i] - s2[i]);
 }
