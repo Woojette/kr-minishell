@@ -63,15 +63,20 @@ int	main(int ac, char **av, char **env)
 		}
 		if (check_pipe_fin(line) == 1)
 		{
-			write(2, "Error: syntax error near unexpected token '|'\n", 47);
+			write(2, "Error: syntax error near unexpected token `|'\n", 47);
 			mini->exit_status = 2;
 			free(line);
 			continue ;
 		}
-		if (parse_input(line, &parsing, mini) < 0)
+		resultat = parse_input(line, &parsing, mini);
+		if (resultat < 0)
 		{
-			write(2, "Error: parse_input failed\n", 26);
-			mini->exit_status = 1;
+			// write(2, "Error: parse_input failed\n", 26);
+			// mini->exit_status = 1;
+			if (resultat == -2)
+				mini->exit_status = 2;
+			else
+				mini->exit_status = 1;
 			free_tokens(&parsing);
 			free(line);
 			continue ;

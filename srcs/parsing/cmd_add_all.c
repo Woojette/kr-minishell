@@ -16,7 +16,7 @@ int	appliquer_add_cmd_pipe(t_token *token, t_cmd *cmd, t_var_cmd *var_cmd)
 {
 	char	*erreur;
 
-	erreur = "Error: syntax error near unexpected token '|'\n";
+	erreur = "Error: syntax error near unexpected token `|'\n";
 	if (!token || !cmd || !var_cmd || var_cmd->index_cmd < 0)
 		return (-1);
 	if (cmd[var_cmd->index_cmd].inoutfile
