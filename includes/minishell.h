@@ -321,8 +321,6 @@ char	*remplacer_dollar(char *str, t_mini *mini); // remplacement de $ par la val
 int		appliquer_dollar_sur_liste_token(t_token **token, t_mini *mini); // appliquer le remplacement de $ sur toute la liste chainee token
 int		appliquer_quote_sur_liste_token(t_token **token); // enlever des quotes pour chaque token de type T_MOT et fd redir
 
-void	inout_redir(t_mini *mini, int i);
-
 // // heredoc.c
 // int		preparer_temp_file_name(t_mini *mini, int j, int n);
 // int		collecter_heredoc_lines(int fd, t_mini *mini, int j, int n); // recuperer les lignes de heredoc, puis les stocker dans le fichier temp
@@ -434,14 +432,14 @@ void	fork_center(t_mini *mini);
 // redir_inout_refac_util.c
 void	heredoc_restore(t_mini *mini, int i, int k);
 int	get_redir_type(t_mini *mini, int i, int n);
-void	fail_redir(t_mini *mini, int i, t_redir *redir, int inhd);
+int	fail_redir(t_mini *mini, int i, t_redir *redir, int inhd);
 void	open_fail(t_mini *mini, int i, const char *p, int inhd);
 int	before_inout(t_mini *mini, int i);
 
 // redir_inout_refac.c
 int	open_redir(t_mini *mini, int i, t_redir *redir);
 void	remplacer_fd(int *dst, int fd);
-void	inout_redir(t_mini *mini, int i);
+int	inout_redir(t_mini *mini, int i);
 
 // redirection.c
 int	redirection_center(t_mini *mini);

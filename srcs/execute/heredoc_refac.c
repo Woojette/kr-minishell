@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 17:17:10 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/15 17:17:11 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/16 01:37:41 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,17 @@
 
 int	before_appliquer(t_mini *mini, int j)
 {
+	t_cmd	*cmd;
+
 	if (!mini || j < 0 || j >= mini->nbr_cmd)
 		return (-1);
 	if (mini->cmd_array[j].compter_heredoc <= 0)
 		return (0);
+	cmd = &mini->cmd_array[j];
 	set_signal_parent_wait();
 	if (mini->cmd_array[j].temp_heredoc == NULL)
 	{
-		mini->cmd_array[j].temp_heredoc = ft_calloc(mini->cmd_array[j].compter_heredoc
-				+ 1, sizeof(char *));
+		cmd->temp_heredoc = ft_calloc(cmd->compter_heredoc + 1, sizeof(char *));
 		if (!mini->cmd_array[j].temp_heredoc)
 		{
 			mini->cmd_array[j].inout_fail = 1;
@@ -94,7 +96,7 @@ int	appliquer_heredoc_cmd(t_mini *mini, int j)
 		return (set);
 	n = 0;
 	while (n < mini->cmd_array[j].compter_heredoc)
-	{	
+	{
 		if (work_appliquer(mini, j, n) == -1)
 			return (-1);
 		n++;

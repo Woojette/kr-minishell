@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 11:42:21 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/15 17:16:06 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/16 01:15:22 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void	c_dup2(t_mini *mini, int fd_has, int fd_to)
 
 void	ft_close(int fd)
 {
-	int result;
+	int	result;
 
 	result = close(fd);
 	if (result == -1)

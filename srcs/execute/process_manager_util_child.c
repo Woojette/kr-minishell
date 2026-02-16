@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 17:27:52 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/15 18:21:19 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/16 01:29:40 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ void	first(t_mini *mini, int *pipe_fd)
 	c_dup2(mini, pipe_fd[1], 1);
 	close(pipe_fd[1]);
 }
+
 void	middle(t_mini *mini, int *pipe_fd)
 {
 	c_dup2(mini, mini->pipe_read_end, 0);

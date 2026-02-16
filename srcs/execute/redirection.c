@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 11:47:45 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/15 18:17:49 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/16 01:30:51 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,10 +70,11 @@ void	obar_util(t_mini *mini, int flag)
 		c->fd_out = -1;
 	}
 }
+
 int	one_builtin_avec_redirs(t_mini *mini)
 {
 	t_cmd		*c;
-	int	type;
+	int			type;
 	const int	in_save = dup(0);
 	const int	out_save = dup(1);
 

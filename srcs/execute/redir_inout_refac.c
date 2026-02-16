@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 22:23:40 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/15 22:35:06 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/16 01:26:31 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,14 +45,14 @@ void	remplacer_fd(int *dst, int fd)
 	*dst = fd;
 }
 
-void	inout_redir(t_mini *mini, int i)
+int	inout_redir(t_mini *mini, int i)
 {
 	t_redir	redir;
 	int		fd;
 	int		inhd;
 
 	if (before_inout(mini, i) < 0)
-		return ;
+		return (-1);
 	redir.n = 0;
 	redir.k = 0;
 	while (mini->cmd_array[i].inoutfile[redir.n])
@@ -61,10 +61,7 @@ void	inout_redir(t_mini *mini, int i)
 		fd = open_redir(mini, i, &redir);
 		inhd = (redir.type == INF || redir.type == HEREDOC);
 		if (fd < 0)
-		{
-			fail_redir(mini, i, &redir, inhd);
-			return ;
-		}
+			return (fail_redir(mini, i, &redir, inhd));
 		if (inhd)
 			remplacer_fd(&mini->cmd_array[i].fd_in, fd);
 		else
@@ -73,4 +70,5 @@ void	inout_redir(t_mini *mini, int i)
 			mini->exit_status = 0;
 		redir.n++;
 	}
+	return (0);
 }

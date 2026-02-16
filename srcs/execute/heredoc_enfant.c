@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 12:53:25 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/15 13:28:01 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/16 01:15:02 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,9 @@ void	util_struct_check(t_mini *mini, int j, int n)
 
 void	util_close_exit(t_mini *mini, int fd_temp, int exit_flag)
 {
+	(void)mini;
 	ft_close(fd_temp);
-	child_exit_nb(mini, exit_flag);
+	exit(exit_flag);
 }
 
 void	sig_hd(void)

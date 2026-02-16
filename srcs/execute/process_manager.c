@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 11:47:01 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/15 18:15:45 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/16 01:16:28 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,8 @@ static int	status_exit(int status)
 
 static void	wait_pid(t_mini *mini, pid_t *pids)
 {
-	int	i;
-	int	status;
+	int		i;
+	int		status;
 	pid_t	last_pid;
 
 	last_pid = -1;
@@ -40,11 +40,11 @@ static void	wait_pid(t_mini *mini, pid_t *pids)
 
 static void	while_cut(t_mini *mini, pid_t *pids)
 {
-	int	i;
+	int		i;
 	int		pipe_fd[2];
 	pid_t	child_id;
+
 	i = 0;
-	
 	while (i < mini->nbr_cmd)
 	{
 		pipe_fd[0] = -1;

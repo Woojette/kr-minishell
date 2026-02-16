@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   redir_inout_refac_util.c                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/16 01:28:02 by yookyeoc          #+#    #+#             */
+/*   Updated: 2026/02/16 01:28:03 by yookyeoc         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 void	heredoc_restore(t_mini *mini, int i, int k)
@@ -14,11 +26,12 @@ int	get_redir_type(t_mini *mini, int i, int n)
 	return (mini->cmd_array[i].ihoa[n]);
 }
 
-void	fail_redir(t_mini *mini, int i, t_redir *redir, int inhd)
+int	fail_redir(t_mini *mini, int i, t_redir *redir, int inhd)
 {
 	if (redir->type == HEREDOC)
 		heredoc_restore(mini, i, redir->k);
 	open_fail(mini, i, redir->path, inhd);
+	return (-1);
 }
 
 void	open_fail(t_mini *mini, int i, const char *p, int inhd)
