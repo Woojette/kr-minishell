@@ -1,8 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   bi_export_utils1.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: wooyang <wooyang@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/05 11:44:27 by wooyang           #+#    #+#             */
+/*   Updated: 2025/05/14 15:55:42 by wooyang          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 int	first_checker(char c)
 {
-	if(ft_isalpha(c) != 0 || c == '_')
+	if (ft_isalpha(c) != 0 || c == '_')
 		return (1);
 	return (0);
 }
@@ -32,7 +44,7 @@ int	key_len(char *str)
 	while (str[i])
 	{
 		if (str[i] == '=')
-			break;
+			break ;
 		i++;
 	}
 	return (i);
@@ -64,7 +76,7 @@ int	equal_checker(char *str)
 
 int	has_valid_key(char *str)
 {
-	int	check;
+	int check;
 	check = equal_checker(str);
 	if (check == 0 || check == 1)
 	{

@@ -1,12 +1,24 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   bi_export_utils4.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: wooyang <wooyang@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/05 11:44:27 by wooyang           #+#    #+#             */
+/*   Updated: 2025/05/14 15:55:42 by wooyang          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-void env_update(char *str, t_mini *mini)
+void	env_update(char *str, t_mini *mini)
 {
-	int	i;
-	char **result;
-	
+	int		i;
+	char	**result;
+
 	i = -1;
-	result = malloc(sizeof(char*) * (ft_env_len(mini->env) + 2));
+	result = malloc(sizeof(char *) * (ft_env_len(mini->env) + 2));
 	if (!result)
 		return ;
 	while (mini->env[++i])
@@ -31,13 +43,13 @@ void env_update(char *str, t_mini *mini)
 
 void	env_update_sub(char *str, t_mini *mini, int change_pos)
 {
-	int	taille;
-	char **new_env;
-	int	i;
+	int		taille;
+	char	**new_env;
+	int		i;
 
 	i = -1;
 	taille = ft_env_len(mini->env);
-	new_env = malloc(sizeof(char*) * (taille + 1));
+	new_env = malloc(sizeof(char *) * (taille + 1));
 	if (!new_env)
 		return ;
 	while (++i < taille)
@@ -61,16 +73,18 @@ void	env_update_sub(char *str, t_mini *mini, int change_pos)
 void	env_update2(char *str, t_mini *mini)
 {
 	int	index;
+
 	if (equal_checker(str) != 1)
 		return ;
 	index = key_index(str, mini->env);
 	if (index < 0)
-	{	
+	{
 		env_update(str, mini);
 		return ;
 	}
 	env_update_sub(str, mini, index);
 }
+
 void	ex_and_env(char *str, t_mini *mini)
 {
 	exp_update(str, mini);

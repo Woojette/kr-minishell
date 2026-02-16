@@ -1,12 +1,24 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   bi_export_utils3.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: wooyang <wooyang@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/05 11:44:27 by wooyang           #+#    #+#             */
+/*   Updated: 2025/05/14 15:55:42 by wooyang          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 void	exp_update(char *str, t_mini *mini)
 {
-	int	i;
-	char **result;
-	
+	int		i;
+	char	**result;
+
 	i = -1;
-	result = malloc(sizeof(char*) * (ft_env_len(mini->save_ex) + 2));
+	result = malloc(sizeof(char *) * (ft_env_len(mini->save_ex) + 2));
 	if (!result)
 		return ;
 	while (mini->save_ex[++i])
@@ -15,7 +27,7 @@ void	exp_update(char *str, t_mini *mini)
 		if (!result[i])
 		{
 			free_tab_char(result);
-			return  ;
+			return ;
 		}
 	}
 	result[i] = ft_strdup(str);
@@ -31,13 +43,13 @@ void	exp_update(char *str, t_mini *mini)
 
 void	exp_update2(char *str, t_mini *mini, int change_pos)
 {
-	int	taille;
+	int taille;
 	char **new_exp;
-	int	i;
+	int i;
 
 	i = 0;
 	taille = ft_env_len(mini->save_ex);
-	new_exp = malloc(sizeof(char*) * (taille + 1));
+	new_exp = malloc(sizeof(char *) * (taille + 1));
 	if (!new_exp)
 		return ;
 	while (i < taille)

@@ -19,6 +19,7 @@ int	main(int ac, char **av, char **env)
 	mini = ft_calloc(1, sizeof(t_mini)); // memset 0 더해서 쓰레기값 방지
 	if (!mini)
 		return (0);
+	// mini->pipe_read_end = -1;
 	copy_env_exp(mini, env); //보이드로 바로 복사체 스트럭트에 업뎃
 	set_path_array(mini);
 	mini->exit_status = 0;
@@ -62,15 +63,20 @@ int	main(int ac, char **av, char **env)
 		}
 		if (check_pipe_fin(line) == 1)
 		{
-			write(2, "Error: syntax error near unexpected token '|'\n", 47);
+			write(2, "Error: syntax error near unexpected token `|'\n", 47);
 			mini->exit_status = 2;
 			free(line);
 			continue ;
 		}
-		if (parse_input(line, &parsing, mini) < 0)
+		resultat = parse_input(line, &parsing, mini);
+		if (resultat < 0)
 		{
-			write(2, "Error: parse_input failed\n", 26);
-			mini->exit_status = 1;
+			// write(2, "Error: parse_input failed\n", 26);
+			// mini->exit_status = 1;
+			if (resultat == -2)
+				mini->exit_status = 2;
+			else
+				mini->exit_status = 1;
 			free_tokens(&parsing);
 			free(line);
 			continue ;

@@ -54,8 +54,12 @@ int	appliquer_mot_token(char **line, t_token **token, t_type_token *fd_type,
 int	appliquer_token_final(t_token **token, t_type_token fd_type, t_mini *mini)
 {
 	if (fd_type != (t_type_token)-1)
+	{
+		if (mini)
+			mini->exit_status = 2;
 		return (free_tokens(token), write(2,
 				"syntax error near unexpected token `newline'\n", 45), -2);
+	}
 	if (appliquer_dollar_sur_liste_token(token, mini) == -1)
 		return (free_tokens(token), -1);
 	if (appliquer_quote_sur_liste_token(token) == -1)
