@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 11:44:27 by wooyang           #+#    #+#             */
-/*   Updated: 2026/02/16 15:58:28 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/16 18:57:06 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,36 +14,27 @@
 
 void	ft_exit_sans_arg2(t_mini *mini)
 {
-	// int save_exit_status;
-
 	mini->exit_status = mini->exit_status % 256;
-	// save_exit_status = mini->exit_status;
-	// free_round(mini);
 	printf("exit\n");
-	// exit(mini->exit_status);
 }
 
 void	ft_exit_normal_arg2(long long val, t_mini *mini)
 {
 	mini->exit_status = val % 256;
-	// free_round(mini);
 	printf("exit\n");
-	// exit(mini->exit_status);
 }
 
 void	ft_exit_wrong_arg2(char *str, t_mini *mini)
 {
 	mini->exit_status = 2;
-	// free_round(mini);
 	printf("exit\n");
 	printf("minishell: exit: %s: numeric argument required\n", str);
-	// exit(mini->exit_status);
 }
 
 void	ft_exit2(char **tab, t_mini *mini)
 {
-	long long temp;
-	int error;
+	long long	temp;
+	int			error;
 
 	error = 0;
 	if (tab[1] == NULL)
