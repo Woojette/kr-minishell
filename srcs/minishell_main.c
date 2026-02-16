@@ -135,7 +135,7 @@ int	main(int ac, char **av, char **env)
 			free_tokens(&parsing);
 			//??!!??!!free(line) 잇어야 된다는데 그게 머지? free(line); line = NULL;
 			// continue 때문에 점프해서 프리 안함
-			// free(line);
+			free(line);
 			// free_mini(mini); //  종료할 때만 해야함
 			continue ;
 

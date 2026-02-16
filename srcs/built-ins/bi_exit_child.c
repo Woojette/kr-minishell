@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   bi_exit_child.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: wooyang <wooyang@student.42.fr>            +#+  +:+       +#+        */
+/*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 11:44:27 by wooyang           #+#    #+#             */
-/*   Updated: 2025/05/14 15:55:42 by wooyang          ###   ########.fr       */
+/*   Updated: 2026/02/16 14:14:05 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,10 @@
 
 void	ft_exit_sans_arg2(t_mini *mini)
 {
+	int save_exit_status;
+
+	mini->exit_status = mini->exit_status % 256;
+	save_exit_status = mini->exit_status;
 	free_round(mini);
 	printf("exit\n");
 	exit(mini->exit_status);

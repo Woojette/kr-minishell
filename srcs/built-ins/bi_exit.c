@@ -14,7 +14,10 @@
 
 void	ft_exit_sans_arg(t_mini *mini)
 {
+	int save_exit_status;
+
 	mini->exit_status = mini->exit_status % 256;
+	save_exit_status = mini->exit_status;
 	termios_back(mini);
 	free_mini(mini);
 	printf("exit\n");
@@ -23,11 +26,14 @@ void	ft_exit_sans_arg(t_mini *mini)
 
 void	ft_exit_normal_arg(long long val, t_mini *mini)
 {
+	int save_exit_status;
+
 	mini->exit_status = val % 256;
+	save_exit_status = mini->exit_status;
 	termios_back(mini);
-	// free_mini(mini);
+	free_mini(mini);
 	printf("exit\n");
-	exit(mini->exit_status);
+	exit(save_exit_status);
 }
 
 void	ft_exit_pl_arg(t_mini *mini)
@@ -39,12 +45,15 @@ void	ft_exit_pl_arg(t_mini *mini)
 
 void	ft_exit_wrong_arg(char *str, t_mini *mini)
 {
+	int save_exit_status;
+
 	mini->exit_status = 2;
+	save_exit_status = mini->exit_status;
 	termios_back(mini);
-	// free_mini(mini);
+	free_mini(mini);
 	printf("exit\n");
 	printf("minishell: exit: %s: numeric argument required\n", str);
-	exit(mini->exit_status);
+	exit(save_exit_status);
 }
 
 void	ft_exit(char **tab, t_mini *mini)
