@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 17:29:24 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/16 03:15:39 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/16 16:01:13 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,14 +31,24 @@ void	child_center(t_mini *mini, t_cmd cmd, int *pipe_fd, int i)
 	{
 		ft_execute(mini, &mini->cmd_array[i]);
 		if (mini->exit_status == 0)
+		{
+			set_pipe_exit(mini, pipe_fd);
 			child_exit_nb(mini, 127);
+		}
 	}
 	else
 	{
+		if (type == T_EXIT)
+		{
+			ft_exit2(mini->cmd_array[i].cmd, mini);
+			set_pipe_exit(mini, pipe_fd);
+			child_exit(mini);
+			return ;
+		}
 		execute_built_in2(mini, mini->cmd_array[i].cmd, type);
+		set_pipe_exit(mini, pipe_fd);
 		child_exit(mini);
 	}
-	set_pipe_exit(mini, pipe_fd);
 }
 
 void	parent_center(t_mini *mini, int pipe_fd[2], int i)
