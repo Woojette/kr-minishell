@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 22:23:40 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/16 03:56:00 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/16 17:16:46 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ int	inout_redir(t_mini *mini, int i)
 		if (fd < 0)
 		{
 			if (mini->cmd_array[i].fd_in >= 0)
-			{	
+			{
 				close(mini->cmd_array[i].fd_in);
 				mini->cmd_array[i].fd_in = -1;
 			}

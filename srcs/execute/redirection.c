@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 11:47:45 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/16 01:30:51 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/16 17:15:42 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,14 @@ void	obar_util(t_mini *mini, int flag)
 	}
 }
 
+static void	set_pipe(t_mini *mini, int in_save, int out_save)
+{
+	p_dup2(mini, in_save, 0);
+	p_dup2(mini, out_save, 1);
+	ft_close(in_save);
+	ft_close(out_save);
+}
+
 int	one_builtin_avec_redirs(t_mini *mini)
 {
 	t_cmd		*c;
@@ -85,17 +93,16 @@ int	one_builtin_avec_redirs(t_mini *mini)
 	if (!c->cmd || !c->cmd[0])
 		return (mini->exit_status = 1);
 	if (c->fd_in >= 0)
-	{
 		obar_util(mini, 0);
-	}
 	if (c->fd_out >= 0)
-	{
 		obar_util(mini, 1);
+	if (type == T_EXIT)
+	{
+		ft_exit(c->cmd, mini);
+		set_pipe(mini, in_save, out_save);
+		return (mini->exit_status);
 	}
 	execute_built_in(mini, c->cmd, type);
-	p_dup2(mini, in_save, 0);
-	p_dup2(mini, out_save, 1);
-	ft_close(in_save);
-	ft_close(out_save);
+	set_pipe(mini, in_save, out_save);
 	return (mini->exit_status);
 }
