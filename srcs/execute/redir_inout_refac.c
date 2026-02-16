@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 22:23:40 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/16 17:16:46 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/16 18:40:28 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,26 @@ void	remplacer_fd(int *dst, int fd)
 	*dst = fd;
 }
 
+static void	small_inre(t_mini *mini, int i)
+{
+	if (mini->cmd_array[i].fd_in >= 0)
+	{
+		close(mini->cmd_array[i].fd_in);
+		mini->cmd_array[i].fd_in = -1;
+	}
+	if (mini->cmd_array[i].fd_out >= 0)
+	{
+		close(mini->cmd_array[i].fd_out);
+		mini->cmd_array[i].fd_out = -1;
+	}
+}
+
+static int	smaller_inre(t_mini *mini, int i, t_redir *redir, int inhd)
+{
+	small_inre(mini, i);
+	return (fail_redir(mini, i, redir, inhd));
+}
+
 int	inout_redir(t_mini *mini, int i)
 {
 	t_redir	redir;
@@ -61,19 +81,7 @@ int	inout_redir(t_mini *mini, int i)
 		fd = open_redir(mini, i, &redir);
 		inhd = (redir.type == INF || redir.type == HEREDOC);
 		if (fd < 0)
-		{
-			if (mini->cmd_array[i].fd_in >= 0)
-			{
-				close(mini->cmd_array[i].fd_in);
-				mini->cmd_array[i].fd_in = -1;
-			}
-			if (mini->cmd_array[i].fd_out >= 0)
-			{
-				close(mini->cmd_array[i].fd_out);
-				mini->cmd_array[i].fd_out = -1;
-			}
-			return (fail_redir(mini, i, &redir, inhd));
-		}
+			return (smaller_inre(mini, i, &redir, inhd));
 		if (inhd)
 			remplacer_fd(&mini->cmd_array[i].fd_in, fd);
 		else
