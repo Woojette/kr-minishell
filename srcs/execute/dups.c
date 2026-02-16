@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 11:42:21 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/16 01:15:22 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/16 04:41:24 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,16 +18,23 @@ void	p_dup2(t_mini *mini, int fd_has, int fd_to)
 
 	result = dup2(fd_has, fd_to);
 	if (result == -1)
-		p_exit(mini);
+	{
+		perror("dup2");
+		mini->exit_status = 1;
+	}
 }
 
 void	c_dup2(t_mini *mini, int fd_has, int fd_to)
 {
+	(void)mini;
 	int	result;
 
 	result = dup2(fd_has, fd_to);
 	if (result == -1)
-		child_exit(mini);
+	{	
+		perror("dup2");
+		exit(1);
+	}
 }
 
 void	ft_close(int fd)

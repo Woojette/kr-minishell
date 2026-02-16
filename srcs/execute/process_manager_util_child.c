@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 17:27:52 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/16 01:29:40 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/16 03:15:57 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,5 +48,5 @@ void	set_pipe_exit(t_mini *mini, int *pipe_fd)
 		ft_close(pipe_fd[1]);
 	if (mini->pipe_read_end >= 0)
 		ft_close(mini->pipe_read_end);
-	child_exit_nb(mini, 126);
+	child_exit(mini);
 }

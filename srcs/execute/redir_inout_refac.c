@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 22:23:40 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/16 01:26:31 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/16 03:56:00 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,19 @@ int	inout_redir(t_mini *mini, int i)
 		fd = open_redir(mini, i, &redir);
 		inhd = (redir.type == INF || redir.type == HEREDOC);
 		if (fd < 0)
+		{
+			if (mini->cmd_array[i].fd_in >= 0)
+			{	
+				close(mini->cmd_array[i].fd_in);
+				mini->cmd_array[i].fd_in = -1;
+			}
+			if (mini->cmd_array[i].fd_out >= 0)
+			{
+				close(mini->cmd_array[i].fd_out);
+				mini->cmd_array[i].fd_out = -1;
+			}
 			return (fail_redir(mini, i, &redir, inhd));
+		}
 		if (inhd)
 			remplacer_fd(&mini->cmd_array[i].fd_in, fd);
 		else
