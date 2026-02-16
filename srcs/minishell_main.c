@@ -19,6 +19,7 @@ int	main(int ac, char **av, char **env)
 	mini = ft_calloc(1, sizeof(t_mini)); // memset 0 더해서 쓰레기값 방지
 	if (!mini)
 		return (0);
+	// mini->pipe_read_end = -1;
 	copy_env_exp(mini, env); //보이드로 바로 복사체 스트럭트에 업뎃
 	set_path_array(mini);
 	mini->exit_status = 0;

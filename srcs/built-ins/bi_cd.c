@@ -1,28 +1,35 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   bi_cd.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: wooyang <wooyang@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/05 11:44:27 by wooyang           #+#    #+#             */
+/*   Updated: 2025/05/14 15:55:42 by wooyang          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
-//free((*env)[j]); 메인의 env 그대로 쓰면서 프리하는 UB라서 에러 가능
-// deep copy 해서 복사본만 수정하기
-// dup_env(envp) 깊은 복사 후 env_set(&mini->envm "PWD", value) 같은 형태로 PWD/OLDPWD업데이트 하라는데
-// 중요한 건 내가 할당하지 않은 메모리를 프리한는거란거
-// 내 메모리로 만들고 환경 변수 수정은 항상 mini->env 만 수정
 
-char *ft_cd_val_env(char *str, t_mini *mini)
+char	*ft_cd_val_env(char *str, t_mini *mini)
 {
-  int   j;
-  char	*str_path;
+	int		j;
+	char	*str_path;
 
-  j = 0;
-  while ((mini->env)[j] != NULL)
-  {
-    if (ft_strncmp((mini->env)[j], str, ft_strlen(str)) == 0)
+	j = 0;
+	while ((mini->env)[j] != NULL)
 	{
-		str_path = ft_strdup((mini->env)[j] + ft_strlen(str));
-		if (!str_path)
-			return (NULL);
-		return (str_path);
+		if (ft_strncmp((mini->env)[j], str, ft_strlen(str)) == 0)
+		{
+			str_path = ft_strdup((mini->env)[j] + ft_strlen(str));
+			if (!str_path)
+				return (NULL);
+			return (str_path);
+		}
+		j++;
 	}
-    j++;
-  }
-  return (NULL);
+	return (NULL);
 }
 
 int	ft_cd_sans_av(char **val, char **path, char *str, t_mini *mini)
@@ -30,7 +37,7 @@ int	ft_cd_sans_av(char **val, char **path, char *str, t_mini *mini)
 	char	*new_oldpwd;
 	char	*new_pwd;
 
-    (*val) = ft_cd_val_env(str, mini);
+	(*val) = ft_cd_val_env(str, mini);
 	if (!(*val))
 	{
 		if (ft_strncmp(str, "HOME=", 5) == 0)
@@ -39,11 +46,11 @@ int	ft_cd_sans_av(char **val, char **path, char *str, t_mini *mini)
 			printf("minishell: cd: OLDPWD not set\n");
 		return (-1);
 	}
-    (*path) = (*val);
+	(*path) = (*val);
 	new_oldpwd = getcwd(NULL, 0);
 	if (chdir((*path)) == -1)
 	{
-		perror ("chdir");
+		perror("chdir");
 		return (-1);
 	}
 	new_pwd = getcwd(NULL, 0);
@@ -58,10 +65,10 @@ int	ft_cd_tiret(char *oldpwd, char **path, t_mini *mini)
 
 	oldpwd = ft_cd_val_env("OLDPWD=", mini);
 	if ((oldpwd) == NULL)
-    {
-      printf("minishell: cd: OLDPWD not set\n");
-      return (-1);
-    }
+	{
+		printf("minishell: cd: OLDPWD not set\n");
+		return (-1);
+	}
 	(*path) = (oldpwd);
 	if (getcwd(new_oldpwd, sizeof(new_oldpwd)) == NULL)
 		return (perror("minishell: cd"), -1);
@@ -78,20 +85,6 @@ int	ft_cd_tiret(char *oldpwd, char **path, t_mini *mini)
 	return (0);
 }
 
-// void	ft_cd_env_val_vide(int j, char *str, char ***env)
-// {
-// 	int	i;
-// 	int	len;
-
-// 	i = ft_strlen(str);
-// 	len = ft_strlen((*env)[j]);
-// 	while (i < len)
-// 	{
-// 		(*env)[j][i] = '\0';
-// 		i++;
-// 	}
-// }
- 
 int	ft_cd_env_update(char *oldpwd, char *pwd, t_mini *mini)
 {
 	int		j;
@@ -105,7 +98,7 @@ int	ft_cd_env_update(char *oldpwd, char *pwd, t_mini *mini)
 			temp = ft_strjoin("OLDPWD=", oldpwd);
 			if (!temp)
 				return (-1);
-			free ((mini->env)[j]);
+			free((mini->env)[j]);
 			(mini->env)[j] = temp;
 		}
 		else if (ft_strncmp((mini->env)[j], "PWD=", 4) == 0)
@@ -113,7 +106,7 @@ int	ft_cd_env_update(char *oldpwd, char *pwd, t_mini *mini)
 			temp = ft_strjoin("PWD=", pwd);
 			if (!temp)
 				return (-1);
-			free ((mini->env)[j]);
+			free((mini->env)[j]);
 			(mini->env)[j] = temp;
 		}
 		j++;
@@ -123,7 +116,7 @@ int	ft_cd_env_update(char *oldpwd, char *pwd, t_mini *mini)
 
 int	ft_cd_all(char **tab, t_mini *mini)
 {
-	char 	oldpwd[1024];
+	char	oldpwd[1024];
 	char	pwd[1024];
 	char	*home;
 	char	*path;
@@ -158,7 +151,7 @@ int	ft_cd_all(char **tab, t_mini *mini)
 			return (perror("chdir"), -1);
 		}
 		if (getcwd(pwd, sizeof(pwd)) == NULL)
-		{	
+		{
 			mini->exit_status = 1;
 			return (perror("minishell: cd"), -1);
 		}

@@ -1,10 +1,16 @@
-#include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   bi_export.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: wooyang <wooyang@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/05 11:44:27 by wooyang           #+#    #+#             */
+/*   Updated: 2025/05/14 15:55:42 by wooyang          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-// export 이용시 export 라고 뜨게 하기
-// ASCII 재정렬
-// 밸류 안 넣은건 안들어가게 하기
-// 성공시 엑싯코드 0 실패시 1
-// unset 역시 export 업뎃 뭉치 기준으로 해야함
+#include "minishell.h"
 
 void	export_print(t_mini *mini)
 {
@@ -45,7 +51,7 @@ int	ft_export_all(char **tab, t_mini *mini)
 		return (0);
 	}
 	i = 1;
-	while(tab[i] != NULL)
+	while (tab[i] != NULL)
 	{
 		save_export(tab[i], mini);
 		i++;

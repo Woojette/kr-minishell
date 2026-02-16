@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   bi_unset.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: wooyang <wooyang@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/05 11:44:27 by wooyang           #+#    #+#             */
+/*   Updated: 2025/05/14 15:55:42 by wooyang          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 void	ft_unset_init_int_zero(int *j, int *supprime, int *taille)
@@ -24,9 +36,10 @@ int	ft_unset2(char *str, t_mini *mini)
 		return (-1);
 	while ((mini->save_ex)[j + supprime] != NULL)
 	{
-		if (((j + supprime) < taille) 
-			&& ft_strncmp(str, (mini->save_ex)[j + supprime], len_str) == 0 && ((mini->save_ex)[j + supprime][len_str] == '='
-		|| (mini->save_ex)[j + supprime][len_str] == '\0'))
+		if (((j + supprime) < taille) && ft_strncmp(str, (mini->save_ex)[j
+				+ supprime], len_str) == 0 && ((mini->save_ex)[j
+				+ supprime][len_str] == '=' || (mini->save_ex)[j
+				+ supprime][len_str] == '\0'))
 			supprime++;
 		if ((j + supprime) < taille)
 		{
@@ -34,7 +47,7 @@ int	ft_unset2(char *str, t_mini *mini)
 			if (!env_supprime[j])
 				return (ft_free_tab(env_supprime), -1);
 		}
-		j++; 
+		j++;
 	}
 	env_supprime[j] = NULL;
 	ft_free_tab((mini->save_ex));
@@ -59,9 +72,9 @@ int	ft_unset(char *str, t_mini *mini)
 		return (-1);
 	while ((mini->env)[j + supprime] != NULL)
 	{
-		if (((j + supprime) < taille) 
-			&& ft_strncmp(str, (mini->env)[j + supprime], len_str) == 0
-			&& (mini->env)[j + supprime][len_str] == '=')
+		if (((j + supprime) < taille) && ft_strncmp(str, (mini->env)[j
+				+ supprime], len_str) == 0 && (mini->env)[j
+			+ supprime][len_str] == '=')
 			supprime++;
 		if ((j + supprime) < taille)
 		{
@@ -69,7 +82,7 @@ int	ft_unset(char *str, t_mini *mini)
 			if (!env_supprime[j])
 				return (ft_free_tab(env_supprime), -1);
 		}
-		j++; 
+		j++;
 	}
 	env_supprime[j] = NULL;
 	ft_free_tab((mini->env));
