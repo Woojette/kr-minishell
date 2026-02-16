@@ -43,6 +43,15 @@ void	clean_after_exec(t_mini *mini, t_token *parsing, char *line)
 		free(line);
 }
 
+void	clean_after_cmd(t_m *m)
+{
+	free_cmd_all(m->mini->cmd_array, m->mini->nbr_cmd);
+	m->mini->cmd_array = NULL;
+	m->mini->nbr_cmd = 0;
+	free_tokens(&m->parsing);
+	free(m->line);
+}
+
 int	after_all(t_mini *mini)
 {
 	termios_back(mini);

@@ -531,6 +531,7 @@ void	print_cmd_array(t_cmd *cmd_array, int nbr_cmd);
 // main exec
 void	execution_main(t_mini *mini);
 void	clean_after_exec(t_mini *mini, t_token *parsing, char *line);
+void	clean_after_cmd(t_m *m);
 int		after_all(t_mini *mini);
 
 #endif
