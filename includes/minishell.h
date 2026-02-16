@@ -42,17 +42,6 @@ typedef enum s_type_token
 	T_FD_OUT_APPEND,
 }	t_type_token;
 
-// typedef enum s_type_bi
-// {
-// 	T_ECHO,
-// 	T_CD,
-// 	T_PWD,
-// 	T_EXPORT,
-// 	T_UNSET,
-// 	T_ENV,
-// 	T_EXIT,
-// }	t_type_bi; 어케하지?
-
 typedef enum s_type_bi
 {
 	T_NOT_BUILT_IN,
@@ -165,6 +154,20 @@ typedef struct s_mini
 	struct  termios orig_term;
 	char	**save_ex; // 이닛 위치 잡기 빌트인
 }	t_mini;
+
+typedef struct s_m
+{
+	char			*line;
+	t_cmd			*cmd;
+	t_token			*parsing;
+	int				j;
+	// int				check_builtin;
+	int				resultat;
+	int				nbr_cmd;
+	t_mini			*mini;
+	// struct termios	orig_term;
+}	t_m;
+
 
 // typedef struct s_mini
 // {
@@ -524,5 +527,10 @@ void	print_tab_char(char **tab);
 void	print_tab_int(int *tab, int size);
 void	print_cmd(t_cmd *cmd, int index);
 void	print_cmd_array(t_cmd *cmd_array, int nbr_cmd);
+
+// main exec
+void	execution_main(t_mini *mini);
+void	clean_after_exec(t_mini *mini, t_token *parsing, char *line);
+int		after_all(t_mini *mini);
 
 #endif

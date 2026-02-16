@@ -19,6 +19,7 @@ SRCS_FILES = 	minishell_main.c \
 				execute/execute_manager.c \
 				execute/process_manager.c \
 				execute/error_utils.c \
+				execute/main_refac_exec.c \
 				execute/path_utils.c \
 				execute/file_utils.c \
 				execute/redirection.c \

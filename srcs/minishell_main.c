@@ -1,176 +1,155 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minishell_main.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: wooyang <wooyang@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/05 11:44:27 by wooyang           #+#    #+#             */
+/*   Updated: 2025/05/14 15:55:42 by wooyang          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-int			g_exit_status = 0;
+int	g_exit_status = 0;
 
-int	main(int ac, char **av, char **env)
+int	init_main(int ac, char **av, char **env, t_m *m)
 {
 	(void)ac;
 	(void)av;
-	char		*line;
-	t_cmd		*cmd;
-	t_token	*parsing;
-	int			j;
-	int 	check_builtin;
-	int			resultat;
-	int			nbr_cmd;
-	t_mini	*mini;
-	struct termios orig_term;
+	m->line = NULL;
+	m->cmd = NULL;
+	m->parsing = NULL;
+	m->j = 0;
+	// m->check_builtin = 0;
+	m->resultat = 0;
+	m->nbr_cmd = 0;
+	m->mini = ft_calloc(1, sizeof(t_mini));
+	if (!m->mini)
+		return (-1);
+	copy_env_exp(m->mini, env);
+	set_path_array(m->mini);
+	m->mini->exit_status = 0;
+	m->mini->cmd_array = NULL;
+	m->mini->nbr_cmd = 0;
+	return (0);
+}
 
-	mini = ft_calloc(1, sizeof(t_mini)); // memset 0 더해서 쓰레기값 방지
-	if (!mini)
-		return (0);
-	// mini->pipe_read_end = -1;
-	copy_env_exp(mini, env); //보이드로 바로 복사체 스트럭트에 업뎃
-	set_path_array(mini);
-	mini->exit_status = 0;
-	mini->cmd_array = NULL;
-	mini->nbr_cmd = 0;
-	// i = 0;
-	cmd = NULL;
-	j = 0;
+void	init_avant_prompt(t_m *m)
+{
+	tcgetattr(STDIN_FILENO, &m->mini->orig_term);
+	control_c(m->mini);
+	init_signaux();
+	if (g_exit_status != 0)
+	{
+		m->mini->exit_status = g_exit_status;
+		g_exit_status = 0;
+	}
+}
 
+int	main(int ac, char **av, char **env)
+{
+	t_m	*m;
+
+	m = ft_calloc(1, sizeof(t_m));
+	if (!m)
+		return (-1);
+	if (init_main(ac, av, env, m) < 0)
+		return (free(m), -1);
 	while (1)
 	{
-		tcgetattr(STDIN_FILENO, &orig_term);
-		control_c(mini); // 일요일 수정함
-		init_signaux();
-		if (g_exit_status != 0)
-		{
-			mini->exit_status = g_exit_status;
-			g_exit_status = 0;
-		}
-		line = readline("coucou$ ");
-		if (!line) // ctrl D
+		init_avant_prompt(m);
+		m->line = readline("coucou$ ");
+		if (!m->line)
 		{
 			write(1, "exit\n", 5);
 			break ;
 		}
-		if (line[0] == '\0')
+		if (m->line[0] == '\0')
 		{
-			free(line);
+			free(m->line);
 			continue ;
 		}
-		add_history(line);
-
-		parsing = NULL;
-		// i = 0;
-		if (check_quotes(line) == 0)
+		add_history(m->line);
+		m->parsing = NULL;
+		if (check_quotes(m->line) == 0)
 		{
 			write(2, "Error: unclosed quotes\n", 23);
-			mini->exit_status = 2;
-			free(line);
+			m->mini->exit_status = 2;
+			free(m->line);
 			continue ;
 		}
-		if (check_pipe_fin(line) == 1)
+		if (check_pipe_fin(m->line) == 1)
 		{
 			write(2, "Error: syntax error near unexpected token `|'\n", 47);
-			mini->exit_status = 2;
-			free(line);
+			m->mini->exit_status = 2;
+			free(m->line);
 			continue ;
 		}
-		resultat = parse_input(line, &parsing, mini);
-		if (resultat < 0)
+		m->resultat = parse_input(m->line, &m->parsing, m->mini);
+		if (m->resultat < 0)
 		{
-			// write(2, "Error: parse_input failed\n", 26);
-			// mini->exit_status = 1;
-			if (resultat == -2)
-				mini->exit_status = 2;
+			if (m->resultat == -2)
+				m->mini->exit_status = 2;
 			else
-				mini->exit_status = 1;
-			free_tokens(&parsing);
-			free(line);
+				m->mini->exit_status = 1;
+			free_tokens(&m->parsing);
+			free(m->line);
 			continue ;
 		}
-
-		// print_tokens(parsing);
-
-		cmd = malloc_cmd(parsing);
-		if (!cmd)
+		m->cmd = malloc_cmd(m->parsing);
+		if (!m->cmd)
 		{
-			free_tokens(&parsing);
-			free(line);
+			free_tokens(&m->parsing);
+			free(m->line);
 			continue ;
 		}
-		// printf("cmd\n");
-		nbr_cmd = count_pipe(parsing) + 1;
-		resultat = add_cmd(parsing, cmd);
-		// printf("add cmd resultat: %d\n", resultat);
-		if (resultat == -1)
+		m->nbr_cmd = count_pipe(m->parsing) + 1;
+		m->resultat = add_cmd(m->parsing, m->cmd);
+		if (m->resultat == -1)
 		{
-
-			free_cmd_all(cmd, nbr_cmd);
-			free_tokens(&parsing);
-			free(line);
+			free_cmd_all(m->cmd, m->nbr_cmd);
+			free_tokens(&m->parsing);
+			free(m->line);
 			continue ;
 		}
-		else if (resultat == -2)
+		else if (m->resultat == -2)
 		{
-
-			free_cmd_all(cmd, nbr_cmd);
-			free_tokens(&parsing);
-			free(line);
+			free_cmd_all(m->cmd, m->nbr_cmd);
+			free_tokens(&m->parsing);
+			free(m->line);
 			continue ;
 		}
-		mini->cmd_array = cmd;
-		mini->nbr_cmd = nbr_cmd;
-		j = 0;
-
-		// printf("cmd2\n");
-		// print_cmd_array(mini->cmd_array, mini->nbr_cmd);
-
-		while (j < mini->nbr_cmd)
+		m->mini->cmd_array = m->cmd;
+		m->mini->nbr_cmd = m->nbr_cmd;
+		m->j = 0;
+		while (m->j < m->mini->nbr_cmd)
 		{
-			if (appliquer_heredoc_cmd(mini, j) < 0)
-			{
+			if (appliquer_heredoc_cmd(m->mini, m->j) < 0)
 				break ;
-			}
-			j++;
+			m->j++;
 		}
-		if (j < mini->nbr_cmd)
+		if (m->j < m->mini->nbr_cmd)
 		{
-
-			free_cmd_all(mini->cmd_array, mini->nbr_cmd);
-			mini->cmd_array = NULL;
-			mini->nbr_cmd = 0;
-			free_tokens(&parsing);
-			//??!!??!!free(line) 잇어야 된다는데 그게 머지? free(line); line = NULL;
-			// continue 때문에 점프해서 프리 안함
-			free(line);
-			// free_mini(mini); //  종료할 때만 해야함
+			free_cmd_all(m->mini->cmd_array, m->mini->nbr_cmd);
+			m->mini->cmd_array = NULL;
+			m->mini->nbr_cmd = 0;
+			free_tokens(&m->parsing);
+			free(m->line);
 			continue ;
-
 		}
-	
-		redirection_center(mini);
-		if (mini->cmd_array && mini->cmd_array[0].cmd && mini->cmd_array[0].cmd[0])
+		if (m->j < m->mini->nbr_cmd)
 		{
-			check_builtin = is_built_in(mini->cmd_array[0].cmd[0]);
-    		if (mini->nbr_cmd == 1 && check_builtin != T_NOT_BUILT_IN)
-    		{
-				one_builtin_avec_redirs(mini);
-			// 함수 1
-				// 1개 실행을 위한 리다이렉션 체크 + 호출 함수 호출,
-				//dup2 
-      		// execute_built_in(mini, mini->cmd_array[0].cmd, check_builtin);
-			// 함수 2
-				// stdin, out 으로 복원 
-			// return (0);
-    		} 
-			else 
-    		fork_center(mini);
+			free_cmd_all(m->mini->cmd_array, m->mini->nbr_cmd);
+			m->mini->cmd_array = NULL;
+			m->mini->nbr_cmd = 0;
+			free_tokens(&m->parsing);
+			free(m->line);	
+			continue ;
 		}
-		else if (cmd_qqpart(mini))
-			fork_center(mini);
-		if (mini->cmd_array)
-			free_cmd_all(mini->cmd_array, mini->nbr_cmd); // 이번 이터레이션 자원만 정리하기
-		mini->cmd_array = NULL;
-		mini->nbr_cmd = 0;
-		if (parsing)
-			free_tokens(&parsing);
-		if (line)
-			free(line);
+		execution_main(m->mini);
+		clean_after_exec(m->mini, m->parsing, m->line);
 	}
-	termios_back(mini);
-	free_mini(mini);
-	return (0);
+	return (after_all(m->mini));
 }
