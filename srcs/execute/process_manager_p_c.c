@@ -6,11 +6,16 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 17:29:24 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/16 16:01:13 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/16 17:58:53 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+// static void	cc_cut(t_mini *mini, int *pipe_fd, int i)
+// {
+		
+// }
 
 void	child_center(t_mini *mini, t_cmd cmd, int *pipe_fd, int i)
 {

@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/16 01:28:02 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/16 03:53:31 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/16 18:14:26 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,9 @@ void	open_fail(t_mini *mini, int i, const char *p, int inhd)
 {
 	if (p)
 		perror(p);
-	mini->exit_status = 1;
 	mini->cmd_array[i].inout_fail = 1;
+	if (mini->nbr_cmd == 1)
+		mini->exit_status = 1;
 	if (inhd && mini->cmd_array[i].fd_in != -1)
 	{
 		ft_close(mini->cmd_array[i].fd_in);
