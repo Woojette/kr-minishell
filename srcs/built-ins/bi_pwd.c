@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   bi_pwd.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: wooyang <wooyang@student.42.fr>            +#+  +:+       +#+        */
+/*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 11:44:27 by wooyang           #+#    #+#             */
-/*   Updated: 2025/05/14 15:55:42 by wooyang          ###   ########.fr       */
+/*   Updated: 2026/02/16 21:20:01 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,8 @@ int	ft_pwd(void)
 	else
 	{
 		printf("pwd: error retrieving current directory: ");
-		printf("getcwd: cannot access parent directories: No such file or directory");
+		printf("getcwd: cannot access parent directories");
+		printf(": No such file or directory");
 		printf("\n");
 	}
 	return (-1);

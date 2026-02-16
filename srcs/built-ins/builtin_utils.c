@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 11:44:27 by wooyang           #+#    #+#             */
-/*   Updated: 2026/02/16 14:19:18 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/16 21:20:59 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ int	is_built_in(char *cmd)
 {
 	int			i;
 	const char	*bi_table[] = {"cd", "echo", "pwd", "export", "unset", "env",
-			"exit", NULL};
+		"exit", NULL};
 
 	i = 0;
 	if (!cmd || !*cmd)

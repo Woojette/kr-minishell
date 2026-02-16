@@ -6,11 +6,17 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 11:44:27 by wooyang           #+#    #+#             */
-/*   Updated: 2026/02/16 21:12:11 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/16 21:16:27 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+static void	cut_env_update(t_mini *mini, char **result)
+{
+	free_tab_char(mini->env);
+	mini->env = result;
+}
 
 void	env_update(char *str, t_mini *mini)
 {
@@ -23,7 +29,8 @@ void	env_update(char *str, t_mini *mini)
 		return ;
 	while (mini->env[++i])
 	{
-		if (!(result[i] = ft_strdup(mini->env[i])))
+		result[i] = ft_strdup(mini->env[i]);
+		if (!(result[i]))
 		{
 			result[i] = NULL;
 			free_tab_char(result);
@@ -37,8 +44,7 @@ void	env_update(char *str, t_mini *mini)
 		return ;
 	}
 	result[++i] = NULL;
-	free_tab_char(mini->env);
-	mini->env = result;
+	cut_env_update(mini, result);
 }
 
 void	env_update_sub(char *str, t_mini *mini, int change_pos)
