@@ -342,6 +342,20 @@ void	set_signal_parent_wait(void);
 const char	*get_token_type_str(t_type_token type); // pour tester (enum -> string)	
 // char		*get_token_type_state(t_state state); // pour tester type quote
 
+//main_parsing
+int		check_parsing(t_m *m);
+int		check_readline(t_m *m);
+int		check_syntaxe(t_m *m);
+int		check_erreur_cmd(t_m *m);
+int		check_cmd_heredoc(t_m *m);
+void	erreur_syntaxe(t_m *m, int code);
+void	erreur_parse(t_m *m);
+void	erreur_cmd(t_m *m);
+int		check_erreur_syntaxe(t_m *m);
+int		check_erreur_parse_input(t_m *m);
+int		init_main(int ac, char **av, char **env, t_m *m);
+void	init_avant_prompt(t_m *m);
+
 //clean_utils.c
 void	cleanup_paths(t_mini *mini);
 
