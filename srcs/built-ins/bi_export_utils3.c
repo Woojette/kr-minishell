@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   bi_export_utils3.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: wooyang <wooyang@student.42.fr>            +#+  +:+       +#+        */
+/*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 11:44:27 by wooyang           #+#    #+#             */
-/*   Updated: 2025/05/14 15:55:42 by wooyang          ###   ########.fr       */
+/*   Updated: 2026/02/16 20:05:35 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,9 +43,9 @@ void	exp_update(char *str, t_mini *mini)
 
 void	exp_update2(char *str, t_mini *mini, int change_pos)
 {
-	int taille;
-	char **new_exp;
-	int i;
+	int		taille;
+	char	**new_exp;
+	int		i;
 
 	i = 0;
 	taille = ft_env_len(mini->save_ex);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   bi_export_utils1.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: wooyang <wooyang@student.42.fr>            +#+  +:+       +#+        */
+/*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 11:44:27 by wooyang           #+#    #+#             */
-/*   Updated: 2025/05/14 15:55:42 by wooyang          ###   ########.fr       */
+/*   Updated: 2026/02/16 20:04:44 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,8 @@ int	equal_checker(char *str)
 
 int	has_valid_key(char *str)
 {
-	int check;
+	int	check;
+
 	check = equal_checker(str);
 	if (check == 0 || check == 1)
 	{

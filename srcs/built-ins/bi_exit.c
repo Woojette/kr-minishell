@@ -14,7 +14,7 @@
 
 void	ft_exit_sans_arg(t_mini *mini)
 {
-	int save_exit_status;
+	int	save_exit_status;
 
 	mini->exit_status = mini->exit_status % 256;
 	save_exit_status = mini->exit_status;
@@ -26,7 +26,7 @@ void	ft_exit_sans_arg(t_mini *mini)
 
 void	ft_exit_normal_arg(long long val, t_mini *mini)
 {
-	int save_exit_status;
+	int	save_exit_status;
 
 	mini->exit_status = val % 256;
 	save_exit_status = mini->exit_status;
@@ -45,7 +45,7 @@ void	ft_exit_pl_arg(t_mini *mini)
 
 void	ft_exit_wrong_arg(char *str, t_mini *mini)
 {
-	int save_exit_status;
+	int	save_exit_status;
 
 	mini->exit_status = 2;
 	save_exit_status = mini->exit_status;
