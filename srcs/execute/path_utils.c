@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 17:17:38 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/16 04:53:16 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/16 18:53:22 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,14 +119,7 @@ char	*cmd_path_center(t_mini *mini, char *cmd)
 			mini->exit_status = 127;
 		return (found_path);
 	}
-	// found_path = get_path_absolute(mini, cmd);
-	// if (found_path)
-	// 	return (found_path);
-	// if (mini->exit_status == 126)
-	// 	return (NULL);
 	set_path_array(mini);
 	found_path = get_path_envp(mini, cmd);
-	// if (!found_path && mini->exit_status == 0)
-	// 	mini->exit_status = 127;
 	return (found_path);
 }

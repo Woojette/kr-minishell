@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 11:42:21 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/16 16:06:39 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/16 18:53:47 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,12 +26,12 @@ void	p_dup2(t_mini *mini, int fd_has, int fd_to)
 
 void	c_dup2(t_mini *mini, int fd_has, int fd_to)
 {
-	(void)mini;
 	int	result;
 
+	(void)mini;
 	result = dup2(fd_has, fd_to);
 	if (result == -1)
-	{	
+	{
 		perror("dup2");
 		exit(1);
 	}

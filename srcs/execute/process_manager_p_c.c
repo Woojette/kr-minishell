@@ -6,16 +6,35 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 17:29:24 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/16 17:58:53 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/16 18:48:33 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-// static void	cc_cut(t_mini *mini, int *pipe_fd, int i)
-// {
-		
-// }
+static void	cc_cut(t_mini *mini, int *pipe_fd, int i)
+{
+	if (i == 0)
+		first(mini, pipe_fd);
+	else if (i != 0 && i != mini->nbr_cmd - 1)
+		middle(mini, pipe_fd);
+	else
+		last(mini);
+}
+
+static void	cc_cut2(t_mini *mini, int *pipe_fd, int i)
+{
+	ft_exit2(mini->cmd_array[i].cmd, mini);
+	set_pipe_exit(mini, pipe_fd);
+	child_exit(mini);
+}
+
+static void	cc_cut3(t_mini *mini, int *pipe_fd, int i, int type)
+{
+	execute_built_in2(mini, mini->cmd_array[i].cmd, type);
+	set_pipe_exit(mini, pipe_fd);
+	child_exit(mini);
+}
 
 void	child_center(t_mini *mini, t_cmd cmd, int *pipe_fd, int i)
 {
@@ -23,14 +42,7 @@ void	child_center(t_mini *mini, t_cmd cmd, int *pipe_fd, int i)
 
 	before(mini, cmd);
 	if (mini->nbr_cmd > 1)
-	{
-		if (i == 0)
-			first(mini, pipe_fd);
-		else if (i != 0 && i != mini->nbr_cmd - 1)
-			middle(mini, pipe_fd);
-		else
-			last(mini);
-	}
+		cc_cut(mini, pipe_fd, i);
 	apply_redirection_child(mini, &cmd);
 	if (type == T_NOT_BUILT_IN)
 	{
@@ -45,14 +57,10 @@ void	child_center(t_mini *mini, t_cmd cmd, int *pipe_fd, int i)
 	{
 		if (type == T_EXIT)
 		{
-			ft_exit2(mini->cmd_array[i].cmd, mini);
-			set_pipe_exit(mini, pipe_fd);
-			child_exit(mini);
+			cc_cut2(mini, pipe_fd, i);
 			return ;
 		}
-		execute_built_in2(mini, mini->cmd_array[i].cmd, type);
-		set_pipe_exit(mini, pipe_fd);
-		child_exit(mini);
+		cc_cut3(mini, pipe_fd, i, type);
 	}
 }
 
