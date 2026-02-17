@@ -12,26 +12,6 @@
 
 #include "minishell.h"
 
-char	*ft_cd_val_env(char *str, t_mini *mini)
-{
-	int		j;
-	char	*str_path;
-
-	j = 0;
-	while ((mini->env)[j] != NULL)
-	{
-		if (ft_strncmp((mini->env)[j], str, ft_strlen(str)) == 0)
-		{
-			str_path = ft_strdup((mini->env)[j] + ft_strlen(str));
-			if (!str_path)
-				return (NULL);
-			return (str_path);
-		}
-		j++;
-	}
-	return (NULL);
-}
-
 int	ft_cd_sans_av(char **val, char **path, char *str, t_mini *mini)
 {
 	char	*new_oldpwd;
@@ -85,47 +65,33 @@ int	ft_cd_tiret(char *oldpwd, char **path, t_mini *mini)
 	return (0);
 }
 
-int	ft_cd_env_update(char *oldpwd, char *pwd, t_mini *mini)
+int	check_cd_tiret_ou_move(char **tab, t_mini *mini, t_cd_buf *buf, char **path)
 {
-	int		j;
-	char	*temp;
-
-	j = 0;
-	while ((mini->env)[j] != NULL)
+	if (tab[1][0] == '-' && tab[1][1] == '\0')
 	{
-		if (ft_strncmp((mini->env)[j], "OLDPWD=", 7) == 0)
-		{
-			temp = ft_strjoin("OLDPWD=", oldpwd);
-			if (!temp)
-				return (-1);
-			free((mini->env)[j]);
-			(mini->env)[j] = temp;
-		}
-		else if (ft_strncmp((mini->env)[j], "PWD=", 4) == 0)
-		{
-			temp = ft_strjoin("PWD=", pwd);
-			if (!temp)
-				return (-1);
-			free((mini->env)[j]);
-			(mini->env)[j] = temp;
-		}
-		j++;
+		if (ft_cd_tiret(NULL, path, mini) == -1)
+			return (mini->exit_status = 1);
+		return (mini->exit_status = 0);
 	}
-	return (0);
+	if (getcwd(buf->oldpwd, sizeof(buf->oldpwd)) == NULL)
+		return (mini->exit_status = 1, perror("minishell: cd"), -1);
+	if (chdir(tab[1]) == -1)
+		return (mini->exit_status = 1, perror("chdir"), -1);
+	if (getcwd(buf->pwd, sizeof(buf->pwd)) == NULL)
+		return (mini->exit_status = 1, perror("minishell: cd"), -1);
+	return (1);
 }
 
 int	ft_cd_all(char **tab, t_mini *mini)
 {
-	char	oldpwd[1024];
-	char	pwd[1024];
-	char	*home;
-	char	*path;
+	t_cd_buf	buf;
+	char		*home;
+	char		*path;
+	int			resultat;
 
+	resultat = 0;
 	if ((tab[1] != NULL) && (tab[2] != NULL))
-	{
-		printf("cd: too many arguments\n");
-		return (mini->exit_status = 1);
-	}
+		return (printf("cd: too many arguments\n"), mini->exit_status = 1);
 	if (tab[1] == NULL || (tab[1][0] == '~' && tab[1][1] == '\0'))
 	{
 		if (ft_cd_sans_av(&home, &path, "HOME=", mini) == -1)
@@ -134,28 +100,10 @@ int	ft_cd_all(char **tab, t_mini *mini)
 	}
 	if (tab[2] == NULL)
 	{
-		if (tab[1][0] == '-' && tab[1][1] == '\0')
-		{
-			if (ft_cd_tiret(oldpwd, &path, mini) == -1)
-				return (mini->exit_status = 1);
-			return (mini->exit_status = 0);
-		}
-		if (getcwd(oldpwd, sizeof(oldpwd)) == NULL)
-		{
-			mini->exit_status = 1;
-			return (perror("minishell: cd"), -1);
-		}
-		if (chdir(tab[1]) == -1)
-		{
-			mini->exit_status = 1;
-			return (perror("chdir"), -1);
-		}
-		if (getcwd(pwd, sizeof(pwd)) == NULL)
-		{
-			mini->exit_status = 1;
-			return (perror("minishell: cd"), -1);
-		}
-		ft_cd_env_update(oldpwd, pwd, mini);
+		resultat = check_cd_tiret_ou_move(tab, mini, &buf, &path);
+		if (resultat <= 0)
+			return (resultat);
+		ft_cd_env_update(buf.oldpwd, buf.pwd, mini);
 		return (mini->exit_status = 0);
 	}
 	return (mini->exit_status = 0);

@@ -34,6 +34,7 @@ SRCS_FILES = 	minishell_main.c \
 				execute/process_manager_util_child.c \
 				built-ins/builtin_utils.c \
 				built-ins/bi_cd.c \
+				built-ins/bi_cd_env.c \
 				built-ins/bi_echo.c \
 				built-ins/bi_pwd.c \
 				built-ins/bi_export.c \

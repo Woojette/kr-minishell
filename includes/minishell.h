@@ -88,6 +88,13 @@ typedef struct s_var_cmd
 	int		size_cmd;
 } t_var_cmd;
 
+typedef struct s_cd_buf
+{
+	char	oldpwd[1024];
+	char	pwd[1024];
+}	t_cd_buf;
+
+
 typedef struct s_redir
 {
 	int			n;
