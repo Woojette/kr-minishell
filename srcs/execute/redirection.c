@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 11:47:45 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/17 04:06:22 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/17 06:09:34 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,11 +88,11 @@ int	one_builtin_avec_redirs(t_mini *mini)
 
 	c = &mini->cmd_array[0];
 	dup_check(mini, in_save, out_save);
-	type = is_built_in(c->cmd[0]);
 	if (c->inout_fail)
-		return (mini->exit_status);
+		return (close_save_exit_status(mini, in_save, out_save));
 	if (!c->cmd || !c->cmd[0])
 		return (mini->exit_status = 1);
+	type = is_built_in(c->cmd[0]);
 	if (c->fd_in >= 0)
 		obar_util(mini, 0);
 	if (c->fd_out >= 0)

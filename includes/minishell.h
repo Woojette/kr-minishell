@@ -452,6 +452,10 @@ void	apply_redirection_child(t_mini *mini, t_cmd *cmd);
 void	obar_util(t_mini *mini, int flag);
 int	one_builtin_avec_redirs(t_mini *mini);
 
+// redirection_utils.c
+void	close_save(int in_save, int out_save);
+int	close_save_exit_status(t_mini *mini, int in_save, int out_save);
+
 // built-ins
 //builtin_utils.c
 int	is_built_in(char *cmd);

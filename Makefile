@@ -23,6 +23,7 @@ SRCS_FILES = 	minishell_main.c \
 				execute/path_utils.c \
 				execute/file_utils.c \
 				execute/redirection.c \
+				execute/redirection_utils.c \
 				execute/control_c.c \
 				execute/clean_utils.c \
 				execute/dups.c \
