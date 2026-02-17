@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 11:47:45 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/16 17:15:42 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/17 04:06:22 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,7 @@ int	one_builtin_avec_redirs(t_mini *mini)
 	const int	out_save = dup(1);
 
 	c = &mini->cmd_array[0];
+	dup_check(mini, in_save, out_save);
 	type = is_built_in(c->cmd[0]);
 	if (c->inout_fail)
 		return (mini->exit_status);

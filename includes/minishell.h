@@ -350,6 +350,7 @@ void control_c(t_mini *mini);
 void	termios_back(t_mini *mini);
 
 // dups.c
+void	dup_check(t_mini *mini, int in_save, int out_save);
 void	p_dup2(t_mini *mini, int fd_has, int fd_to);
 void	c_dup2(t_mini *mini, int fd_has, int fd_to);
 void	ft_close(int fd);
