@@ -71,13 +71,11 @@ int	check_cmd_heredoc(t_m *m)
 	while (m->j < m->mini->nbr_cmd)
 	{
 		if (appliquer_heredoc_cmd(m->mini, m->j) < 0)
+		{
+			clean_after_cmd(m);
 			return (-2);
+		}
 		m->j++;
-	}
-	if (m->j < m->mini->nbr_cmd)
-	{
-		clean_after_cmd(m);
-		return (-1);
 	}
 	return (0);
 }
