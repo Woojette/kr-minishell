@@ -60,6 +60,10 @@ int	preparer_temp_file_name(t_mini *mini, int j, int n)
 		return (-1);
 	mini->cmd_array[j].temp_heredoc[n] = temp_j_n;
 	if (access(mini->cmd_array[j].temp_heredoc[n], F_OK) == 0)
+	{
 		unlink(mini->cmd_array[j].temp_heredoc[n]);
+		free(mini->cmd_array[j].temp_heredoc[n]);
+		mini->cmd_array[j].temp_heredoc[n] = NULL;
+	}
 	return (0);
 }

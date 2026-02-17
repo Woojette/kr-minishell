@@ -25,9 +25,12 @@ void	fatal_error(t_mini *mini, char *err)
 
 void	p_exit(t_mini *mini)
 {
+	int	status;
+
+	status = mini->exit_status;
 	termios_back(mini);
 	free_mini(mini);
-	exit(mini->exit_status);
+	exit(status);
 }
 
 void	p_exit_nb(t_mini *mini, int nb_exit)

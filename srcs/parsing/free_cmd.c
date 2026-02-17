@@ -43,6 +43,8 @@ void	free_cmd_fd_tab_sans_hd(t_cmd *cmd)
 	cmd->in_heredoc = NULL;
 	free_tab_int(cmd->hd_env);
 	cmd->hd_env = NULL;
+	free_temp_heredoc(cmd->temp_heredoc);
+	cmd->temp_heredoc = NULL;
 }
 
 void	free_cmd_partiel(t_cmd *cmd, int nbr_cmd)

@@ -15,7 +15,11 @@
 void	heredoc_restore(t_mini *mini, int i, int k)
 {
 	if (mini->cmd_array[i].temp_heredoc && mini->cmd_array[i].temp_heredoc[k])
+	{
+		unlink(mini->cmd_array[i].temp_heredoc[k]);
+		free(mini->cmd_array[i].temp_heredoc[k]);
 		mini->cmd_array[i].temp_heredoc[k] = NULL;
+	}
 	init_signaux();
 }
 

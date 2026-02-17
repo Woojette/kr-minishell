@@ -21,6 +21,8 @@
 # include <unistd.h>
 #include <errno.h>
 
+extern int g_exit_status;
+
 typedef enum s_state
 {
 	DQUOTES,
@@ -413,7 +415,7 @@ int	collecter_heredoc_lines(int fd, t_mini *mini, int j, int n);
 // heredoc_enfant.c
 void	util_struct_check(t_mini *mini, int j, int n);
 void	util_close_exit(t_mini *mini, int fd_temp, int exit_flag);
-void	sig_hd(void);
+void	sig_hd(t_mini *mini);
 void	perexit(t_mini *mini, int exit_flag);
 void	appliquer_heredoc_enfant(t_mini *mini, int j, int n);
 

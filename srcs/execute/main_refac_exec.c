@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 12:18:21 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/16 22:12:29 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/15 12:18:22 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,29 @@
 
 void	execution_main(t_mini *mini)
 {
-	int 	check_builtin;
+	int	check_builtin;
+	int	i;
 
 	redirection_center(mini);
+	i = 0;
+	while (i < mini->nbr_cmd)
+	{
+		if (mini->cmd_array[i].temp_heredoc)
+		{
+			free_temp_heredoc(mini->cmd_array[i].temp_heredoc);
+			mini->cmd_array[i].temp_heredoc = NULL;
+		}
+		i++;
+	}
 	if (mini->cmd_array && mini->cmd_array[0].cmd && mini->cmd_array[0].cmd[0])
 	{
 		check_builtin = is_built_in(mini->cmd_array[0].cmd[0]);
-    	if (mini->nbr_cmd == 1 && check_builtin != T_NOT_BUILT_IN)
-    	{
+		if (mini->nbr_cmd == 1 && check_builtin != T_NOT_BUILT_IN)
+		{
 			one_builtin_avec_redirs(mini);
-    	} 
-		else 
-    	fork_center(mini);
+		}
+		else
+			fork_center(mini);
 	}
 	else if (cmd_qqpart(mini))
 		fork_center(mini);
@@ -43,18 +54,10 @@ void	clean_after_exec(t_mini *mini, t_token *parsing, char *line)
 		free(line);
 }
 
-void	clean_after_cmd(t_m *m)
-{
-	free_cmd_all(m->mini->cmd_array, m->mini->nbr_cmd);
-	m->mini->cmd_array = NULL;
-	m->mini->nbr_cmd = 0;
-	free_tokens(&m->parsing);
-	free(m->line);
-}
-
 int	after_all(t_mini *mini)
 {
 	termios_back(mini);
+	rl_clear_history();
 	free_mini(mini);
 	return (0);
 }
