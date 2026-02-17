@@ -153,6 +153,7 @@ typedef struct s_mini
 	char	**path_array; // tableau des chemins d'acces pour les commandes (recupere a partir de la variable d'env PATH divise par ':')
 	struct  termios orig_term;
 	char	**save_ex; // 이닛 위치 잡기 빌트인
+	void 	*m_ptr;
 }	t_mini;
 
 typedef struct s_m
@@ -256,7 +257,7 @@ char	*enlever_quote_dans_token(char *str);
 void	init_signaux(void);
 void	appliquer_sigint_prompt(int sig);
 void	print_heredoc_warning_ctrl_d(char *delimiter);
-
+void	set_exit(int *exit_status);
 // token_all.c
 int	traiter_redirection(char **line, t_token **token, t_type_token *fd_type);
 int	traiter_pipe(char **line, t_token **token, t_type_token *fd_type);
@@ -477,7 +478,7 @@ int	ft_cd_env_update(char *oldpwd, char *pwd, t_mini *mini);
 int	ft_cd_all(char **tab, t_mini *mini);
 //echo
 int	ft_echo_option_n(char *str);
-void	ft_echo_all(char **tab);
+void	ft_echo_all(t_mini *mini, char **tab);
 //pwd
 int	ft_pwd(void);
 //export
@@ -536,11 +537,11 @@ void	ft_free_tab(char **tab);
 void	ft_free_all(t_mini **mini);
 
 //test
-void	print_tokens(t_token *token);
-void	print_tab_char(char **tab);
-void	print_tab_int(int *tab, int size);
-void	print_cmd(t_cmd *cmd, int index);
-void	print_cmd_array(t_cmd *cmd_array, int nbr_cmd);
+// void	print_tokens(t_token *token);
+// void	print_tab_char(char **tab);
+// void	print_tab_int(int *tab, int size);
+// void	print_cmd(t_cmd *cmd, int index);
+// void	print_cmd_array(t_cmd *cmd_array, int nbr_cmd);
 
 // main exec
 void	execution_main(t_mini *mini);

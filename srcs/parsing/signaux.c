@@ -12,20 +12,23 @@
 
 #include "minishell.h"
 
-void	init_signaux(void)
+void	set_exit(int *exit_status)
 {
-	signal(SIGINT, appliquer_sigint_prompt);
-	signal(SIGQUIT, SIG_IGN);
+	static int	*new_exit = NULL;
+
+	if (new_exit == NULL)
+		new_exit = exit_status;
+	*new_exit = 130;
 }
 
 void	appliquer_sigint_prompt(int sig)
 {
 	(void)sig;
 	write(1, "\n", 1);
-
 	rl_replace_line("", 0);
 	rl_on_new_line();
 	rl_redisplay();
+	set_exit(&sig);
 }
 
 void	print_heredoc_warning_ctrl_d(char *delimiter)

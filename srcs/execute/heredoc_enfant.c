@@ -57,6 +57,7 @@ void	appliquer_heredoc_enfant(t_mini *mini, int j, int n)
 	resultat = collecter_heredoc_lines(fd_temp, mini, j, n);
 	if (resultat == 1)
 	{
+		perror("test");
 		print_heredoc_warning_ctrl_d(mini->cmd_array[j].limiter[n]);
 		util_close_exit(mini, fd_temp, 0);
 	}

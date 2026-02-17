@@ -74,5 +74,8 @@ void	free_mini(t_mini *mini)
 	mini->save_ex = NULL;
 	if (mini->pipe_read_end >= 0)
 		close(mini->pipe_read_end);
+	if (mini->m_ptr)
+		free(mini->m_ptr);
+	mini->m_ptr = NULL;
 	free(mini);
 }

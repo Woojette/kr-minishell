@@ -36,7 +36,7 @@ int	ft_echo_option_n(char *str)
 	return (1);
 }
 
-void	ft_echo_all(char **tab)
+void	ft_echo_all(t_mini *mini, char **tab)
 {
 	int	j;
 	int	option_n;
@@ -56,6 +56,7 @@ void	ft_echo_all(char **tab)
 	}
 	if (option_n == 0)
 		printf("\n");
+	mini->exit_status = 0;
 }
 
 // void	ft_echo(char *str)

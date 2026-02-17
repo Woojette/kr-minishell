@@ -12,16 +12,35 @@
 
 #include "minishell.h"
 
+void exit_clean(t_mini *mini)
+{
+	t_m *m;
+
+	m = (t_m *)mini->m_ptr;
+	if (m)
+	{
+		if (m->parsing)
+			free_tokens(&m->parsing);
+		if (m->line)
+			free(m->line);
+		m->parsing = NULL;
+		m->line = NULL;
+	}
+	termios_back(mini);
+	free_mini(mini);
+}
+
 void	ft_exit_sans_arg(t_mini *mini)
 {
 	int	save_exit_status;
 
 	mini->exit_status = mini->exit_status % 256;
 	save_exit_status = mini->exit_status;
-	termios_back(mini);
-	free_mini(mini);
+	// termios_back(mini);
+	// free_mini(mini);
+	exit_clean(mini);
 	printf("exit\n");
-	exit(mini->exit_status);
+	exit(save_exit_status);
 }
 
 void	ft_exit_normal_arg(long long val, t_mini *mini)
@@ -30,8 +49,9 @@ void	ft_exit_normal_arg(long long val, t_mini *mini)
 
 	mini->exit_status = val % 256;
 	save_exit_status = mini->exit_status;
-	termios_back(mini);
-	free_mini(mini);
+	// termios_back(mini);
+	// free_mini(mini);
+	exit_clean(mini);
 	printf("exit\n");
 	exit(save_exit_status);
 }
@@ -49,8 +69,9 @@ void	ft_exit_wrong_arg(char *str, t_mini *mini)
 
 	mini->exit_status = 2;
 	save_exit_status = mini->exit_status;
-	termios_back(mini);
-	free_mini(mini);
+	// termios_back(mini);
+	// free_mini(mini);
+	exit_clean(mini);
 	printf("exit\n");
 	printf("minishell: exit: %s: numeric argument required\n", str);
 	exit(save_exit_status);

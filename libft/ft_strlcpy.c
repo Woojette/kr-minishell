@@ -12,9 +12,9 @@
 
 #include "libft.h"
 
-char    *ft_strcpy(char *dest, char *src)
+char	*ft_strcpy(char *dest, char *src)
 {
-	int     i;
+	int	i;
 
 	i = 0;
 	while (src[i] != '\0')
@@ -60,7 +60,7 @@ int	main(void)
 	printf("youpi / 3 = %zu\n", ft_strlcpy(dest00, faim, 3));
 	printf("youpi / 3 = %zu vrai\n", strlcpy(dest01, faim, 3));
 	printf("dest = %s\n", dest00);
-	printf("dest = %s vrai\n\n", dest01);	
+	printf("dest = %s vrai\n\n", dest01);
 	printf("coucou / 2 = %zu\n", ft_strlcpy(dest10, faim, 2));
 	printf("coucou / 2 = %zu vrai\n", strlcpy(dest11, faim, 2));
 	printf("dest = %s\n", dest10);

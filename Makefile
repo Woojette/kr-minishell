@@ -53,6 +53,7 @@ SRCS_FILES = 	minishell_main.c \
 				parsing/env_var.c \
 				parsing/quote_enlever.c \
 				parsing/signaux.c \
+				parsing/signaux_init.c \
      			parsing/token_all.c \
 				parsing/token_parse_if.c \
 				parsing/token_parse_redir.c \
@@ -72,7 +73,6 @@ SRCS_FILES = 	minishell_main.c \
 				parsing/cmd_add_mot.c \
 				parsing/cmd_add_redir.c \
 				parsing/cmd_agrandi.c \
-				parsing/test.c \
 				parsing/cmd_init.c \
 				parsing/main_parsing_all.c \
 				parsing/main_parsing_cmd.c \

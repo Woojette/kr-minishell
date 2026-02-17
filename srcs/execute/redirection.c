@@ -78,6 +78,11 @@ static void	set_pipe(t_mini *mini, int in_save, int out_save)
 	ft_close(in_save);
 	ft_close(out_save);
 }
+void ft_close_save(int in_save, int out_save)
+{
+	ft_close(in_save);
+	ft_close(out_save);
+}
 
 int	one_builtin_avec_redirs(t_mini *mini)
 {
@@ -89,15 +94,16 @@ int	one_builtin_avec_redirs(t_mini *mini)
 	c = &mini->cmd_array[0];
 	type = is_built_in(c->cmd[0]);
 	if (c->inout_fail)
-		return (mini->exit_status);
+		return (ft_close_save(in_save, out_save), mini->exit_status);
 	if (!c->cmd || !c->cmd[0])
-		return (mini->exit_status = 1);
+		return (ft_close_save(in_save, out_save), mini->exit_status = 1);
 	if (c->fd_in >= 0)
 		obar_util(mini, 0);
 	if (c->fd_out >= 0)
 		obar_util(mini, 1);
 	if (type == T_EXIT)
 	{
+		ft_close_save(in_save, out_save);
 		ft_exit(c->cmd, mini);
 		set_pipe(mini, in_save, out_save);
 		return (mini->exit_status);

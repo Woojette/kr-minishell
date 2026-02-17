@@ -39,7 +39,7 @@ int	while_collect_lines(int fd, t_mini *mini, int j, int n)
 	{
 		line = readline("> ");
 		if (!line)
-			return (1);
+			return (free_mini(mini), 1);
 		if (cmd->limiter[n] && ft_strcmp(line, cmd->limiter[n]) == 0)
 			return (free(line), 0);
 		line_applique = util_hd_line(cmd, mini, n, line);

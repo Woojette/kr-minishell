@@ -64,6 +64,8 @@ int	work_appliquer(t_mini *mini, int j, int n)
 
 	if (preparer_temp_file_name(mini, j, n) == -1)
 		return (reduce_1(mini, j), -1);
+	printf("test1123");
+	signal(SIGINT, SIG_IGN);
 	mini->cmd_array[j].pid_heredoc = fork();
 	if (mini->cmd_array[j].pid_heredoc == -1)
 		return (reduce_1(mini, j), -1);
@@ -71,6 +73,7 @@ int	work_appliquer(t_mini *mini, int j, int n)
 		appliquer_heredoc_enfant(mini, j, n);
 	if (waitpid(mini->cmd_array[j].pid_heredoc, &status, 0) == -1)
 		return (reduce_1(mini, j), -1);
+	signal(SIGINT, appliquer_sigint_prompt);
 	if (WIFSIGNALED(status))
 		return (reduce_2(mini, j, status), -1);
 	else if (WIFEXITED(status))
