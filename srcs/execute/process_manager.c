@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 11:47:01 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/16 19:54:07 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/16 01:16:28 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,6 @@ void	fork_center(t_mini *mini)
 	pid_t	*pids;
 
 	set_signal_parent_wait();
-	redirection_center(mini);
 	pids = malloc(sizeof(pid_t) * mini->nbr_cmd);
 	if (!pids)
 		fatal_error(mini, "pids_malloc_error");
