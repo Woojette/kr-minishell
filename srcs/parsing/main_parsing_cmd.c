@@ -73,7 +73,7 @@ int	check_cmd_heredoc(t_m *m)
 		if (appliquer_heredoc_cmd(m->mini, m->j) < 0)
 		{
 			clean_after_cmd(m);
-			return (-2);
+			return (-1);
 		}
 		m->j++;
 	}
