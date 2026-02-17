@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 11:44:27 by wooyang           #+#    #+#             */
-/*   Updated: 2026/02/16 21:20:59 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/17 00:53:21 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void	execute_built_in(t_mini *mini, char **cmd, int type)
 	}
 	else if (type == T_ECHO)
 	{
-		ft_echo_all(cmd);
+		ft_echo_all(mini, cmd);
 	}
 	else if (type == T_PWD)
 		ft_pwd();
@@ -60,7 +60,7 @@ void	execute_built_in2(t_mini *mini, char **cmd, int type)
 	}
 	else if (type == T_ECHO)
 	{
-		ft_echo_all(cmd);
+		ft_echo_all(mini, cmd);
 	}
 	else if (type == T_PWD)
 		ft_pwd();

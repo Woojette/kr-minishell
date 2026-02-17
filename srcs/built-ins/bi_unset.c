@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 11:44:27 by wooyang           #+#    #+#             */
-/*   Updated: 2026/02/16 21:26:34 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/17 01:05:27 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,11 @@ int	ft_unset2(char *str, t_mini *mini)
 	env_supprime = malloc(sizeof(char *) * (taille + 1));
 	if (!env_supprime)
 		return (-1);
+	if (ft_strcmp(str, "PATH") == 0)
+	{
+		ft_free_tab(mini->path_array);
+		mini->path_array = NULL;
+	}
 	while ((mini->save_ex)[j + supprime] != NULL)
 	{
 		if (((j + supprime) < taille) && ft_strncmp(str, (mini->save_ex)[j
@@ -70,6 +75,11 @@ int	ft_unset(char *str, t_mini *mini)
 	env_supprime = malloc(sizeof(char *) * (taille + 1));
 	if (!env_supprime)
 		return (-1);
+	if (ft_strcmp(str, "PATH") == 0)
+	{
+		ft_free_tab(mini->path_array);
+		mini->path_array = NULL;
+	}
 	while ((mini->env)[j + supprime] != NULL)
 	{
 		if (((j + supprime) < taille) && ft_strncmp(str, (mini->env)[j

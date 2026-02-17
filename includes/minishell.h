@@ -370,6 +370,7 @@ void	child_exit_nb(t_mini *mini, int nb_exit);
 // execute_manager.c
 void	invalid_cmd(t_mini *mini, char *not_cmd);
 void	ft_execute(t_mini *mini, t_cmd *cmd);
+void	no_path(t_mini *mini, char *cmd);
 
 // file_utils.c
 int	is_directory(char *file_path);
@@ -412,7 +413,7 @@ int	preparer_temp_file_name(t_mini *mini, int j, int n);
 
 // path_utils.c
 char	*get_env_path(t_mini *mini);
-void	set_path_array(t_mini *mini);
+void	set_path_array(t_mini *mini, char *str);
 char	*get_path_absolute(t_mini *mini, char *cmd);
 char	*get_path_absolute(t_mini *mini, char *cmd);
 char	*get_path_envp(t_mini *mini, char *cmd);
@@ -463,7 +464,7 @@ int	ft_cd_env_update(char *oldpwd, char *pwd, t_mini *mini);
 int	ft_cd_all(char **tab, t_mini *mini);
 //echo
 int	ft_echo_option_n(char *str);
-void	ft_echo_all(char **tab);
+void	ft_echo_all(t_mini *mini, char **tab);
 //pwd
 int	ft_pwd(void);
 //export

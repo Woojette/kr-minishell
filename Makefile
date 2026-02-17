@@ -73,8 +73,7 @@ SRCS_FILES = 	minishell_main.c \
 				parsing/cmd_add_redir.c \
 				parsing/cmd_agrandi.c \
 				parsing/test.c \
-				parsing/cmd_init.c \
-				execute/main_refac_exec.c
+				parsing/cmd_init.c
 
 
 SRCS = $(addprefix $(SRC_DIR)/, $(SRCS_FILES))

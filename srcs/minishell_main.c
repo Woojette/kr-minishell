@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 11:44:27 by wooyang           #+#    #+#             */
-/*   Updated: 2026/02/16 22:12:07 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/17 02:45:28 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,14 +16,14 @@ int	g_exit_status = 0;
 
 int	init_main(int ac, char **av, char **env, t_m *m)
 {
-	char			*line;
-	t_cmd			*cmd;
-	t_token			*parsing;
-	int				j;
-	int				resultat;
-	int				nbr_cmd;
-	t_mini			*mini;
-	struct termios	orig_term;
+	// char			*line;
+	// t_cmd			*cmd;
+	// t_token			*parsing;
+	// int				j;
+	// int				resultat;
+	// int				nbr_cmd;
+	// t_mini			*mini;
+	// struct termios	orig_term;
 
 	(void)ac;
 	(void)av;
@@ -38,7 +38,7 @@ int	init_main(int ac, char **av, char **env, t_m *m)
 	if (!m->mini)
 		return (-1);
 	copy_env_exp(m->mini, env);
-	set_path_array(m->mini);
+	// set_path_array(m->mini);
 	m->mini->exit_status = 0;
 	m->mini->cmd_array = NULL;
 	m->mini->nbr_cmd = 0;

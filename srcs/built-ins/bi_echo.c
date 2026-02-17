@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   bi_echo.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: wooyang <wooyang@student.42.fr>            +#+  +:+       +#+        */
+/*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 11:44:27 by wooyang           #+#    #+#             */
-/*   Updated: 2025/05/14 15:55:42 by wooyang          ###   ########.fr       */
+/*   Updated: 2026/02/17 00:52:20 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ int	ft_echo_option_n(char *str)
 	return (1);
 }
 
-void	ft_echo_all(char **tab)
+void	ft_echo_all(t_mini *mini, char **tab)
 {
 	int	j;
 	int	option_n;
@@ -56,6 +56,7 @@ void	ft_echo_all(char **tab)
 	}
 	if (option_n == 0)
 		printf("\n");
+	mini->exit_status = 0;
 }
 
 // void	ft_echo(char *str)
