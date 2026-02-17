@@ -6,11 +6,21 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 11:42:42 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/15 11:42:43 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/17 02:43:05 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+void	no_path(t_mini *mini, char *cmd)
+{
+	int	len;
+
+	len = ft_strlen(cmd);
+	write(2, cmd, len);
+	write(2, ": No such file or directory\n", 28);
+	child_exit_nb(mini, 127);
+}
 
 void	invalid_cmd(t_mini *mini, char *not_cmd)
 {

@@ -26,7 +26,7 @@ int	init_main(int ac, char **av, char **env, t_m *m)
 	if (!m->mini)
 		return (-1);
 	copy_env_exp(m->mini, env);
-	set_path_array(m->mini);
+	// set_path_array(m->mini);
 	m->mini->exit_status = 0;
 	m->mini->cmd_array = NULL;
 	m->mini->nbr_cmd = 0;

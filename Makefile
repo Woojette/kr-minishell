@@ -23,6 +23,7 @@ SRCS_FILES = 	minishell_main.c \
 				execute/path_utils.c \
 				execute/file_utils.c \
 				execute/redirection.c \
+				execute/redirection_utils.c \
 				execute/control_c.c \
 				execute/clean_utils.c \
 				execute/dups.c \
@@ -78,7 +79,8 @@ SRCS_FILES = 	minishell_main.c \
 				parsing/main_parsing_all.c \
 				parsing/main_parsing_cmd.c \
 				parsing/main_parsing_erreur.c \
-				parsing/main_parsing_init.c
+				parsing/main_parsing_init.c \
+				parsing/test.c
 
 
 SRCS = $(addprefix $(SRC_DIR)/, $(SRCS_FILES))

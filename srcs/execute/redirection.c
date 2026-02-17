@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 11:47:45 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/16 17:15:42 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/17 06:09:34 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,47 @@ static void	set_pipe(t_mini *mini, int in_save, int out_save)
 	ft_close(out_save);
 }
 
+// int	one_builtin_avec_redirs(t_mini *mini)
+// {
+// 	t_cmd		*c;
+// 	int			type;
+// 	const int	in_save = dup(0);
+// 	const int	out_save = dup(1);
+
+// 	type = is_built_in(c->cmd[0]);
+// 	c = &mini->cmd_array[0];
+// 	dup_check(mini, in_save, out_save);
+// 	if (c->inout_fail)
+// 		return (close_save_exit_status(mini, in_save, out_save));
+// 	if (!c->cmd || !c->cmd[0])
+// 	{
+// 		close(in_save);
+// 		close(out_save);
+// 		return (mini->exit_status = 1);
+// 	}
+// 	// type = is_built_in(c->cmd[0]);
+// 	if (c->fd_in >= 0)
+// 		obar_util(mini, 0);
+// 	if (c->fd_out >= 0)
+// 		obar_util(mini, 1);
+// 	if (type == T_EXIT)
+// 	{
+// 		close(in_save);
+// 		close(out_save);
+// 		ft_exit(c->cmd, mini);
+// 		return (mini->exit_status);
+// 	}
+// 	execute_built_in(mini, c->cmd, type);
+// 	set_pipe(mini, in_save, out_save);
+// 	return (mini->exit_status);
+// }
+
+void ft_close_save(int in_save, int out_save)
+{
+	ft_close(in_save);
+	ft_close(out_save);
+}
+
 int	one_builtin_avec_redirs(t_mini *mini)
 {
 	t_cmd		*c;
@@ -89,26 +130,18 @@ int	one_builtin_avec_redirs(t_mini *mini)
 	c = &mini->cmd_array[0];
 	type = is_built_in(c->cmd[0]);
 	if (c->inout_fail)
-	{
-		close(in_save);
-		close(out_save);
-		return (mini->exit_status);
-	}
+		return (ft_close_save(in_save, out_save), mini->exit_status);
 	if (!c->cmd || !c->cmd[0])
-	{
-		close(in_save);
-		close(out_save);
-		return (mini->exit_status = 1);
-	}
+		return (ft_close_save(in_save, out_save), mini->exit_status = 1);
 	if (c->fd_in >= 0)
 		obar_util(mini, 0);
 	if (c->fd_out >= 0)
 		obar_util(mini, 1);
 	if (type == T_EXIT)
 	{
-		close(in_save);
-		close(out_save);
+		ft_close_save(in_save, out_save);
 		ft_exit(c->cmd, mini);
+		set_pipe(mini, in_save, out_save);
 		return (mini->exit_status);
 	}
 	execute_built_in(mini, c->cmd, type);

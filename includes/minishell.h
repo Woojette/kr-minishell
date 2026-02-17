@@ -374,6 +374,7 @@ void control_c(t_mini *mini);
 void	termios_back(t_mini *mini);
 
 // dups.c
+void	dup_check(t_mini *mini, int in_save, int out_save);
 void	p_dup2(t_mini *mini, int fd_has, int fd_to);
 void	c_dup2(t_mini *mini, int fd_has, int fd_to);
 void	ft_close(int fd);
@@ -394,6 +395,7 @@ void	child_exit_nb(t_mini *mini, int nb_exit);
 // execute_manager.c
 void	invalid_cmd(t_mini *mini, char *not_cmd);
 void	ft_execute(t_mini *mini, t_cmd *cmd);
+void	no_path(t_mini *mini, char *cmd);
 
 // file_utils.c
 int	is_directory(char *file_path);
@@ -436,7 +438,7 @@ int	preparer_temp_file_name(t_mini *mini, int j, int n);
 
 // path_utils.c
 char	*get_env_path(t_mini *mini);
-void	set_path_array(t_mini *mini);
+void	set_path_array(t_mini *mini, char *str);
 char	*get_path_absolute(t_mini *mini, char *cmd);
 char	*get_path_absolute(t_mini *mini, char *cmd);
 char	*get_path_envp(t_mini *mini, char *cmd);
@@ -473,6 +475,10 @@ int	redirection_center(t_mini *mini);
 void	apply_redirection_child(t_mini *mini, t_cmd *cmd);
 void	obar_util(t_mini *mini, int flag);
 int	one_builtin_avec_redirs(t_mini *mini);
+
+// redirection_utils.c
+void	close_save(int in_save, int out_save);
+int	close_save_exit_status(t_mini *mini, int in_save, int out_save);
 
 // built-ins
 //builtin_utils.c

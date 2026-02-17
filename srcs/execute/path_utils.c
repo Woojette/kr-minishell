@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 17:17:38 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/16 18:53:22 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/17 02:42:57 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ char	*get_env_path(t_mini *mini)
 	return (NULL);
 }
 
-void	set_path_array(t_mini *mini)
+void	set_path_array(t_mini *mini, char *cmd)
 {
 	char	*env_path;
 	int		i;
@@ -38,7 +38,7 @@ void	set_path_array(t_mini *mini)
 		return ;
 	env_path = get_env_path(mini);
 	if (!env_path)
-		fatal_error(mini, "PATH not found");
+		no_path(mini, cmd);
 	mini->path_array = ft_split(env_path, ':');
 	if (!mini->path_array)
 		fatal_error(mini, "malloc error on PATH split");
@@ -119,7 +119,7 @@ char	*cmd_path_center(t_mini *mini, char *cmd)
 			mini->exit_status = 127;
 		return (found_path);
 	}
-	set_path_array(mini);
+	set_path_array(mini, cmd);
 	found_path = get_path_envp(mini, cmd);
 	return (found_path);
 }
