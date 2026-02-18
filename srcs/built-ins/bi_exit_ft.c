@@ -56,3 +56,21 @@ long long	ft_exit_atoi_long(const char *str, int *error)
 	}
 	return (nb * signe);
 }
+
+void	exit_clean(t_mini *mini)
+{
+	t_m	*m;
+
+	m = (t_m *)mini->m_ptr;
+	if (m)
+	{
+		if (m->parsing)
+			free_tokens(&m->parsing);
+		if (m->line)
+			free(m->line);
+		m->parsing = NULL;
+		m->line = NULL;
+	}
+	termios_back(mini);
+	free_mini(mini);
+}

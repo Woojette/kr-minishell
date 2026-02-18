@@ -96,6 +96,15 @@ typedef struct s_cd_buf
 	char	pwd[1024];
 }	t_cd_buf;
 
+typedef struct s_unset
+{
+	int		j;
+	int		supprime;
+	int		taille;
+	int		len_str;
+	char	**env_supprime;
+}	t_unset;
+
 
 typedef struct s_redir
 {
@@ -178,14 +187,6 @@ typedef struct s_m
 	// struct termios	orig_term;
 }	t_m;
 
-
-// typedef struct s_mini
-// {
-// 	char	**env;
-// 	int		exit_status;
-// 	t_cmd	*cmd; // tableau de structures cmd (divise par pipe)
-// 	int		nbr_cmd; // nombre de commandes (nombre de structures cmd dans cmd_tab)
-// }	t_mini;
 
 
 

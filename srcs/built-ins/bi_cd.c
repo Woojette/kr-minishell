@@ -30,13 +30,11 @@ int	ft_cd_sans_av(char **val, char **path, char *str, t_mini *mini)
 	new_oldpwd = getcwd(NULL, 0);
 	if (chdir((*path)) == -1)
 	{
-		// free path
 		perror("chdir");
 		return (-1);
 	}
 	new_pwd = getcwd(NULL, 0);
 	ft_cd_env_update(new_oldpwd, new_pwd, mini);
-	// free path
 	return (0);
 }
 
@@ -48,7 +46,6 @@ int	ft_cd_tiret(char *oldpwd, char **path, t_mini *mini)
 	oldpwd = ft_cd_val_env("OLDPWD=", mini);
 	if ((oldpwd) == NULL)
 	{
-		// free oldpwd
 		printf("minishell: cd: OLDPWD not set\n");
 		return (-1);
 	}
@@ -59,7 +56,6 @@ int	ft_cd_tiret(char *oldpwd, char **path, t_mini *mini)
 	{
 		printf("cd: %s", (*path));
 		printf(": No such file or directory\n");
-		// free path
 		return (-1);
 	}
 	if (getcwd(new_pwd, sizeof(new_pwd)) == NULL)
@@ -99,7 +95,6 @@ int	ft_cd_all(char **tab, t_mini *mini)
 	if (tab[1] == NULL || (tab[1][0] == '~' && tab[1][1] == '\0'))
 	{
 		if (ft_cd_sans_av(&home, &path, "HOME=", mini) == -1)
-		// free path
 			return (mini->exit_status = 1);
 		return (mini->exit_status = 0);
 	}

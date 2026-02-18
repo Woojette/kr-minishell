@@ -12,11 +12,6 @@
 
 #include "minishell.h"
 
-// Si on met -n, option_n = 1, 
-// echo -nnn -n -nnn arg => option_n = 1 (affiche : arg)
-// echo -nnnn -n -nnann -n arg => option_n = 1 (affiche : -nnann -n arg)
-// sinon option_n = 0
-
 int	ft_echo_option_n(char *str)
 {
 	int	i;
@@ -58,20 +53,3 @@ void	ft_echo_all(t_mini *mini, char **tab)
 		printf("\n");
 	mini->exit_status = 0;
 }
-
-// void	ft_echo(char *str)
-// {
-// 	int	option_n;
-
-// 	option_n = ft_echo_option_n(str);
-// 	printf("%s", str);
-// 	if (option_n == 0)
-// 		printf("\n");
-// }
-
-// void	ft_echo(char *str, int option_n)
-// {
-// 	printf("%s", str);
-// 	if (option_n == 0)
-// 		printf("\n");
-// }
