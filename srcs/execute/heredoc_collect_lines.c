@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 12:32:59 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/15 18:27:07 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/18 17:39:34 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,13 @@ int	write_line(int fd, char *str)
 	return (0);
 }
 
+int	cut_while_c_l(void)
+{
+	if (g_exit_status == 130)
+		return (-2);
+	return (1);
+}
+
 int	while_collect_lines(int fd, t_mini *mini, int j, int n)
 {
 	char	*line;
@@ -39,11 +46,7 @@ int	while_collect_lines(int fd, t_mini *mini, int j, int n)
 	{
 		line = readline("> ");
 		if (!line)
-		{
-			if (g_exit_status == 130)
-				return (-2);
-			return (1);
-		}
+			return (cut_while_c_l());
 		if (cmd->limiter[n] && ft_strcmp(line, cmd->limiter[n]) == 0)
 			return (free(line), 0);
 		line_applique = util_hd_line(cmd, mini, n, line);
