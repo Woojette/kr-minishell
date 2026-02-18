@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-int	g_exit_status = 0;
+int		g_exit_status = 0;
 
 void	init_avant_prompt(t_m *m)
 {

@@ -14,14 +14,15 @@
 
 int	ft_unset_all(char **tab, t_mini *mini)
 {
-	int	j;
+	int		j;
+	t_unset	u;
 
 	j = 1;
 	while (tab[j] != NULL)
 	{
-		if (ft_unset(tab[j], mini) == -1)
+		if (ft_unset(tab[j], &u, mini) == -1)
 			return (-1);
-		if (ft_unset2(tab[j], mini) == -1)
+		if (ft_unset2(tab[j], &u, mini) == -1)
 			return (-1);
 		j++;
 	}
