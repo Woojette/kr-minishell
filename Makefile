@@ -46,7 +46,8 @@ SRCS_FILES = 	minishell_main.c \
 				built-ins/bi_export_utils5.c \
 				built-ins/bi_free.c \
 				built-ins/bi_env.c \
-				built-ins/bi_unset.c \
+				built-ins/bi_unset_all.c \
+				built-ins/bi_unset_appliquer.c \
 				built-ins/bi_exit.c \
 				built-ins/bi_exit_child.c \
 				built-ins/bi_exit_ft.c \

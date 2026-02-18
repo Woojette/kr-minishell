@@ -526,10 +526,12 @@ void	ft_env(t_mini *mini);
 int	ft_check_env_egal(char *str);
 int	ft_check_env_double(char *str, t_mini *mini);
 //unset
-int	ft_unset_all(char **tab, t_mini *mini);
-int	ft_unset(char *str, t_mini *mini);
-int	ft_unset2(char *str, t_mini *mini);
-void	ft_unset_init_int_zero(int *j, int *supprime, int *taille);
+int		ft_unset_all(char **tab, t_mini *mini);
+int		ft_unset(char *str, t_mini *mini);
+int		ft_unset_init(char *str, t_unset *u, t_mini *mini);
+int		ft_unset2(char *str, t_mini *mini);
+int		ft_unset2_init(char *str, t_unset *u, t_mini *mini);
+int		ft_unset_path(char *str, t_mini *mini);
 //exit
 void	ft_exit_sans_arg(t_mini *mini);
 void	ft_exit_normal_arg(long long val, t_mini *mini);
