@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 17:17:10 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/18 18:54:45 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/18 23:19:49 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,10 +72,11 @@ int	work_appliquer(t_mini *mini, int j, int n, t_hd_enfant *he)
 	return (0);
 }
 
-int	appliquer_heredoc_cmd(t_mini *mini, int j, t_hd_enfant *he)
+int	appliquer_heredoc_cmd(t_mini *mini, int j)
 {
-	int	n;
-	int	set;
+	int			n;
+	int			set;
+	t_hd_enfant	he;
 
 	set = before_appliquer(mini, j);
 	if (set <= 0)
@@ -83,7 +84,7 @@ int	appliquer_heredoc_cmd(t_mini *mini, int j, t_hd_enfant *he)
 	n = 0;
 	while (n < mini->cmd_array[j].compter_heredoc)
 	{
-		if (work_appliquer(mini, j, n, he) == -1)
+		if (work_appliquer(mini, j, n, &he) == -1)
 			return (-1);
 		n++;
 	}

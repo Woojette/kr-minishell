@@ -187,6 +187,14 @@ typedef struct s_m
 	// struct termios	orig_term;
 }	t_m;
 
+typedef struct s_hd_enfant
+{
+	t_mini *mini;
+	int	j;
+	int	n;
+	int	fd_temp;
+	int	resultat;
+}	t_hd_enfant;
 
 
 
@@ -354,11 +362,11 @@ const char	*get_token_type_str(t_type_token type); // pour tester (enum -> strin
 // char		*get_token_type_state(t_state state); // pour tester type quote
 
 //main_parsing
-int		check_parsing(t_m *m);
+int	check_parsing(t_m *m);
 int		check_readline(t_m *m);
 int		check_syntaxe(t_m *m);
 int		check_erreur_cmd(t_m *m);
-int		check_cmd_heredoc(t_m *m);
+int	check_cmd_heredoc(t_m *m);
 void	erreur_syntaxe(t_m *m, int code);
 void	erreur_parse(t_m *m);
 void	erreur_cmd(t_m *m);
@@ -412,15 +420,20 @@ void	free_round(t_mini *mini);
 // heredoc_collect_lines.c
 char	*util_hd_line(t_cmd *cmd, t_mini *mini, int n, char *line);
 int	write_line(int fd, char *str);
-int	while_collet_lines(int fd, t_mini *mini, int j, int n);
+int	while_collect_lines(int fd, t_mini *mini, int j, int n);
 int	collecter_heredoc_lines(int fd, t_mini *mini, int j, int n);
+int	cut_while_c_l(void);
 
 // heredoc_enfant.c
 void	util_struct_check(t_mini *mini, int j, int n);
 void	util_close_exit(t_mini *mini, int fd_temp, int exit_flag);
 void	sig_hd(t_mini *mini);
 void	perexit(t_mini *mini, int exit_flag);
-void	appliquer_heredoc_enfant(t_mini *mini, int j, int n);
+void	appliquer_heredoc_enfant(t_hd_enfant *he);
+void	hd_child_cleanup(t_mini *mini, int fd_temp);
+
+// heredoc_enfat_util.c
+void	sig_hd_handler(int sig);
 
 // heredoc_limiter.c
 int	check_quote_limiter(char *limiter);
@@ -430,8 +443,10 @@ int	check_heredoc_env(char *limiter);
 int	before_appliquer(t_mini *mini, int j);
 void	reduce_1(t_mini *mini, int j);
 void	reduce_2(t_mini *mini, int j, int status);
-int	work_appliquer(t_mini *mini, int j, int n);
+int	work_appliquer(t_mini *mini, int j, int n, t_hd_enfant *he);
 int	appliquer_heredoc_cmd(t_mini *mini, int j);
+int	cut_wa(t_mini *mini, int j, int exit_status);
+//heredoc_refac_util.c
 
 // heredoc_temp_file.c
 char	*temp_file_name(int j, int n);
@@ -526,11 +541,11 @@ void	ft_env(t_mini *mini);
 int	ft_check_env_egal(char *str);
 int	ft_check_env_double(char *str, t_mini *mini);
 //unset
-int		ft_unset_all(char **tab, t_mini *mini);
+int	ft_unset_all(char **tab, t_mini *mini);
 int		ft_unset(char *str, t_unset *u, t_mini *mini);
 int		ft_unset_init(char *str, t_unset *u, t_mini *mini);
 int		ft_unset2(char *str, t_unset *u, t_mini *mini);
-int		ft_unset2_init(char *str, t_unset *u, t_mini *mini);
+int	    ft_unset2_init(char *str, t_unset *u, t_mini *mini);
 int		ft_unset_path(char *str, t_mini *mini);
 //exit
 void	ft_exit_sans_arg(t_mini *mini);
@@ -554,13 +569,6 @@ long long	ft_exit_atoi_long(const char *str, int *error);
 //bi_free
 void	ft_free_tab(char **tab);
 void	ft_free_all(t_mini **mini);
-
-//test
-// void	print_tokens(t_token *token);
-// void	print_tab_char(char **tab);
-// void	print_tab_int(int *tab, int size);
-// void	print_cmd(t_cmd *cmd, int index);
-// void	print_cmd_array(t_cmd *cmd_array, int nbr_cmd);
 
 // main exec
 void	execution_main(t_mini *mini);

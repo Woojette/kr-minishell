@@ -12,6 +12,8 @@ LIBS = -lreadline -lncurses $(LIBFT_DIR)/libft.a
 
 SRCS_FILES = 	minishell_main.c \
 				execute/heredoc_refac.c \
+				execute/heredoc_refac_util.c \
+				execute/heredoc_enfant_util.c \
 				execute/free_parsing_refac.c \
 				execute/env_exp_utils.c \
 				execute/redir_inout_refac.c \
@@ -23,6 +25,7 @@ SRCS_FILES = 	minishell_main.c \
 				execute/path_utils.c \
 				execute/file_utils.c \
 				execute/redirection.c \
+				execute/redirection_center.c \
 				execute/redirection_utils.c \
 				execute/control_c.c \
 				execute/clean_utils.c \
