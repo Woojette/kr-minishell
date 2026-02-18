@@ -37,7 +37,7 @@ int	ft_unset_init(char *str, t_unset *u, t_mini *mini)
 
 int	ft_unset_path(char *str, t_mini *mini)
 {
-	if (!str || !mini || !mini->env)
+	if (!str || !mini)
 		return (-1);
 	if (ft_strcmp(str, "PATH") == 0)
 	{
@@ -64,12 +64,9 @@ int	ft_unset(char *str, t_unset *u, t_mini *mini)
 			(u->supprime)++;
 			continue ;
 		}
-		if (((u->j) + (u->supprime)) < (u->taille))
-		{
-			u->env_supprime[(u->j)] = ft_strdup((mini->env)[(u->j) + (u->supprime)]);
-			if (!u->env_supprime[(u->j)])
-				return (ft_free_tab(u->env_supprime), -1);
-		}
+		u->env_supprime[(u->j)] = ft_strdup((mini->env)[(u->j) + (u->supprime)]);
+		if (!u->env_supprime[(u->j)])
+			return (ft_free_tab(u->env_supprime), -1);
 		u->j++;
 	}
 	u->env_supprime[u->j] = NULL;
