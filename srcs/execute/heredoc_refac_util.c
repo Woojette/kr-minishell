@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/18 17:29:07 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/18 17:29:08 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/19 19:33:57 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,4 +34,14 @@ int	before_appliquer(t_mini *mini, int j)
 		}
 	}
 	return (1);
+}
+
+void	struct_hdenfant(t_hd_enfant *he, t_mini *mini, int j, int n)
+{
+	ft_bzero(he, sizeof(*he));
+	he->mini = mini;
+	he->j = j;
+	he->n = n;
+	he->fd_temp = -1;
+	he->resultat = 0;
 }

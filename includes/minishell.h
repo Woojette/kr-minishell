@@ -440,6 +440,7 @@ int			work_appliquer(t_mini *mini, int j, int n, t_hd_enfant *he);
 int			appliquer_heredoc_cmd(t_mini *mini, int j);
 int			cut_wa(t_mini *mini, int j, int exit_status);
 //heredoc_refac_util.c
+void	struct_hdenfant(t_hd_enfant *he, t_mini *mini, int j, int n);
 
 // heredoc_temp_file.c
 char		*temp_file_name(int j, int n);
