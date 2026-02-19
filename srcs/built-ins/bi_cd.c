@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 11:44:27 by wooyang           #+#    #+#             */
-/*   Updated: 2026/02/16 22:38:11 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/19 20:46:31 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,6 @@ int	ft_cd_all(char **tab, t_mini *mini)
 		resultat = check_cd_tiret_ou_move(tab, mini, &buf, &path);
 		if (resultat <= 0)
 			return (resultat);
-		// ft_cd_env_update(buf.oldpwd, buf.pwd, mini);
 		return (mini->exit_status = 0);
 	}
 	return (mini->exit_status = 0);

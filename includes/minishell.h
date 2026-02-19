@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: wooyang <wooyang@student.42.fr>            +#+  +:+       +#+        */
+/*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/18 21:25:44 by wooyang           #+#    #+#             */
-/*   Updated: 2026/02/18 21:25:48 by wooyang          ###   ########.fr       */
+/*   Updated: 2026/02/19 20:45:51 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,17 +175,14 @@ typedef struct s_m
 
 typedef struct s_hd_enfant
 {
-	t_mini *mini;
-	int	j;
-	int	n;
-	int	fd_temp;
-	int	resultat;
+	t_mini			*mini;
+	int				j;
+	int				n;
+	int				fd_temp;
+	int				resultat;
 }	t_hd_enfant;
 
-
-
-// ======================================================= token =======================================================
-
+// ============ token ==============
 
 // cmd_add_all.c
 int			appliquer_add_cmd_pipe(t_token *token, t_cmd *cmd,
@@ -440,7 +437,7 @@ int			work_appliquer(t_mini *mini, int j, int n, t_hd_enfant *he);
 int			appliquer_heredoc_cmd(t_mini *mini, int j);
 int			cut_wa(t_mini *mini, int j, int exit_status);
 //heredoc_refac_util.c
-void	struct_hdenfant(t_hd_enfant *he, t_mini *mini, int j, int n);
+void		struct_hdenfant(t_hd_enfant *he, t_mini *mini, int j, int n);
 
 // heredoc_temp_file.c
 char		*temp_file_name(int j, int n);
