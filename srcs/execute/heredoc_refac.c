@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 17:17:10 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/18 23:19:49 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/19 19:33:38 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,7 @@ int	appliquer_heredoc_cmd(t_mini *mini, int j)
 	n = 0;
 	while (n < mini->cmd_array[j].compter_heredoc)
 	{
+		struct_hdenfant(&he, mini, j, n);
 		if (work_appliquer(mini, j, n, &he) == -1)
 			return (-1);
 		n++;
