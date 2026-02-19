@@ -40,19 +40,19 @@ int	ft_cd_env_update(char *oldpwd, char *pwd, t_mini *mini)
 	j = 0;
 	while ((mini->env)[j] != NULL)
 	{
-		if (ft_strncmp((mini->env)[j], "OLDPWD=", 7) == 0)
+		if (ft_strncmp((mini->env)[j], "OLDPWD=", 7) == 0 && oldpwd)
 		{
 			temp = ft_strjoin("OLDPWD=", oldpwd);
 			if (!temp)
-				return (-1);
+				return (free(pwd), -1);
 			free((mini->env)[j]);
 			(mini->env)[j] = temp;
 		}
-		else if (ft_strncmp((mini->env)[j], "PWD=", 4) == 0)
+		else if (ft_strncmp((mini->env)[j], "PWD=", 4) == 0 && pwd)
 		{
 			temp = ft_strjoin("PWD=", pwd);
 			if (!temp)
-				return (-1);
+				return (free(oldpwd), -1);
 			free((mini->env)[j]);
 			(mini->env)[j] = temp;
 		}

@@ -63,7 +63,7 @@ int	ft_unset(char *str, t_unset *u, t_mini *mini)
 	if (ft_unset_init(str, u, mini) == -1)
 		return (-1);
 	if (ft_unset_path(str, mini) == -1)
-		return (-1);
+		return (ft_free_tab(u->env_supprime), -1);
 	while ((mini->env)[(u->j) + (u->supprime)] != NULL)
 	{
 		if ((((u->j) + (u->supprime)) < (u->taille)) && ft_strncmp(str,
@@ -91,7 +91,7 @@ int	ft_unset2(char *str, t_unset *u, t_mini *mini)
 	if (ft_unset2_init(str, u, mini) == -1)
 		return (-1);
 	if (ft_unset_path(str, mini) == -1)
-		return (-1);
+		return (ft_free_tab(u->env_supprime), -1);
 	while ((mini->save_ex)[u->j + u->supprime] != NULL)
 	{
 		if (((u->j + u->supprime) < u->taille) && ft_strncmp(str,
