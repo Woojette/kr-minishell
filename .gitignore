@@ -3,3 +3,7 @@
 /objs
 
 *.o
+
+minishell
+
+.vscode

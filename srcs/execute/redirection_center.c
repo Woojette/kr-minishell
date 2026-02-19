@@ -1,49 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   dups.c                                             :+:      :+:    :+:   */
+/*   redirection_center.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/02/15 11:42:21 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/16 18:53:47 by yookyeoc         ###   ########.fr       */
+/*   Created: 2026/02/18 17:33:18 by yookyeoc          #+#    #+#             */
+/*   Updated: 2026/02/18 17:33:19 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	p_dup2(t_mini *mini, int fd_has, int fd_to)
+int	redirection_center(t_mini *mini)
 {
-	int	result;
+	int		i;
+	t_cmd	*c;
 
-	result = dup2(fd_has, fd_to);
-	if (result == -1)
+	i = 0;
+	if (!mini || !mini->cmd_array || mini->nbr_cmd <= 0)
+		return (-1);
+	while (i < mini->nbr_cmd)
 	{
-		perror("dup2");
-		mini->exit_status = 1;
+		c = &mini->cmd_array[i];
+		if (!c->inout_fail)
+			inout_redir(mini, i);
+		i++;
 	}
-}
-
-void	c_dup2(t_mini *mini, int fd_has, int fd_to)
-{
-	int	result;
-
-	(void)mini;
-	result = dup2(fd_has, fd_to);
-	if (result == -1)
-	{
-		perror("dup2");
-		exit(1);
-	}
-}
-
-void	ft_close(int fd)
-{
-	int	result;
-
-	result = close(fd);
-	if (result == -1)
-	{
-		perror("close problem");
-	}
+	return (0);
 }

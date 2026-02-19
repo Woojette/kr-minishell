@@ -6,29 +6,11 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 11:47:45 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/17 06:09:34 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/18 17:34:58 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-int	redirection_center(t_mini *mini)
-{
-	int		i;
-	t_cmd	*c;
-
-	i = 0;
-	if (!mini || !mini->cmd_array || mini->nbr_cmd <= 0)
-		return (-1);
-	while (i < mini->nbr_cmd)
-	{
-		c = &mini->cmd_array[i];
-		if (!c->inout_fail)
-			inout_redir(mini, i);
-		i++;
-	}
-	return (0);
-}
 
 void	apply_redirection_child(t_mini *mini, t_cmd *cmd)
 {
@@ -79,42 +61,7 @@ static void	set_pipe(t_mini *mini, int in_save, int out_save)
 	ft_close(out_save);
 }
 
-// int	one_builtin_avec_redirs(t_mini *mini)
-// {
-// 	t_cmd		*c;
-// 	int			type;
-// 	const int	in_save = dup(0);
-// 	const int	out_save = dup(1);
-
-// 	type = is_built_in(c->cmd[0]);
-// 	c = &mini->cmd_array[0];
-// 	dup_check(mini, in_save, out_save);
-// 	if (c->inout_fail)
-// 		return (close_save_exit_status(mini, in_save, out_save));
-// 	if (!c->cmd || !c->cmd[0])
-// 	{
-// 		close(in_save);
-// 		close(out_save);
-// 		return (mini->exit_status = 1);
-// 	}
-// 	// type = is_built_in(c->cmd[0]);
-// 	if (c->fd_in >= 0)
-// 		obar_util(mini, 0);
-// 	if (c->fd_out >= 0)
-// 		obar_util(mini, 1);
-// 	if (type == T_EXIT)
-// 	{
-// 		close(in_save);
-// 		close(out_save);
-// 		ft_exit(c->cmd, mini);
-// 		return (mini->exit_status);
-// 	}
-// 	execute_built_in(mini, c->cmd, type);
-// 	set_pipe(mini, in_save, out_save);
-// 	return (mini->exit_status);
-// }
-
-void ft_close_save(int in_save, int out_save)
+void	ft_close_save(int in_save, int out_save)
 {
 	ft_close(in_save);
 	ft_close(out_save);

@@ -173,6 +173,20 @@ typedef struct s_m
 	t_mini			*mini;
 }	t_m;
 
+typedef struct s_hd_enfant
+{
+	t_mini *mini;
+	int	j;
+	int	n;
+	int	fd_temp;
+	int	resultat;
+}	t_hd_enfant;
+
+
+
+// ======================================================= token =======================================================
+
+
 // cmd_add_all.c
 int			appliquer_add_cmd_pipe(t_token *token, t_cmd *cmd,
 				t_var_cmd *var_cmd);
@@ -399,15 +413,20 @@ void		free_round(t_mini *mini);
 // heredoc_collect_lines.c
 char		*util_hd_line(t_cmd *cmd, t_mini *mini, int n, char *line);
 int			write_line(int fd, char *str);
-int			while_collet_lines(int fd, t_mini *mini, int j, int n);
+int			while_collect_lines(int fd, t_mini *mini, int j, int n);
 int			collecter_heredoc_lines(int fd, t_mini *mini, int j, int n);
+int			cut_while_c_l(void);
 
 // heredoc_enfant.c
 void		util_struct_check(t_mini *mini, int j, int n);
 void		util_close_exit(t_mini *mini, int fd_temp, int exit_flag);
 void		sig_hd(t_mini *mini);
 void		perexit(t_mini *mini, int exit_flag);
-void		appliquer_heredoc_enfant(t_mini *mini, int j, int n);
+void		appliquer_heredoc_enfant(t_hd_enfant *he);
+void		hd_child_cleanup(t_mini *mini, int fd_temp);
+
+// heredoc_enfat_util.c
+void		sig_hd_handler(int sig);
 
 // heredoc_limiter.c
 int			check_quote_limiter(char *limiter);
@@ -417,8 +436,10 @@ int			check_heredoc_env(char *limiter);
 int			before_appliquer(t_mini *mini, int j);
 void		reduce_1(t_mini *mini, int j);
 void		reduce_2(t_mini *mini, int j, int status);
-int			work_appliquer(t_mini *mini, int j, int n);
+int			work_appliquer(t_mini *mini, int j, int n, t_hd_enfant *he);
 int			appliquer_heredoc_cmd(t_mini *mini, int j);
+int			cut_wa(t_mini *mini, int j, int exit_status);
+//heredoc_refac_util.c
 
 // heredoc_temp_file.c
 char		*temp_file_name(int j, int n);
