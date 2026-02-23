@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/16 21:17:23 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/16 21:17:32 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/23 19:27:45 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ void	ft_exit_normal_arg(long long val, t_mini *mini)
 void	ft_exit_pl_arg(t_mini *mini)
 {
 	mini->exit_status = 1;
+	mini->exit_pl_arg = 1;
 	printf("exit\n");
 	printf("minishell: exit: too many arguments\n");
 }

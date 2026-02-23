@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   free_token_tab.c                                   :+:      :+:    :+:   */
+/*   main_parsing_init.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: wooyang <wooyang@student.42.fr>            +#+  +:+       +#+        */
+/*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 11:44:27 by wooyang           #+#    #+#             */
-/*   Updated: 2025/05/14 15:55:42 by wooyang          ###   ########.fr       */
+/*   Updated: 2026/02/23 19:28:52 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,5 +32,6 @@ int	init_main(int ac, char **av, char **env, t_m *m)
 	set_exit(&m->mini->exit_status);
 	m->mini->exit_status = 0;
 	m->mini->m_ptr = m;
+	m->mini->exit_pl_arg = -1;
 	return (0);
 }

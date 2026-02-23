@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 11:47:45 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/18 17:34:58 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/23 19:38:22 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,8 @@ int	one_builtin_avec_redirs(t_mini *mini)
 	{
 		ft_close_save(in_save, out_save);
 		ft_exit(c->cmd, mini);
+		if (mini->exit_pl_arg == 1)
+			return (mini->exit_pl_arg = -1);
 		set_pipe(mini, in_save, out_save);
 		return (mini->exit_status);
 	}

@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 17:29:24 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/16 18:48:33 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/23 19:35:55 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,11 @@ static void	cc_cut(t_mini *mini, int *pipe_fd, int i)
 static void	cc_cut2(t_mini *mini, int *pipe_fd, int i)
 {
 	ft_exit2(mini->cmd_array[i].cmd, mini);
+	// if (mini->exit_pl_arg == 1)
+	// {
+	// 	mini->exit_pl_arg = -1;
+	// 	return ;
+	// }
 	set_pipe_exit(mini, pipe_fd);
 	child_exit(mini);
 }

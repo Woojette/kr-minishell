@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/18 21:25:44 by wooyang           #+#    #+#             */
-/*   Updated: 2026/02/19 20:45:51 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/23 19:29:36 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,6 +160,7 @@ typedef struct s_mini
 	struct termios	orig_term;
 	char			**save_ex;
 	void			*m_ptr;
+	int				exit_pl_arg;
 }	t_mini;
 
 typedef struct s_m
