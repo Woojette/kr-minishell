@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 11:43:23 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/15 11:43:24 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/24 00:51:40 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,28 @@ void	free_mini(t_mini *mini)
 	mini->save_ex = NULL;
 	if (mini->pipe_read_end >= 0)
 		close(mini->pipe_read_end);
+	if (mini->m_ptr)
+		free(mini->m_ptr);
+	mini->m_ptr = NULL;
+	free(mini);
+}
+
+void	free_all_child(t_mini *mini)
+{
+	t_m	*m;
+
+	if (!mini)
+		return ;
+	m = (t_m *)mini->m_ptr;
+	if (m)
+		free_tokens(&m->parsing);
+	if (mini->env)
+		free_tab_char(mini->env);
+	free_round(mini);
+	mini->env = NULL;
+	if (mini->save_ex)
+		free_tab_char(mini->save_ex);
+	mini->save_ex = NULL;
 	if (mini->m_ptr)
 		free(mini->m_ptr);
 	mini->m_ptr = NULL;

@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 11:44:27 by wooyang           #+#    #+#             */
-/*   Updated: 2026/02/17 02:45:28 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/24 05:35:24 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	init_avant_prompt(t_m *m)
 	init_signaux();
 	if (g_exit_status != 0)
 	{
-		m->mini->exit_status = g_exit_status;
+		m->mini->exit_status = 128 + g_exit_status;
 		g_exit_status = 0;
 	}
 }

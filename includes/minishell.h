@@ -6,12 +6,15 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/18 21:25:44 by wooyang           #+#    #+#             */
-/*   Updated: 2026/02/23 19:29:36 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/24 05:47:33 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
+# ifndef MAX_CMDS
+#  define MAX_CMDS 1024
+# endif
 
 # include "libft.h"
 
@@ -151,6 +154,7 @@ typedef struct s_cmd
 
 typedef struct s_mini
 {
+	t_token			*token;
 	char			**env;
 	int				exit_status;
 	t_cmd			*cmd_array;
@@ -268,6 +272,8 @@ void		init_signaux(void);
 void		appliquer_sigint_prompt(int sig);
 void		print_heredoc_warning_ctrl_d(char *delimiter);
 void		set_exit(int *exit_status);
+void		print_sig_msg(int status);
+
 // token_all.c
 int			traiter_redirection(char **line, t_token **token,
 				t_type_token *fd_type);
@@ -407,6 +413,7 @@ int			does_file_exist(char *file_path);
 int			cmd_qqpart(t_mini *mini);
 
 void		free_round(t_mini *mini);
+void		free_all_child(t_mini *mini);
 
 // heredoc_collect_lines.c
 char		*util_hd_line(t_cmd *cmd, t_mini *mini, int n, char *line);
@@ -482,11 +489,14 @@ int			inout_redir(t_mini *mini, int i);
 int			redirection_center(t_mini *mini);
 void		apply_redirection_child(t_mini *mini, t_cmd *cmd);
 void		obar_util(t_mini *mini, int flag);
+void		set_pipe(t_mini *mini, int in_save, int out_save);
+void		ft_close_save(int in_save, int out_save);
 int			one_builtin_avec_redirs(t_mini *mini);
 
 // redirection_utils.c
 void		close_save(int in_save, int out_save);
 int			close_save_exit_status(t_mini *mini, int in_save, int out_save);
+int			obar_t_exit(t_mini *mini, t_cmd *c, int in_save, int out_save);
 
 // built-ins
 //builtin_utils.c

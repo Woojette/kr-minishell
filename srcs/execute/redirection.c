@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 11:47:45 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/23 19:38:22 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/24 01:12:54 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ void	obar_util(t_mini *mini, int flag)
 	}
 }
 
-static void	set_pipe(t_mini *mini, int in_save, int out_save)
+void	set_pipe(t_mini *mini, int in_save, int out_save)
 {
 	p_dup2(mini, in_save, 0);
 	p_dup2(mini, out_save, 1);
@@ -85,14 +85,7 @@ int	one_builtin_avec_redirs(t_mini *mini)
 	if (c->fd_out >= 0)
 		obar_util(mini, 1);
 	if (type == T_EXIT)
-	{
-		ft_close_save(in_save, out_save);
-		ft_exit(c->cmd, mini);
-		if (mini->exit_pl_arg == 1)
-			return (mini->exit_pl_arg = -1);
-		set_pipe(mini, in_save, out_save);
-		return (mini->exit_status);
-	}
+		return (obar_t_exit(mini, c, in_save, out_save));
 	execute_built_in(mini, c->cmd, type);
 	set_pipe(mini, in_save, out_save);
 	return (mini->exit_status);

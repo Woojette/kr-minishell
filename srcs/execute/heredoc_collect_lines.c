@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 12:32:59 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/18 17:39:34 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/24 05:39:38 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ int	write_line(int fd, char *str)
 
 int	cut_while_c_l(void)
 {
-	if (g_exit_status == 130)
+	if (g_exit_status == SIGINT)
 		return (-2);
 	return (1);
 }

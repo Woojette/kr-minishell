@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 11:42:42 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/17 02:43:05 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/23 20:55:35 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	invalid_cmd(t_mini *mini, char *not_cmd)
 	mini->exit_status = 127;
 	write(2, not_cmd, len);
 	write(2, ": command not found\n", 21);
-	child_exit(mini);
+	child_exit_nb(mini, 127);
 }
 
 void	ft_execute(t_mini *mini, t_cmd *cmd)

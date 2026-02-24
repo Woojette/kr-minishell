@@ -36,6 +36,7 @@ SRCS_FILES = 	minishell_main.c \
 				execute/heredoc_collect_lines.c \
 				execute/process_manager_p_c.c \
 				execute/process_manager_util_child.c \
+				execute/signaux_exec.c \
 				built-ins/builtin_utils.c \
 				built-ins/bi_cd.c \
 				built-ins/bi_cd_env.c \
@@ -59,7 +60,6 @@ SRCS_FILES = 	minishell_main.c \
 				parsing/env_var.c \
 				parsing/quote_enlever.c \
 				parsing/signaux.c \
-				parsing/signaux_init.c \
      			parsing/token_all.c \
 				parsing/token_parse_if.c \
 				parsing/token_parse_redir.c \

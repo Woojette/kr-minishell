@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 11:41:39 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/17 02:42:31 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/23 21:24:42 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,6 @@ void	child_exit(t_mini *mini)
 
 void	child_exit_nb(t_mini *mini, int nb_exit)
 {
-	free_round(mini);
+	free_all_child(mini);
 	exit(nb_exit);
 }

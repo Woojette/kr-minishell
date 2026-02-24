@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/18 17:50:57 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/18 17:50:58 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/24 05:39:06 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,7 @@ void	sig_hd(t_mini *mini)
 
 void	sig_hd_handler(int sig)
 {
-	(void)sig;
-	g_exit_status = 130;
+	g_exit_status = sig;
 	write(1, "\n", 1);
 	close(STDIN_FILENO);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   free_token_tab.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: wooyang <wooyang@student.42.fr>            +#+  +:+       +#+        */
+/*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 11:44:27 by wooyang           #+#    #+#             */
-/*   Updated: 2025/05/14 15:55:42 by wooyang          ###   ########.fr       */
+/*   Updated: 2026/02/23 21:30:55 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ void	free_tokens(t_token **token)
 {
 	t_token	*tmp;
 
+	if (!token)
+		return ;
 	while (*token)
 	{
 		tmp = *token;

@@ -6,7 +6,7 @@
 /*   By: yookyeoc <yookyeoc@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/15 17:27:52 by yookyeoc          #+#    #+#             */
-/*   Updated: 2026/02/19 15:21:29 by yookyeoc         ###   ########.fr       */
+/*   Updated: 2026/02/24 00:43:26 by yookyeoc         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,10 @@
 
 void	before(t_mini *mini, t_cmd cmd)
 {
+	if (cmd.inout_fail)
+		child_exit_nb(mini, 1);
 	if (!cmd.cmd || !cmd.cmd[0])
-		child_exit(mini);
+		child_exit_nb(mini, 0);
 }
 
 void	first(t_mini *mini, int *pipe_fd)
